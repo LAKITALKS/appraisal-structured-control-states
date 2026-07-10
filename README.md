@@ -3,6 +3,8 @@
 *A Preregistered Hypothesis and Experimental Design for Task-Induced
 Response-Strategy Modulation*
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21294932.svg)](https://doi.org/10.5281/zenodo.21294932)
+
 **Short name:** ASCR (a working abbreviation used in this repository; not an
 established field term).
 
@@ -123,9 +125,16 @@ make paper                # build paper/preprint.pdf (requires latexmk)
 
 ## How to cite
 
-Please cite via [`CITATION.cff`](CITATION.cff). Until a reviewed release is made,
-cite the repository and commit. A DOI is **pending the first reviewed GitHub
-Release** and is not yet assigned; there is intentionally no DOI badge here.
+Version **v0.1.0** has been publicly archived on Zenodo. Please cite via
+[`CITATION.cff`](CITATION.cff), using the version-specific DOI for the present
+preregistration.
+
+- **This exact version (v0.1.0):** [10.5281/zenodo.21294933](https://doi.org/10.5281/zenodo.21294933)
+- **All versions (concept DOI):** [10.5281/zenodo.21294932](https://doi.org/10.5281/zenodo.21294932)
+
+Citations of this preregistration should use the version-specific DOI,
+[10.5281/zenodo.21294933](https://doi.org/10.5281/zenodo.21294933). The concept
+DOI always resolves to the latest archived version.
 
 ## Author
 
