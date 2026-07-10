@@ -17,6 +17,16 @@ authors:
     country: "DE"
     email: "varvatislazaros@gmail.com"
 repository-code: "https://github.com/LAKITALKS/appraisal-structured-control-states"
+preferred-citation:
+  type: report
+  title: "Toward Appraisal-Structured Latent Control Representations in Language Models: A Preregistered Hypothesis and Experimental Design for Task-Induced Response-Strategy Modulation"
+  authors:
+    - family-names: "Varvatis"
+      given-names: "Lazaros"
+  year: 2026
+  version: "0.1.0"
+  url: "https://github.com/LAKITALKS/appraisal-structured-control-states"
+  notes: "Preregistration draft; reports no experimental results."
 keywords:
   - "mechanistic interpretability"
   - "representation engineering"
