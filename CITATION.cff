@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite it as below."
+title: "Toward Appraisal-Structured Latent Control Representations in Language Models: A Preregistered Hypothesis and Experimental Design for Task-Induced Response-Strategy Modulation"
+abstract: >-
+  A preregistered hypothesis and experimental-design note proposing that several
+  known single-behavior latent directions in language models (refusal, abstention,
+  uncertainty reporting, evaluation awareness) may be special cases of a more
+  general family of task-induced, appraisal-structured latent control
+  representations that partially govern response-strategy selection across
+  domains. This version reports no experimental results.
+type: dataset
+version: "0.1.0"
+authors:
+  - family-names: "Varvatis"
+    given-names: "Lazaros"
+    city: "Berlin"
+    country: "DE"
+    email: "varvatislazaros@gmail.com"
+repository-code: "https://github.com/LAKITALKS/appraisal-structured-control-states"
+keywords:
+  - "mechanistic interpretability"
+  - "representation engineering"
+  - "activation steering"
+  - "latent control representation"
+  - "response strategy"
+  - "task induction"
+  - "appraisal structure"
+  - "language models"
+  - "AI safety"
+license: "CC-BY-4.0"

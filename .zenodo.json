@@ -1,0 +1,27 @@
+{
+  "title": "Toward Appraisal-Structured Latent Control Representations in Language Models: A Preregistered Hypothesis and Experimental Design for Task-Induced Response-Strategy Modulation",
+  "description": "A preregistered hypothesis and experimental-design note proposing that several known single-behavior latent directions in language models (refusal, abstention, uncertainty reporting, evaluation awareness) may be special cases of a more general family of task-induced, appraisal-structured latent control representations that partially govern response-strategy selection across semantic domains. This version reports no experimental results.",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "version": "0.1.0",
+  "language": "eng",
+  "access_right": "open",
+  "license": "CC-BY-4.0",
+  "creators": [
+    {
+      "name": "Varvatis, Lazaros",
+      "affiliation": "Independent Researcher, Berlin, Germany"
+    }
+  ],
+  "keywords": [
+    "mechanistic interpretability",
+    "representation engineering",
+    "activation steering",
+    "latent control representation",
+    "response strategy",
+    "task induction",
+    "appraisal structure",
+    "language models",
+    "AI safety"
+  ]
+}

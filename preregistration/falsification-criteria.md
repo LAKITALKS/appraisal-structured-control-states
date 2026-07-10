@@ -1,0 +1,61 @@
+# Falsification Criteria
+
+**Status:** v0.1 preregistration draft. No data have been collected.
+
+This document lists, in advance, the conditions under which the central
+interpretation is **weakened or rejected**. Committing to these before data
+collection is the point of preregistration.
+
+---
+
+## Central interpretation
+
+The claim under test is that a family of *task-induced, appraisal-structured latent
+control representations* of the model's own task situation partially governs
+response-strategy selection, and that this is not reducible to concept tracking,
+simple baselines, or lexical-phrase reweighting.
+
+## The central interpretation is weakened or rejected if any of the following hold
+
+1. **Vocabulary, not state.** Probes primarily track appraisal-related *words*
+   rather than the real task state (fails H1).
+2. **No transfer.** Cross-domain transfer fails; probes trained on some domains do
+   not generalize to a held-out domain (fails H2).
+3. **Baselines suffice.** Lexical classifiers or simple prompt embeddings perform
+   as well as the task-state representation, with no incremental value (fails H2).
+4. **Subsumed by a known single factor.** Valence/arousal, confidence, generic
+   difficulty, or a single refusal direction alone explains the result (fails H2).
+5. **Lexical-geometry artifact.** Causal intervention changes only stereotyped
+   wording and not the underlying strategy, or effects vanish under lexical
+   normalization (fails the mandatory control, H3).
+6. **Indistinguishable from random.** Steering effects are not distinguishable from
+   matched-norm random-direction controls (fails H3 sufficiency).
+7. **No necessity.** Directional ablation has no specific behavioral effect (fails
+   H3 necessity).
+8. **Competence destruction.** Interventions shift strategy only by degrading
+   general linguistic competence (fails H3 specificity).
+9. **No selective manipulability.** Candidate axes cannot be separately
+   manipulated even approximately (undermines the multi-axis claim).
+10. **Controllability adds nothing.** The controllability/coping axis adds no
+    explanatory value beyond simpler baselines (rejects a priority sub-hypothesis).
+11. **Not reproducible.** Results fail to replicate across random seeds.
+12. **Unstable labels.** Response-strategy labels are unstable or
+    evaluator-dependent, so the target variable itself is not well defined.
+
+## Decision discipline
+
+- Each numbered condition maps to a preregistered metric and threshold in
+  [`analysis-plan.md`](analysis-plan.md).
+- Partial outcomes are reported honestly: e.g. H1 and H2 supported but H3
+  necessity not met is reported as such, and does **not** license the full claim.
+- A negative result is a publishable result. If the controls defeat the
+  hypothesis, that is reported plainly.
+
+## What a rejection would and would not mean
+
+A rejection would mean that, for the tested model, axes, and domains, the specific
+ASCR conjunction is not supported. It would **not** by itself establish that no
+task-induced control structure exists in any model, nor would it validate any
+anthropomorphic interpretation. The non-claims in the paper and in
+[`../research/novelty-statement.md`](../research/novelty-statement.md) hold
+regardless of outcome.

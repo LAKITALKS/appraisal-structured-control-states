@@ -1,0 +1,31 @@
+# License
+
+This repository is dual-licensed. The split reflects the two kinds of material it
+contains.
+
+## Code — MIT License
+
+All source code (everything under `experiments/` and `tests/`, and any other
+software in this repository) is licensed under the MIT License.
+See [`LICENSE-CODE`](LICENSE-CODE) for the full text.
+
+## Written content — Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+The paper, the preregistration documents, the research notes, and all other
+original written content and documentation (including everything under `paper/`,
+`preregistration/`, and `research/`, and the Markdown documentation throughout the
+repository) are licensed under CC BY 4.0.
+See [`LICENSE-CONTENT`](LICENSE-CONTENT) for the full text.
+
+## Copyright
+
+Copyright (c) 2026 Lazaros Varvatis.
+
+## Notes
+
+- Third-party works cited in the paper's bibliography remain the property of their
+  respective authors and are referenced under academic citation, not relicensed
+  here.
+- When in doubt about whether a file is "code" or "content", the file's primary
+  nature governs: a `.py` file is code (MIT); a `.md`, `.tex`, or `.bib` file is
+  content (CC BY 4.0).

@@ -1,0 +1,464 @@
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+% Toward Appraisal-Structured Latent Control Representations in Language Models
+% A Preregistered Hypothesis and Experimental Design for Task-Induced
+% Response-Strategy Modulation
+%
+% Author: Lazaros Varvatis (Independent Researcher, Berlin, Germany)
+%
+% This is a preregistered hypothesis and experimental-design note. It reports NO
+% experimental results. Build with: latexmk -pdf main.tex
+% ---------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage[round]{natbib}
+
+\newcommand{\ascr}{ASCR}
+\newcommand{\Hstate}{H_t}
+\newcommand{\Zstate}{Z_t}
+\newcommand{\proj}{\Pi_{\mathcal{A}}}
+
+\title{\textbf{Toward Appraisal-Structured Latent Control Representations in Language Models}\\[0.4em]
+\large A Preregistered Hypothesis and Experimental Design for Task-Induced Response-Strategy Modulation}
+
+\author{Lazaros Varvatis\\
+\small Independent Researcher, Berlin, Germany\\
+\small \texttt{varvatislazaros@gmail.com}}
+
+\date{Version 0.1 --- Preregistration draft}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+Recent interpretability work shows that instruction-tuned language models contain
+causally efficacious latent directions for specific strategic behaviors, including
+refusal, abstention, uncertainty reporting, and evaluation awareness. These results
+have largely been obtained one behavior at a time. We propose, and preregister a
+design to test, the hypothesis that several of these effects are special cases of a
+more general family of \emph{task-induced, appraisal-structured latent control
+representations}: low-dimensional, potentially correlated representations of the
+model's own current task situation that partially govern its choice of response
+strategy across semantic domains. The central methodological contribution is a
+dissociation, built into a $2\times2$ factorial design, between \emph{semantic
+concept tracking} (the prompt names or describes an appraisal-related concept) and
+\emph{task induction} (the model's own task actually contains ambiguity,
+incompatible constraints, or low controllability, whether or not it is named). We
+state four independently falsifiable hypotheses covering task-state dissociation,
+cross-domain and incremental structure, causal response-strategy modulation, and an
+exploratory claim about ordered emergence. We specify probing, transfer, and
+intervention analyses; a battery of competing baselines; and a mandatory
+lexical-geometry control that rejects the deflationary account in which a direction
+merely reweights stereotyped output phrases. We characterize the candidate axes as
+identifiable and selectively manipulable rather than orthogonal, and treat a
+predictive information-bottleneck reading as optional. The novelty status is a
+\emph{novel combination}: the components exist separately in prior work; the
+contribution is their unifying, falsifiable synthesis. This note reports no
+experimental results and makes no claims about subjective experience, feeling, or
+related notions.
+\end{abstract}
+
+\section{Introduction}
+
+Interpretability research on large language models has repeatedly found that
+high-level behaviors are mediated by surprisingly low-dimensional structure in
+activation space. Representation engineering reads and writes population-level
+directions associated with concepts such as honesty and harmlessness
+\citep{zou2023repe}; activation engineering steers outputs by adding contrastive
+direction vectors at inference time \citep{turner2023actadd}; refusal has been
+attributed to a single mediating direction \citep{arditi2024refusal}, and later
+work argues that refusal involves several geometrically distinct directions that
+mostly change \emph{how} rather than \emph{whether} a model refuses
+\citep{joad2026morerefusal}. Conditional activation steering makes such
+interventions context-dependent \citep{lee2024cast}. In parallel, models appear to
+carry directions for uncertainty and factuality \citep{teplica2025sciurus},
+for (un)answerability \citep{lavi2025unanswerability}, for evaluation awareness
+\citep{nguyen2025evalaware,hua2025evaldeployed}, and internal signals that separate
+recognizing an unsafe input from choosing to refuse it \citep{han2025safeswitch}.
+
+These findings share a form: some property of the model's situation is linearly
+decodable from activations, and intervening on the corresponding direction changes
+behavior. Yet they have mostly been studied in isolation, one behavior at a time,
+and often without separating whether the probe tracks the model's \emph{own} task
+situation or merely tracks \emph{words} describing such a situation.
+
+We propose that a single family of representations may underlie many of these
+observations. Informally: when a model faces a task that is ambiguous, internally
+contradictory, low in controllability, or under response pressure, it may form a
+compact internal representation of that situation, and this representation may help
+select a higher-level \emph{response strategy}---to answer directly, hedge, ask for
+clarification, warn, correct a premise, abstain, refuse, or continue conditionally.
+We call the conjectured family \emph{appraisal-structured latent control
+representations} (\ascr), borrowing the word ``appraisal'' from psychology only to
+name a set of situation variables (relevance, controllability, norm tension, and so
+on), and not to attribute emotion, feeling, or experience to the model.
+
+The contribution of this note is threefold. First, a precise \emph{dissociation}
+between concept tracking and task induction, operationalized as a $2\times2$
+factorial design. Second, four preregistered, independently falsifiable hypotheses.
+Third, an analysis plan with a mandatory control against a lexical-geometry
+artifact. We report no experiments here; this is a hypothesis and design.
+
+\section{Problem Formulation}
+\label{sec:problem}
+
+Let $\Hstate \in \mathbb{R}^{d}$ denote the residual-stream activation of an
+instruction-tuned language model at token position $t$ and a chosen layer. We keep
+four notions distinct throughout: the \emph{token position} $t$; the \emph{network
+layer}; whether $\Hstate$ is a \emph{prompt-state} activation (at or before the
+final prompt token) or a \emph{generated-response state} (at an early generated
+token); and the \emph{design condition} of the prompt.
+
+We hypothesize a small family of control coordinates $\Zstate$ extracted from
+$\Hstate$ by a projection-like map,
+\begin{equation}
+\Zstate = \proj(\Hstate), \qquad \dim(\Zstate) \ll \dim(\Hstate).
+\label{eq:projection}
+\end{equation}
+Equation~\eqref{eq:projection} is a \emph{candidate} description, not a proven
+natural object. We do not assume a single universal $\proj$ shared across models or
+layers, and we do not fix $\dim(\Zstate)$ in advance. Candidate coordinates include
+signed relevance, uncertainty, goal congruence, controllability/coping capacity,
+rule/norm tension, and response pressure; we treat goal congruence and
+controllability/coping as priority hypotheses rather than settled axes.
+
+The \textbf{target variable} is not the raw next-token distribution but a
+higher-level \emph{response strategy} $s$ drawn from a small taxonomy $\mathcal{S}$
+(direct compliance, calibrated answer, hedging, clarification request, warning,
+correction, abstention, refusal, conditional continuation). We use ``response
+strategy'' and ``policy mode'' descriptively; we do not claim that an autoregressive
+model is an external reinforcement-learning agent.
+
+The core distinction is between two ways an appraisal-related property can be
+present in a prompt:
+\begin{description}[leftmargin=1.4em,style=nextline]
+\item[Concept tracking.] The prompt \emph{names or describes} the property (e.g.\
+the words ``uncertain'', ``conflict'', ``out of my control''), while the model's own
+task remains straightforward.
+\item[Task induction.] The model's \emph{own current task} contains the property
+(missing information, incompatible instructions, no permissible resolving action),
+whether or not the prompt names it.
+\end{description}
+The central question is whether the model internally represents its \emph{own}
+current task situation in a form that helps determine its response strategy, rather
+than merely representing appraisal-related words or third-party described
+situations.
+
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Reading and steering latent directions.}
+Representation engineering places population-level representations at the center of
+analysis and manipulates high-level attributes \citep{zou2023repe}. Activation
+addition computes steering vectors from contrastive prompt pairs and adds them at
+inference time \citep{turner2023actadd}. Unsupervised methods elicit latent
+behaviors without labeled directions \citep{mack2024melbo}. These establish that
+low-dimensional directions can causally move behavior---a premise we adopt rather
+than re-establish.
+
+\paragraph{Refusal and conditional control.}
+\citet{arditi2024refusal} attribute refusal to a single mediating direction across
+many open models; \citet{joad2026morerefusal} find multiple category-specific
+refusal directions that primarily change the manner of refusal. Conditional
+activation steering gates such interventions on input context \citep{lee2024cast}.
+These are our closest neighbors on the ``strategic behavior'' axis, but they target
+one behavior family (refusal) rather than a general situation representation.
+
+\paragraph{Uncertainty, answerability, and evaluation awareness.}
+SCIURus locates uncertainty in the same circuitry responsible for factuality
+\citep{teplica2025sciurus}; linear directions detect (un)answerability and control
+abstention \citep{lavi2025unanswerability}. Models linearly represent whether they
+are being evaluated \citep{nguyen2025evalaware}, and this state can be steered so a
+model acts ``deployed'' \citep{hua2025evaldeployed}. Internal-activation safety
+signals separate unsafe-input recognition from the refusal decision
+\citep{han2025safeswitch}. Several of these are genuinely \emph{task-induced}
+states, and they motivate the conjecture that a broader family exists.
+
+\paragraph{Task representations and affect geometry.}
+Task representations form just-in-time and transfer across instances
+\citep{li2025taskrepr}. In the affective domain, appraisal variables are causally
+implicated in \emph{third-person} emotion inference \citep{tak2025emotioninfer};
+emotion-concept representations track an operative concept and causally influence
+behavior \citep{sofroniew2026emotion}; and a valence/arousal subspace with circular
+geometry affords multi-behavioral control \citep{sun2026valencearousal}. This work
+supplies the multi-axis, appraisal-structured vocabulary we borrow, but it targets
+emotion concepts or affective generation rather than the model's own
+response-strategy selection.
+
+\paragraph{Position of this work.}
+To our knowledge, we found no prior work that \emph{jointly} tests (i) a
+task-induced, system-relative state dissociated by design from concept tracking,
+(ii) an integrated multi-axis appraisal structure governing response strategy,
+(iii) cross-domain transfer of that structure, and (iv) a mandatory
+lexical-geometry control. The components are established separately; the proposed
+contribution is their unifying, falsifiable synthesis. A companion prior-art matrix
+in the repository records this component-by-component.
+
+\section{Appraisal-Structured Latent Control Representations}
+\label{sec:ascr}
+
+We now state the hypothesis object more carefully. Consider a distribution over
+tasks. For a task instance, let $A \in \mathbb{R}^{k}$ collect the candidate
+appraisal coordinates (relevance, uncertainty, goal congruence, controllability,
+norm tension, response pressure). The \ascr{} conjecture has two parts: that a
+low-dimensional image of $A$ is recoverable from activations as in
+Equation~\eqref{eq:projection}, and that this image conditions the response
+strategy.
+
+\paragraph{An optional compression reading.}
+One \emph{optional} formal characterization is that $\Zstate$ approximates a
+predictive information bottleneck: a compression of the activation state that
+discards task-irrelevant detail while retaining what predicts the appropriate
+strategy. Writing $Y$ for the strategy-relevant target and $I(\cdot;\cdot)$ for
+mutual information, a candidate objective is
+\begin{equation}
+\min_{p(\Zstate\mid \Hstate)}\; I(\Hstate;\Zstate)\;-\;\beta\, I(\Zstate;Y).
+\label{eq:ib}
+\end{equation}
+Equation~\eqref{eq:ib} is a \emph{candidate compression principle}, not a
+demonstrated mechanism, and we do not claim that Transformers have been shown to
+implement it. The core hypothesis is designed to survive even if this bottleneck
+reading is wrong; nothing in the empirical predictions depends on
+Equation~\eqref{eq:ib}.
+
+\paragraph{Identifiability, not orthogonality.}
+We do \emph{not} assume the coordinates are mutually independent, structurally
+uncorrelated, or geometrically orthogonal. We instead ask whether they are
+\emph{identifiable}: separately decodable, cross-domain transferable,
+interventionally identifiable, incrementally predictive, and selectively
+manipulable. Correlations among axes are measured, not assumed away. We summarize
+the conditioning claim as a family of per-axis coordinates that are only
+approximately separable,
+\begin{equation}
+\Zstate = (z_t^{(1)}, \dots, z_t^{(k)}), \qquad
+\mathrm{Cov}(z_t^{(i)}, z_t^{(j)}) \neq 0 \text{ permitted},
+\label{eq:coords}
+\end{equation}
+and the response-strategy claim as a conditioning of the strategy on these
+coordinates and the context $c_t$,
+\begin{equation}
+p(s \mid \text{context}) \;\approx\; g\!\left(\Zstate,\, c_t\right),
+\label{eq:strategy}
+\end{equation}
+where $g$ maps control coordinates and residual context to a distribution over
+strategies $s \in \mathcal{S}$. Equations~\eqref{eq:projection}, \eqref{eq:ib},
+\eqref{eq:coords}, and \eqref{eq:strategy} are the four core equations; all other
+relations are kept in prose.
+
+\section{Hypotheses}
+\label{sec:hypotheses}
+
+We preregister four hypotheses; H1--H3 are load-bearing and H4 is exploratory.
+
+\paragraph{H1 --- Task-state dissociation.}
+Actual task-induced uncertainty, constraint conflict, or low controllability is
+decodable from activations independently of the presence of appraisal-related
+vocabulary; a probe tracks the real task condition more strongly than lexical
+concept mentions.
+
+\paragraph{H2 --- Cross-domain and incremental structure.}
+Task-induced control representations transfer across semantically disjoint domains
+and predict response strategy beyond lexical features, prompt length, surface
+sentiment, valence/arousal baselines, generic difficulty, confidence or
+unanswerability alone, and a single refusal direction.
+
+\paragraph{H3 --- Causal response-strategy modulation.}
+Intervening along an identified task-state direction shifts response strategy in
+the predicted direction. Both sufficiency (matched-norm activation addition) and
+necessity (directional ablation or counter-steering) are tested, and the
+intervention preserves general linguistic competence as far as possible.
+
+\paragraph{H4 --- Ordered emergence (secondary).}
+Coarse signed-relevance or task-pressure signals may become decodable earlier than
+integrated task-appraisal structure, while explicit response-strategy commitment
+may appear later or closer to generation. This is labeled secondary because the
+literature does not justify a strong confirmatory ordering claim.
+
+\section{Preregistered Experimental Design}
+\label{sec:design}
+
+\paragraph{Core $2\times2$ design.}
+For each candidate axis, and holding the broad semantic task fixed, we construct
+four conditions crossing the actual task state with the appraisal-concept mention:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Actual task state & Concept mentioned & Interpretation \\
+\midrule
+absent  & absent  & neutral control \\
+absent  & present & concept tracking only \\
+present & absent  & pure task induction \\
+present & present & combined condition \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Prompts are authored in \emph{matched groups}: one base task instantiated across
+all four cells, differing only along the two intended factors, sharing a matched
+group identifier. Splits are made at the matched-group level so that siblings never
+straddle train and test. The primary analysis asks whether activation patterns
+follow the \emph{actual task-state} factor rather than the \emph{vocabulary}
+factor.
+
+\paragraph{Axes and domains.}
+Primary pilot axes are uncertainty/unanswerability, rule/instruction conflict (norm
+tension), and controllability/coping; signed relevance and goal congruence are
+exploratory. We use at least four semantically distinct domains---software
+debugging, scheduling and planning, policy-constrained assistance, and document
+editing / creative problem solving---so that no single sensitive topic dominates.
+The design supports leave-one-domain-out transfer.
+
+\paragraph{Pilot size.}
+The pilot targets on the order of a few hundred hand-authored, reviewed prompts
+(roughly twenty-four matched groups per primary axis across the four domains, plus
+a neutral holdout for competence checks). This is a feasibility pilot; we claim
+\emph{no} formal power analysis because none has been performed. A scaling plan and
+a pre-study power analysis are deferred to a later confirmatory phase.
+
+\paragraph{Model and activations.}
+The primary model is an open-weight, instruction-tuned model in the $\sim$7--9B
+range (default: \texttt{Qwen/Qwen2.5-7B-Instruct}); the exact immutable revision
+hash is recorded before data generation. An optional replication model may be named
+for the scaling phase, which does not imply that replication has occurred. We record
+residual-stream activations at the final prompt-token position and a small
+preregistered set of early generated-token positions, across all layers or a
+preregistered subset, labeling each activation with token position, layer,
+prompt-vs-generated flag, and design cell.
+
+\paragraph{Probes and transfer.}
+We use interpretable linear methods first---logistic regression, ridge regression,
+and linear discriminant analysis---with matched-group train/validation/test splits,
+leave-one-domain-out evaluation, multiple random seeds, bootstrap confidence
+intervals, and multiple-comparison correction. High in-domain probe accuracy is
+\emph{not} treated as evidence of a general state; the load-bearing result is
+cross-domain transfer and incremental predictive value.
+
+\paragraph{Causal interventions.}
+We preregister activation addition (sufficiency) and directional ablation /
+counter-steering (necessity), each with matched-norm random-direction and
+PCA-direction controls, several intervention strengths, several layers, and
+multiple seeds. Effects should be dose-dependent where predicted, strategy-specific,
+reproducible, and not reducible to degraded fluency or a generic refusal shift. We
+separately track changes in wording, style, semantic content, and high-level
+strategy, and monitor competence on off-target neutral tasks.
+
+\section{Baselines and Alternative Explanations}
+\label{sec:baselines}
+
+The task-state representation must add incremental value over each of the
+following, individually and jointly: bag-of-words/lexical classifiers, sentence or
+prompt embeddings, prompt length, token entropy, independently rated difficulty,
+sentiment/signed-valence, a valence/arousal subspace, a confidence/unanswerability
+direction, a single refusal direction, an evaluation-awareness direction, and
+random and PCA subspaces of matched dimensionality. Support for \ascr{} requires
+beating the \emph{strongest} of these, not merely the weakest.
+
+\paragraph{Mandatory lexical-geometry control.}
+A deflationary account holds that a ``control direction'' only changes the
+probability of stereotyped output phrases (``I can't'', ``sorry'', ``however'',
+``I am uncertain'', standard refusal templates). We therefore require:
+paraphrased output strategies; meaning-based strategy labels; removal or masking of
+stereotyped lexical markers during evaluation; alternative phrasings expressing the
+same strategy; analyses of whether behavior changes persist after lexical
+normalization; and matched prompts whose vocabulary differs while task structure is
+held constant. \emph{A direction that changes stereotyped words without changing
+the underlying response strategy does not support the control-state hypothesis.}
+
+\section{Falsification Criteria}
+\label{sec:falsification}
+
+The central interpretation is weakened or rejected if any of the following hold:
+probes primarily track appraisal-related words rather than real task state;
+cross-domain transfer fails; lexical or simple embedding baselines perform equally
+well; valence/arousal, confidence, difficulty, or refusal alone explains the
+result; causal intervention changes only stereotyped wording; steering effects are
+indistinguishable from matched random controls; ablation has no specific behavioral
+effect; intervention destroys generic competence; candidate axes cannot be
+separately manipulated; controllability/coping adds no value beyond simpler
+baselines; results fail to replicate across seeds; or response-strategy labels are
+unstable or evaluator-dependent. A negative result is reported plainly as such.
+
+\section{Predictions for Existing Latent Representations}
+\label{sec:predictions}
+
+The following are cautious, testable predictions, not results:
+\begin{enumerate}[leftmargin=1.5em]
+\item Published emotion-concept vectors may exhibit a lower-dimensional factor
+structure partly aligned with appraisal-related variables.
+\item A valence/arousal subspace may explain some variance yet fail to distinguish
+response strategies that differ primarily in controllability, coping, or norm
+tension.
+\item Fear-like withdrawal and anger-like correction offer an intuitive motivating
+contrast, but the main claim is stated in non-emotional, strategic terms
+(abstention vs correction).
+\item Safety systems that separate unsafe-input recognition from the refusal choice
+may be a partial instance of an appraisal-versus-action separation.
+\item Multi-category refusal directions may be a restricted special case of a
+broader family of situational control axes.
+\item Task-induced state probes should transfer better across domains than probes
+based only on semantic concept mentions.
+\end{enumerate}
+
+\section{Limitations and Non-Claims}
+\label{sec:limitations}
+
+This note reports no experimental results and establishes no mechanism. It does
+\emph{not} claim, and its design cannot establish, subjective experience, feeling,
+consciousness, sentience, suffering, phenomenal states, biological equivalence, a
+contemplative or Buddhist mechanism inside a Transformer, a universal architecture
+shared by all language models, or the final correct number of latent dimensions.
+The words ``appraisal'' and ``control'' are used technically: ``appraisal'' names a
+set of situation variables, and ``control'' names an influence on response-strategy
+selection, with no anthropomorphic or agentive commitment. Findings, if obtained,
+would be specific to the tested models, axes, and domains. The information-bottleneck
+reading of Section~\ref{sec:ascr} is optional and not relied upon.
+
+\section{Research Roadmap}
+\label{sec:roadmap}
+
+The immediate step is authoring and validating the matched-group pilot corpus and
+freezing the model revision. Next is the probing and transfer analysis under
+Section~\ref{sec:design}, followed by causal interventions with the full control
+battery. Only if the primary hypotheses survive the controls do we proceed to a
+powered confirmatory study with a pre-study power analysis, the exploratory axes, an
+additional held-out domain, and a replication model. Data, prompts, labels, seeds,
+and the frozen model revision hash will be released to make any results
+reconstructable.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We have set out, and preregistered a design to test, the hypothesis that a family of
+task-induced, appraisal-structured latent control representations of a model's own
+task situation partially governs its response-strategy selection, and that several
+existing single-behavior findings may be special cases of this family. The
+distinctive commitments are a built-in dissociation of task induction from concept
+tracking, an identifiability (rather than orthogonality) framing of the axes, and a
+mandatory lexical-geometry control. The novelty status is an honest \emph{novel
+combination}: the components exist in prior work; the contribution is their
+unifying, falsifiable synthesis. Whether the hypothesis survives its own
+falsification criteria is an empirical question this note is designed to make
+answerable.
+
+\section*{Data and Code Availability}
+This is a design note; no data or results accompany it. The design scaffold,
+preregistration documents, prior-art matrix, and citation-verification log are in
+the accompanying repository. Code is released under the MIT License and written
+content under CC BY 4.0.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

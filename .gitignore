@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# LaTeX build artifacts (the committed PDF, if present, is kept explicitly)
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.bbl
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/*.run.xml
+paper/*.bcf
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Large experiment artifacts (never commit fabricated data/results)
+experiments/data/*.jsonl
+experiments/data/*.parquet
+experiments/results/*.csv
+experiments/results/*.npz
+experiments/results/*.pt
+!experiments/data/README.md
+!experiments/results/README.md

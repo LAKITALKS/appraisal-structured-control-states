@@ -1,0 +1,76 @@
+# ASCR pilot configuration (v0.1 preregistration draft).
+#
+# This file records the intended pilot configuration. No data have been
+# collected. The exact immutable model revision hash MUST be recorded in
+# `model.revision` before any activations are extracted; until then it holds the
+# sentinel value below and no data generation may proceed.
+
+model:
+  # Open-weight, instruction-tuned model in the ~7B-9B range.
+  name: "Qwen/Qwen2.5-7B-Instruct"
+  # Immutable revision (commit hash) of the model weights. Freeze before data gen.
+  revision: "TO_BE_FROZEN_BEFORE_DATA_GENERATION"
+  # Optional replication model for the scaling phase (naming it implies no run).
+  replication_model: "Qwen/Qwen2.5-7B-Instruct"
+  decoding:
+    temperature: 0.0
+    top_p: 1.0
+    max_new_tokens: 256
+    seed: 0
+
+design:
+  # Primary, load-bearing axes for the pilot.
+  axes:
+    - uncertainty
+    - norm_tension
+    - controllability
+  # Exploratory axes are documented but not part of the primary analysis.
+  exploratory_axes:
+    - signed_relevance
+    - goal_congruence
+    - response_pressure
+  domains:
+    - software_debugging
+    - scheduling_planning
+    - policy_constrained_assistance
+    - document_editing
+  # Held-out domain for the leave-one-domain-out transfer test.
+  held_out_domain: document_editing
+  cells:
+    - A_neutral_control
+    - B_concept_tracking_only
+    - C_pure_task_induction
+    - D_combined
+  # Pilot target counts (feasibility pilot, not a powered study).
+  matched_groups_per_axis: 24
+  target_total_items: 350
+
+activations:
+  # Record residual-stream activations; keep token position, layer, and
+  # prompt-vs-generated flags distinct.
+  layers: "all"           # or a preregistered subset if compute-limited
+  prompt_final_token: true
+  early_generated_tokens: 4
+
+analysis:
+  probes:
+    - logistic_regression
+    - ridge_regression
+    - linear_discriminant_analysis
+  split_level: matched_group
+  transfer: leave_one_domain_out
+  seeds: [0, 1, 2, 3, 4]
+  bootstrap_resamples: 1000
+  multiple_comparison_correction: benjamini_hochberg
+
+intervention:
+  methods:
+    - activation_addition
+    - directional_ablation
+    - counter_steering
+  controls:
+    - matched_norm_random_direction
+    - pca_direction
+  strengths: [0.5, 1.0, 2.0, 4.0]
+  layers: "subset"
+  seeds: [0, 1, 2, 3, 4]
