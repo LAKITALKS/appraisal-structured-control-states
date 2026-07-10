@@ -36,6 +36,7 @@ arXiv abstract pages for exact author lists.
 | `lavi2025unanswerability` | Detecting (Un)answerability in Large Language Models with Linear Directions | arXiv:2509.22449 | EACL 2026 |
 | `sun2026valencearousal` | Valence-Arousal Subspace in LLMs: Circular Emotion Geometry and Multi-Behavioral Control | arXiv:2604.03147 | Preprint |
 | `mack2024melbo` | Mechanistically Eliciting Latent Behaviors in Language Models | AI Alignment Forum (authors' primary write-up) | Technical report |
+| `gurnee2026workspace` | Verbalizable Representations Form a Global Workspace in Language Models | transformer-circuits.pub/2026/workspace | Transformer Circuits Thread |
 
 Notes on individual entries:
 
@@ -55,18 +56,25 @@ Notes on individual entries:
   repository.
 - `mack2024melbo`: no arXiv record was located; the authors' own Alignment Forum
   write-up is treated as the primary source and cited as a technical report.
+- `gurnee2026workspace`: no arXiv record exists; the official Transformer Circuits
+  Thread publication (Anthropic), dated July 6, 2026, is the primary source. An
+  official Transformer Circuits publication counts as a primary source. Title,
+  full author list (W. Gurnee et al.), venue, and date were confirmed by
+  retrieving the publication page at
+  https://transformer-circuits.pub/2026/workspace/index.html on 2026-07-10. Cited
+  only as a scholarly reference; the citation confers no authorship or endorsement
+  on this repository.
 
 ---
 
 ## Unverified (excluded from `references.bib` pending human review)
 
-- **"Verbalizable Representations Form a Global Workspace in Language Models."**
-  Status: UNVERIFIED. A primary-source record (arXiv / OpenReview / ACL) could not
-  be located in the 2026-07-10 verification pass. The concept (a
-  workspace-like, privileged, verbalizable representation) is discussed in the
-  paper and preregistration in general terms without attributing it to this
-  specific unverified title. It must not enter `references.bib` until a reviewer
-  confirms a primary identifier.
+None. As of the 2026-07-10 verification pass, every work considered for the
+bibliography has been confirmed against a primary source. The
+previously-unconfirmed workspace reference
+(*"Verbalizable Representations Form a Global Workspace in Language Models"*) has
+been verified against its official Transformer Circuits publication and moved to
+the Verified table above (`gurnee2026workspace`).
 
 ---
 
@@ -75,5 +83,4 @@ Notes on individual entries:
 1. Re-confirm every arXiv identifier resolves and matches the title above.
 2. Replace preprint entries with their proceedings versions where a peer-reviewed
    version now exists.
-3. Resolve or drop the unverified workspace reference.
-4. Add DOIs where publishers assign them.
+3. Add DOIs where publishers assign them.

@@ -31,6 +31,6 @@ Initial public preregistration draft.
 ### Status
 - No experimental results, datasets, model runs, or figures are included.
 - No release, tag, Zenodo deposit, or DOI has been created for this version.
-- One prior-art item could not be checked against a primary source and is
-  deliberately excluded from the bibliography (see
+- Every prior-art item considered for the bibliography has been confirmed against
+  a primary source; none remain excluded (see
   `research/citation-verification.md`).
