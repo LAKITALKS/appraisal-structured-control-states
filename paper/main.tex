@@ -178,12 +178,18 @@ one behavior family (refusal) rather than a general situation representation.
 \paragraph{Uncertainty, answerability, and evaluation awareness.}
 SCIURus locates uncertainty in the same circuitry responsible for factuality
 \citep{teplica2025sciurus}; linear directions detect (un)answerability and control
-abstention \citep{lavi2025unanswerability}. Models linearly represent whether they
+abstention \citep{lavi2025unanswerability}, and hidden states encode query
+answerability early in decoding \citep{slobodkin2023unanswerability}. Abstention
+itself decomposes into distinct axes of answer correctness and question
+answerability \citep{wagner2026twoaxes}, and a functional dissociation via sparse
+autoencoders separates uncertainty features from correctness features
+\citep{patel2026uncertaintycorrectness}. Models linearly represent whether they
 are being evaluated \citep{nguyen2025evalaware}, and this state can be steered so a
 model acts ``deployed'' \citep{hua2025evaldeployed}. Internal-activation safety
 signals separate unsafe-input recognition from the refusal decision
 \citep{han2025safeswitch}. Several of these are genuinely \emph{task-induced}
-states, and they motivate the conjecture that a broader family exists.
+states, and they motivate the conjecture that a broader family exists; they also
+narrow the novelty of any \emph{single} ASCR axis.
 
 \paragraph{Task representations and affect geometry.}
 Task representations form just-in-time and transfer across instances
@@ -195,6 +201,21 @@ geometry affords multi-behavioral control \citep{sun2026valencearousal}. This wo
 supplies the multi-axis, appraisal-structured vocabulary we borrow, but it targets
 emotion concepts or affective generation rather than the model's own
 response-strategy selection.
+
+\paragraph{Norm/role tension, difficulty, and multi-attribute steering.}
+Task-induced norm and role conflicts are separately decodable and steerable:
+contextual privacy norms decompose into steerable contextual-integrity parameters
+\citep{wang2026privacy}, and system-versus-user role conflicts are linearly encoded
+and manipulable \citep{zeng2025roleconflict}, both close to the norm-tension axis.
+Generic task difficulty is itself a linear, decodable property
+\citep{lee2025difficulty}, which we therefore treat as a mandatory baseline rather
+than as appraisal structure. Most directly, multi-attribute steering learns several
+attribute directions jointly while enforcing near-orthogonality to reduce
+interference \citep{nguyen2025matsteer}. These works establish the individual axes
+and the feasibility of multi-attribute control, but they do not test whether the
+axes form a \emph{shared task-induced control family}; and in contrast to their
+orthogonality constraints, we frame the axes as identifiable and selectively
+manipulable rather than necessarily orthogonal.
 
 \paragraph{Privileged, verbalizable representations.}
 A separate line of work reports that language models maintain a small, privileged
@@ -213,10 +234,14 @@ response-strategy selection, not by verbalizability.
 To our knowledge, we found no prior work that \emph{jointly} tests (i) a
 task-induced, system-relative state dissociated by design from concept tracking,
 (ii) an integrated multi-axis appraisal structure governing response strategy,
-(iii) cross-domain transfer of that structure, and (iv) a mandatory
-lexical-geometry control. The components are established separately; the proposed
-contribution is their unifying, falsifiable synthesis. A companion prior-art matrix
-in the repository records this component-by-component.
+(iii) cross-domain transfer of that structure, (iv) a mandatory lexical-geometry
+control, and (v) an explicit test that the axes form a \emph{shared} control family
+rather than several independent known directions. The components are established
+separately; the proposed contribution is their unifying, falsifiable synthesis. As
+sharpened in the v0.1.1 pre-data amendment, demonstrating several individual
+task-state directions is not itself evidence of a shared family, so the family claim
+carries its own preregistered test (Section~\ref{sec:hypotheses} and the amendment).
+A companion prior-art matrix in the repository records this component-by-component.
 
 \section{Appraisal-Structured Latent Control Representations}
 \label{sec:ascr}
