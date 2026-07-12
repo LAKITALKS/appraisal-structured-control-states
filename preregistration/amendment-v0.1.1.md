@@ -109,31 +109,37 @@ Explicitly **out of scope** for v0.1.1 (not added): any holonomy hypothesis, any
 
 The family claim is **not** derived from the existence of three decodable
 directions. A three-dimensional subspace spanned by three axis directions is *not*
-a family. The shared-control claim is preregistered with a three-part test (full
-statistical detail in [`analysis-plan.md`](analysis-plan.md) §"Family-structure
-test").
+a family. The shared-control claim is preregistered with a three-part test whose
+components are **all required**: **family claim = A ∧ B ∧ C**. No single advantage
+from any list suffices. Full statistical detail — rank grid, primary log-loss
+metric, and paired-bootstrap decision rules — is in
+[`analysis-plan.md`](analysis-plan.md) §6b "Family-structure test".
 
-**A. Shared low-rank model vs separate models.** Compare, at fair/matched total
-complexity, separate per-axis predictors `z_u = w_u^T h`, `z_n = w_n^T h`,
-`z_c = w_c^T h` against a shared low-rank basis `Q` with axis-specific heads
-`z = Q^T h`, `y_j = a_j^T z`. Evaluation is on fully unseen matched groups, with
-leave-one-domain-out transfer, matched-group cross-validation, and random-subspace
-and PCA controls. A shared space is supported **only** if it yields better held-out
-generalization, better parameter efficiency, more stable axis structure, or extra
-response-strategy explanation than equally complex separate models.
+**A. Shared low-rank model vs separate models.** A shared bottleneck `Q` (rank `r`)
+with axis-specific logistic heads, trained multi-task, versus separate regularized
+per-axis logistic models, on identical matched-group splits with leave-one-domain-out
+transfer and strictly nested cross-validation. Rank grid is `r ∈ {1, 2}` for three
+axes (`r = 3` secondary sensitivity only; `r = 1` admissible for two axes). Primary
+metric: pooled held-out log-loss. **Decision:** the paired matched-group bootstrap of
+`log_loss_shared − log_loss_separate` must lie entirely below zero after FDR; no
+arbitrary margin is used. Secondary metrics are reported but do not decide.
 
-**B. Structured behavioral specificity.** Preregistered, falsifiable
-direction→strategy expectations (see [`analysis-plan.md`](analysis-plan.md)); the
-family claim is **weakened** if every direction merely produces a generic refusal,
-negativity, or degradation effect.
+**B. Structured behavioral specificity.** An intervention-effect matrix
+`E[axis, response_superclass]` with a preregistered per-axis target strategy set,
+stated in canonical taxonomy terms only. **Decision:** the bootstrap CI of the
+per-axis selectivity contrast (mean effect on target strategies minus mean absolute
+effect off-target) must be above zero, the effect must not reduce to generic
+refusal/negativity/fluency degradation, competence controls must pass, and the effect
+must persist after lexical normalization.
 
 **C. Incremental shared contribution.** Nested comparison of
 `known single directions + simple baselines` vs
-`known single directions + simple baselines + shared ASCR representation`; the
-family is supported only if the shared representation explains additional, robust,
-held-out response-strategy variance.
+`known single directions + simple baselines + shared ASCR representation`, primary
+metric held-out response-strategy log-loss. **Decision:** the paired bootstrap CI of
+the improvement must lie entirely above zero after FDR.
 
-This test is a **preregistered addition**, not a post-hoc discovery.
+This test is a **preregistered addition**, not a post-hoc discovery. All three
+components are required; failing any one leaves the family claim unsupported.
 
 ---
 

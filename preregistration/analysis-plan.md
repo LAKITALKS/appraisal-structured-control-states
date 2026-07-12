@@ -97,43 +97,66 @@ as possible) is the operative criterion.
 Preregistered addition (see [`amendment-v0.1.1.md`](amendment-v0.1.1.md) §5). The
 shared-control-family claim is **not** established by H1–H3 alone: succeeding on
 three individual axes is compatible with three independent, already-known
-directions. The family claim requires all three components below. This is a
-precommitment, not a post-hoc discovery.
+directions. This is a precommitment, not a post-hoc discovery.
+
+> **Decision rule (binding).** The family claim is supported **only if all three
+> components A, B, and C independently meet their preregistered criteria below.**
+> No single advantage from any list is sufficient; A ∧ B ∧ C is required. All
+> secondary metrics are reported in full but never substitute for the primary
+> per-component decision.
 
 ### A. Shared low-rank model vs separate models
 
-- **Separate models:** independent per-axis linear predictors,
-  `z_u = w_u^T h`, `z_n = w_n^T h`, `z_c = w_c^T h`.
-- **Shared model:** a common low-rank basis `Q` (rank `r`) with axis-specific
-  heads, `z = Q^T h`, `y_j = a_j^T z`.
-- **Fairness:** total effective complexity (free parameters / effective degrees of
-  freedom) is matched between the shared and separate families, or the shared model
-  is *penalized* to be no larger.
-- **Evaluation:** fully unseen matched groups; leave-one-domain-out transfer;
-  matched-group-level cross-validation only; random-subspace and PCA controls of the
-  same rank `r`.
-- **Decision:** the shared space is supported **only** if it delivers at least one
-  of — better held-out generalization, better parameter efficiency, more stable axis
-  structure (e.g. higher subspace-alignment across folds/seeds), or additional
-  response-strategy explanation — relative to equally complex separate models. A 3-D
-  subspace spanned by three axis directions is, by itself, **not** evidence of a
-  family.
+- **Shared model:** a common shared bottleneck `Q` (rank `r`), `z = Q^T h`, with
+  **axis-specific logistic heads** `y_j = softmax(a_j^T z)`, trained multi-task.
+- **Comparator:** **separate, regularized per-axis** logistic models, one per axis.
+- **Splits:** identical matched-group splits for shared and separate models;
+  **leave-one-domain-out (LODO)**; strictly **nested** cross-validation
+  (rank and regularization chosen only in the inner training/validation loop, never
+  on the outer test fold). Random-subspace and PCA controls of the same rank `r`.
+- **Rank selection (fixed grid).** With **three** axes tested, the primary rank grid
+  is `r ∈ {1, 2}`; `r = 3` may appear **only** as a secondary sensitivity analysis,
+  because three directions trivially span an at-most-3-D space. With **two** axes
+  tested, the shared-compression test with `r = 1` is admissible, but the full
+  family claim remains provisional until three axes are tested.
+- **Primary metric:** **pooled held-out log-loss (cross-entropy)** over axes and
+  LODO folds.
+- **Secondary metrics (reported, non-deciding):** macro balanced accuracy, per-axis
+  balanced accuracy, subspace stability across seeds/folds, and effective model
+  complexity.
+- **Decision (A):** the **paired matched-group bootstrap** of
+  `log_loss_shared − log_loss_separate` must lie **entirely below zero** after the
+  preregistered FDR correction. No arbitrary margin (e.g. no "3 percentage points")
+  is added; the criterion is a paired CI strictly below zero. A 3-D subspace spanned
+  by three axis directions is, by itself, **not** evidence of a family.
 
 ### B. Structured behavioral specificity
 
-Preregistered, falsifiable direction→strategy expectations (superclasses from
+Preregistered, falsifiable direction→strategy expectations, stated with **canonical
+taxonomy terms only** (fine labels / superclasses from
 [`response-strategy-taxonomy.md`](response-strategy-taxonomy.md)):
 
-- **Uncertainty / unanswerability →** calibrated answer, hedging, clarification,
-  abstention.
-- **Low controllability →** clarification request, conditional continuation,
-  explicit limitation.
-- **Norm tension →** warning, correction, conditional compliance, and refusal only
-  where genuinely required.
+- **Uncertainty / unanswerability →** `calibrated_answer`, `hedging`,
+  `clarification_request`, `abstention`.
+- **Low controllability →** `clarification_request`, `conditional_continuation`,
+  `abstention`.
+- **Norm tension →** `warning`, `correction`, `conditional_continuation`, and
+  `refusal` only where genuinely required.
 
-The family claim is **weakened** if every direction merely produces a generic
-refusal, negativity, or degradation effect, i.e. if the axes are behaviorally
-interchangeable.
+Define an **intervention-effect matrix** `E[axis, response_superclass]`. For each
+axis a preregistered **target set** of strategies is fixed (above). Compute a
+**selectivity contrast** per axis:
+
+```
+selectivity(axis) = mean effect on preregistered target strategies
+                    - mean absolute effect on off-target strategies
+```
+
+- **Decision (B):** component B is supported **only if**, for the tested axes, the
+  **bootstrap CI of the selectivity contrast is above zero**; the direction does
+  **not** mainly produce generic refusal, negativity, or fluency-degradation
+  effects; the **competence controls pass**; and the effect **persists after lexical
+  normalization**.
 
 ### C. Incremental shared contribution
 
@@ -143,11 +166,14 @@ Nested comparison, evaluated on held-out domains:
   reproducible) plus simple baselines (see
   [`controls-and-baselines.md`](controls-and-baselines.md)).
 - **Full:** base **+** the shared ASCR representation.
+- **Primary metric:** **held-out response-strategy log-loss.**
+- **Decision (C):** component C is supported **only if** the **paired bootstrap CI**
+  of the improvement (base − full log-loss) lies **entirely above zero** after FDR
+  correction.
 
-The family is supported only if the shared representation explains additional,
-robust, held-out response-strategy variance beyond the base, with bootstrap CI
-excluding zero after FDR correction. The full family claim is assessed only once at
-least two (ideally three) axes are adequately operationalized and tested.
+**Family claim = A ∧ B ∧ C.** The full family claim is assessed only once at least
+two (ideally three) axes are adequately operationalized and tested; with two axes it
+remains provisional.
 
 ## 7. H4 analysis — ordered emergence (exploratory)
 
