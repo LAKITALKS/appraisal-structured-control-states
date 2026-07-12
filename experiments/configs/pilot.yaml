@@ -1,17 +1,20 @@
-# ASCR pilot configuration (v0.1 preregistration draft).
+# ASCR pilot configuration (v0.1.1 pre-data amendment).
 #
 # This file records the intended pilot configuration. No data have been
 # collected. The exact immutable model revision hash MUST be recorded in
 # `model.revision` before any activations are extracted; until then it holds the
 # sentinel value below and no data generation may proceed.
 
+config_version: "0.1.1"
+
 model:
   # Open-weight, instruction-tuned model in the ~7B-9B range.
   name: "Qwen/Qwen2.5-7B-Instruct"
   # Immutable revision (commit hash) of the model weights. Freeze before data gen.
   revision: "TO_BE_FROZEN_BEFORE_DATA_GENERATION"
-  # Optional replication model for the scaling phase (naming it implies no run).
-  replication_model: "Qwen/Qwen2.5-7B-Instruct"
+  # Replication model MUST differ from the primary model (v0.1.1 amendment).
+  # Held as a placeholder until a documented, compatibility-checked choice is made.
+  replication_model: "TO_BE_SELECTED_BEFORE_CONFIRMATORY_REPLICATION"
   decoding:
     temperature: 0.0
     top_p: 1.0
@@ -45,6 +48,15 @@ design:
   matched_groups_per_axis: 24
   target_total_items: 350
 
+# Two-tier response-strategy analysis (v0.1.1 amendment).
+response_strategy:
+  primary_superclasses:
+    - direct_or_comply
+    - qualify_or_warn
+    - redirect_or_clarify
+    - decline_or_abstain
+  secondary: fine_grained_nine_labels
+
 activations:
   # Record residual-stream activations; keep token position, layer, and
   # prompt-vs-generated flags distinct.
@@ -57,11 +69,31 @@ analysis:
     - logistic_regression
     - ridge_regression
     - linear_discriminant_analysis
+  # Primary intervention-direction rule (v0.1.1 amendment).
+  primary_decoder: logistic_regression
+  primary_direction: difference_in_means_task_state_present_minus_absent
   split_level: matched_group
   transfer: leave_one_domain_out
   seeds: [0, 1, 2, 3, 4]
   bootstrap_resamples: 1000
   multiple_comparison_correction: benjamini_hochberg
+  # Primary baselines the task-state representation must beat (v0.1.1 amendment).
+  primary_baselines:
+    - prompt_embedding
+    - difficulty_representation
+    - prompt_length
+    - token_entropy
+    - lexical_bag_of_words
+    - matched_norm_random_subspace
+    - pca_subspace
+
+# Family-structure test (v0.1.1 amendment): the family claim is not established by
+# individual axes alone. See preregistration/analysis-plan.md section 6b.
+family_structure_test:
+  shared_low_rank_vs_separate: true
+  structured_behavioral_specificity: true
+  incremental_shared_contribution: true
+  min_axes_before_family_claim: 2
 
 intervention:
   methods:
@@ -74,3 +106,17 @@ intervention:
   strengths: [0.5, 1.0, 2.0, 4.0]
   layers: "subset"
   seeds: [0, 1, 2, 3, 4]
+
+# Modular mini-shard pilot protocol (v0.1.1 amendment). Each shard tests a single
+# axis and carries an immutable run manifest; shards combine only if all
+# compatibility-relevant manifest fields are identical.
+mini_shards:
+  - id: ASCR-Mini-0
+    axis: uncertainty
+    goal: pipeline_stimulus_and_H1_feasibility
+    readout: prompt_final_token
+    full_steering_sweep: false
+  - id: ASCR-Mini-1
+    axis: norm_tension
+  - id: ASCR-Mini-2
+    axis: controllability

@@ -24,6 +24,43 @@ class ValidationError(ValueError):
     """Raised when a prompt item or config fails schema validation."""
 
 
+# Sentinels that must be replaced before the first data collection / replication.
+PLACEHOLDER_MODEL_REVISION = "TO_BE_FROZEN_BEFORE_DATA_GENERATION"
+PLACEHOLDER_REPLICATION_MODEL = "TO_BE_SELECTED_BEFORE_CONFIRMATORY_REPLICATION"
+
+# Required concept-mention / naturalness QA fields (v0.1.1 amendment). Present only
+# after a matched group passes the stimulus-QA protocol; see
+# preregistration/experimental-design.md.
+REQUIRED_QA_FIELDS: tuple[str, ...] = (
+    "naturalness",
+    "grammatical",
+    "register",
+    "prompt_length",
+    "syntactic_complexity",
+    "domain_match",
+    "target_task",
+    "solvable",
+    "task_state_present_confirmed",
+    "concept_mention_confirmed",
+    "label_leak_free",
+    "no_meta_sentence",
+)
+
+
+def is_placeholder_revision(revision: str) -> bool:
+    """True if ``revision`` is still an unfilled placeholder (not a frozen hash)."""
+    return revision == PLACEHOLDER_MODEL_REVISION or revision.startswith("TO_BE_")
+
+
+def validate_qa(qa: dict[str, Any], item_id: str = "<item>") -> None:
+    """Validate a concept-mention/naturalness QA record."""
+    if not isinstance(qa, dict):
+        raise ValidationError(f"{item_id}: qa must be a mapping")
+    missing = [k for k in REQUIRED_QA_FIELDS if k not in qa]
+    if missing:
+        raise ValidationError(f"{item_id}: qa missing required fields {missing}")
+
+
 @dataclass(frozen=True, slots=True)
 class PromptItem:
     """A single pilot prompt in one cell of the 2x2 design.
@@ -62,6 +99,7 @@ class PromptItem:
     matched_group_id: str
     expected_strategy_space: tuple[str, ...]
     notes: str = ""
+    qa: dict[str, Any] | None = None
 
     @property
     def cell(self) -> str:
@@ -73,6 +111,8 @@ class PromptItem:
         _require_nonempty_str(self.item_id, "item_id")
         _require_nonempty_str(self.prompt_text, "prompt_text")
         _require_nonempty_str(self.matched_group_id, "matched_group_id")
+        if self.qa is not None:
+            validate_qa(self.qa, self.item_id)
 
         if self.axis not in AXES:
             raise ValidationError(
@@ -112,7 +152,7 @@ def item_from_dict(data: dict[str, Any]) -> PromptItem:
 
     Unknown keys are rejected so that typos in the dataset surface early.
     """
-    allowed = {
+    required = {
         "item_id",
         "axis",
         "domain",
@@ -121,12 +161,13 @@ def item_from_dict(data: dict[str, Any]) -> PromptItem:
         "prompt_text",
         "matched_group_id",
         "expected_strategy_space",
-        "notes",
     }
+    optional = {"notes", "qa"}
+    allowed = required | optional
     unknown_keys = set(data) - allowed
     if unknown_keys:
         raise ValidationError(f"unknown item fields: {sorted(unknown_keys)}")
-    missing = allowed - {"notes"} - set(data)
+    missing = required - set(data)
     if missing:
         raise ValidationError(f"missing required item fields: {sorted(missing)}")
 
@@ -140,6 +181,7 @@ def item_from_dict(data: dict[str, Any]) -> PromptItem:
         matched_group_id=data["matched_group_id"],
         expected_strategy_space=tuple(data["expected_strategy_space"]),
         notes=data.get("notes", ""),
+        qa=data.get("qa"),
     )
     item.validate()
     return item
@@ -173,6 +215,102 @@ def validate_matched_group(items: list[PromptItem]) -> None:
         raise ValidationError(f"duplicate design cells in matched group: {cells}")
 
 
+def is_complete_matched_group(items: list[PromptItem]) -> bool:
+    """True if the group covers all four 2x2 cells exactly once and validates."""
+    try:
+        validate_matched_group(items)
+    except ValidationError:
+        return False
+    return {item.cell for item in items} == set(design_cell_labels())
+
+
+def design_cell_labels() -> tuple[str, ...]:
+    """The four 2x2 design-cell labels (A/B/C/D)."""
+    from .strategy_labels import DESIGN_CELLS
+
+    return tuple(DESIGN_CELLS.values())
+
+
+# ---------------------------------------------------------------------------
+# Mini-shard run manifests (v0.1.1 amendment).
+# ---------------------------------------------------------------------------
+# Fields that must be identical for two shards to be safely combined.
+_MANIFEST_COMPAT_FIELDS: tuple[str, ...] = (
+    "prompt_set_version",
+    "model_name",
+    "model_revision",
+    "tokenizer_revision",
+    "chat_template",
+    "code_commit",
+    "decoding",
+    "layer",
+    "token_position",
+    "environment",
+)
+
+
+@dataclass(frozen=True, slots=True)
+class RunManifest:
+    """Immutable manifest recorded for one mini-shard run.
+
+    No run is executed here; this only fixes which fields must be captured and
+    which must match for shards to be combinable.
+    """
+
+    experiment_id: str
+    shard_id: str
+    prompt_set_version: str
+    model_name: str
+    model_revision: str
+    tokenizer_revision: str
+    chat_template: str
+    code_commit: str
+    seed: int
+    decoding: dict[str, Any]
+    layer: Any
+    token_position: Any
+    stimulus_file_hash: str
+    environment: str
+    timestamp: str
+
+    def validate(self, *, require_frozen_revision: bool = False) -> None:
+        """Validate manifest completeness.
+
+        With ``require_frozen_revision`` the model revision must not be a
+        placeholder (enforced before any real data collection).
+        """
+        for name in (
+            "experiment_id",
+            "shard_id",
+            "prompt_set_version",
+            "model_name",
+            "model_revision",
+            "tokenizer_revision",
+            "chat_template",
+            "code_commit",
+            "stimulus_file_hash",
+            "environment",
+            "timestamp",
+        ):
+            _require_nonempty_str(getattr(self, name), f"manifest.{name}")
+        if not isinstance(self.seed, int):
+            raise ValidationError("manifest.seed must be an int")
+        if not isinstance(self.decoding, dict):
+            raise ValidationError("manifest.decoding must be a mapping")
+        if require_frozen_revision and is_placeholder_revision(self.model_revision):
+            raise ValidationError(
+                "manifest.model_revision is still a placeholder; freeze the "
+                "immutable revision hash before data collection"
+            )
+
+
+def manifests_compatible(a: RunManifest, b: RunManifest) -> bool:
+    """True if two shard manifests agree on all compatibility-relevant fields."""
+    return all(
+        getattr(a, name) == getattr(b, name) for name in _MANIFEST_COMPAT_FIELDS
+    )
+
+
 # ---------------------------------------------------------------------------
 # Config loading.
 # ---------------------------------------------------------------------------
@@ -180,13 +318,20 @@ def validate_matched_group(items: list[PromptItem]) -> None:
 class PilotConfig:
     """Minimal validated view of ``configs/pilot.yaml``."""
 
+    config_version: str
     model_name: str
     model_revision: str
+    replication_model: str | None
     axes: tuple[str, ...]
     domains: tuple[str, ...]
     layers: str
     seeds: tuple[int, ...]
     raw: dict[str, Any] = field(default_factory=dict, repr=False)
+
+    @property
+    def revision_is_frozen(self) -> bool:
+        """True once the model revision is no longer a placeholder."""
+        return not is_placeholder_revision(self.model_revision)
 
 
 def parse_config(data: dict[str, Any]) -> PilotConfig:
@@ -194,9 +339,12 @@ def parse_config(data: dict[str, Any]) -> PilotConfig:
 
     Kept separate from file IO so it can be tested without a YAML dependency.
     """
-    for key in ("model", "design", "activations", "analysis"):
+    for key in ("config_version", "model", "design", "activations", "analysis"):
         if key not in data:
             raise ValidationError(f"config missing top-level section {key!r}")
+
+    config_version = data["config_version"]
+    _require_nonempty_str(str(config_version), "config_version")
 
     model = data["model"]
     model_name = model.get("name")
@@ -205,6 +353,20 @@ def parse_config(data: dict[str, Any]) -> PilotConfig:
     # The immutable revision hash must be recorded before data generation. Until
     # then it is intentionally the sentinel string below.
     _require_nonempty_str(model_revision, "model.revision")
+
+    # Replication model (v0.1.1 amendment): must differ from the primary model once
+    # an actual model is chosen; a placeholder is allowed until then.
+    replication_model = model.get("replication_model")
+    if replication_model is not None:
+        _require_nonempty_str(replication_model, "model.replication_model")
+        if (
+            replication_model != PLACEHOLDER_REPLICATION_MODEL
+            and replication_model == model_name
+        ):
+            raise ValidationError(
+                "model.replication_model must differ from model.name once selected; "
+                f"both are {model_name!r}"
+            )
 
     design = data["design"]
     axes = tuple(design.get("axes", ()))
@@ -225,8 +387,10 @@ def parse_config(data: dict[str, Any]) -> PilotConfig:
         raise ValidationError("config analysis.seeds must be non-empty")
 
     return PilotConfig(
+        config_version=str(config_version),
         model_name=model_name,
         model_revision=model_revision,
+        replication_model=replication_model,
         axes=axes,
         domains=domains,
         layers=layers,

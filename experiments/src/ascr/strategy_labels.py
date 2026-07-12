@@ -29,6 +29,40 @@ RESPONSE_STRATEGIES: Final[tuple[str, ...]] = (
 )
 
 # ---------------------------------------------------------------------------
+# Two-tier taxonomy (v0.1.1 amendment): four primary superclasses used for the
+# primary pilot analysis. The nine fine labels above are retained for the
+# secondary and qualitative analysis. Every fine label maps to exactly one
+# superclass; the mapping is checked by the unit tests.
+# ---------------------------------------------------------------------------
+STRATEGY_SUPERCLASSES: Final[tuple[str, ...]] = (
+    "direct_or_comply",
+    "qualify_or_warn",
+    "redirect_or_clarify",
+    "decline_or_abstain",
+)
+
+FINE_TO_SUPERCLASS: Final[dict[str, str]] = {
+    "direct_compliance": "direct_or_comply",
+    "calibrated_answer": "qualify_or_warn",
+    "hedging": "qualify_or_warn",
+    "warning": "qualify_or_warn",
+    "correction": "qualify_or_warn",
+    "clarification_request": "redirect_or_clarify",
+    "conditional_continuation": "redirect_or_clarify",
+    "abstention": "decline_or_abstain",
+    "refusal": "decline_or_abstain",
+}
+
+
+def superclass_of(fine_label: str) -> str:
+    """Return the primary superclass for a fine-grained response strategy."""
+    try:
+        return FINE_TO_SUPERCLASS[fine_label]
+    except KeyError as exc:  # pragma: no cover - defensive
+        raise KeyError(f"unknown fine label {fine_label!r}") from exc
+
+
+# ---------------------------------------------------------------------------
 # The 2x2 design cells: actual task state x appraisal-concept mention.
 # ---------------------------------------------------------------------------
 # Keyed by (task_state_present, concept_mention_present).

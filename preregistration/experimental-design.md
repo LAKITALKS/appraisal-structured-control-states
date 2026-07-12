@@ -119,11 +119,17 @@ model revision hash must be recorded in the run config before any data
 generation.** Decoding settings (temperature, top-p, max tokens, seed) are fixed
 and recorded per run.
 
-### Optional replication model
+### Replication model (constraint tightened in v0.1.1)
 
 A second open-weight instruction-tuned model of comparable scale may be named for
-replication in the scaling phase. Naming it here does **not** imply that
-replication has been performed; no replication has been run.
+replication in the scaling phase. **It must not be `Qwen/Qwen2.5-7B-Instruct`
+again** (v0.1.1 amendment): replication on the identical model would not test
+model-independence. Until a documented, compatibility-checked choice is made (e.g.
+a comparable Llama- or Gemma-Instruct model), the config holds the placeholder
+`TO_BE_SELECTED_BEFORE_CONFIRMATORY_REPLICATION`. Naming a model here does **not**
+imply that replication has been performed; no replication has been run. The config
+loader rejects a replication model equal to the primary model once a real model is
+set.
 
 ### Activation extraction
 
@@ -171,3 +177,61 @@ trigger.
   `experiments/data/` and `experiments/results/` contain only README placeholders.
 - Prompt text, labels, and the frozen model revision hash will be released with the
   first data-bearing version, subject to model-license terms.
+
+---
+
+## 8. Concept-mention stimulus-QA protocol (v0.1.1 amendment)
+
+A binding quality-assurance protocol governs the concept-mention cells (B and D)
+so that concept mention does not covary with difficulty and cell B is not more
+artificial or metalinguistic than cell A. This is applied **before any activation
+is extracted**; matched groups that fail are revised or discarded.
+
+Each item is checked for: **naturalness**, **grammatical plausibility**,
+**register**, **prompt length**, **syntactic complexity**, **domain identity**, the
+intended **target task**, **solvability**, the true **presence/absence of the task
+state**, the **concept mention**, absence of **direct label leaks**, and absence of
+**artificial meta-sentences**. These checks are recorded in the optional `qa`
+metadata block of each prompt item (see
+[`../experiments/src/ascr/schema.py`](../experiments/src/ascr/schema.py),
+`REQUIRED_QA_FIELDS`).
+
+For matched groups:
+
+- A–D share the **same underlying base task**.
+- Concept mention must **not** simultaneously change difficulty.
+- Cell B must not read as more artificial or metalinguistic than cell A.
+- Concept markers appear in **several natural paraphrases**, not a single template.
+- **Marker masking** and synonym-based robustness are evaluated.
+- A small **naturalness rating** is collected.
+- **Prompt embeddings, length, and register features** are stored as
+  baselines/covariates.
+
+Disposition of bad groups: any matched group failing the checks above is either
+revised until it passes or discarded from the corpus; the disposition is logged.
+No model activations are collected from unreviewed groups.
+
+---
+
+## 9. Modular mini-shard protocol (v0.1.1 amendment)
+
+The pilot is executable as versioned **mini-shards**, each testing a single axis,
+without pretending to be the full confirmatory study.
+
+- **ASCR-Mini-0** — uncertainty/unanswerability; pipeline, stimulus, and H1
+  feasibility; a few preregistered layers; final prompt-token readout; **no** full
+  steering sweep yet.
+- **ASCR-Mini-1** — norm tension.
+- **ASCR-Mini-2** — controllability.
+
+Each shard carries an **immutable run manifest** with: experiment ID, shard ID,
+prompt-set version, model name, immutable model revision, tokenizer revision, chat
+template, code commit, seed, decoding configuration, layer, token position,
+stimulus-file hash, environment, and timestamp (validated by
+`ascr.schema.RunManifest`).
+
+**Combination rule.** Shards may be combined only if all compatibility-relevant
+manifest fields are identical (`ascr.schema.manifests_compatible`). Any change to
+model, prompt construction, readout, or code is recorded as a new prompt-set
+version or a separate experiment. There is **no** cherry-picking or merging of only
+positive shards; all run shards are reported.
