@@ -2,7 +2,7 @@
 
 **Project:** Toward Appraisal-Structured Latent Control Representations in Language
 Models (ASCR)
-**Status:** v0.1 preregistration draft. No data have been collected.
+**Status:** v0.1 hypotheses, unchanged by the v0.1.1 pre-data amendment; no data collected.
 **Author:** Lazaros Varvatis, Independent Researcher, Berlin, Germany.
 
 This document states the hypotheses that the pilot is designed to test. Each is

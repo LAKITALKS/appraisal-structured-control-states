@@ -1,6 +1,6 @@
 # Preregistered Experimental Design
 
-**Status:** v0.1 preregistration draft. No data have been collected. All numbers
+**Status:** v0.1.1 pre-data amendment; no data collected. All numbers
 below are *planned* pilot parameters, not results.
 
 This document specifies the pilot: the factorial design, the candidate axes and

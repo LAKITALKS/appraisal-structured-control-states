@@ -1,6 +1,6 @@
 # Response-Strategy Taxonomy
 
-**Status:** v0.1 preregistration draft.
+**Status:** v0.1.1 pre-data amendment; no data collected.
 
 The target variable of ASCR is a higher-level **response strategy** (policy mode),
 not the raw next-token distribution. This document defines the strategy labels, the
@@ -57,6 +57,27 @@ The four superclasses are the **primary** analysis target (more robust, higher
 per-class counts, less evaluator-dependent). The nine fine labels remain for
 **secondary** analysis, qualitative detail, and a later larger study. The fine
 taxonomy is not otherwise modified.
+
+### Dominance / tie-breaker rule (v0.1.1, 2nd pass)
+
+When a single response plausibly exhibits more than one communicative act, the
+**dominant** superclass is chosen by this fixed priority ordering (highest first):
+
+1. **`decline_or_abstain`** — full non-answer on epistemic or normative grounds.
+2. **`redirect_or_clarify`** — a follow-up question, or continuation only under a
+   stated condition / partial scope.
+3. **`qualify_or_warn`** — a substantive answer carrying a substantial confidence
+   limitation, warning, or correction.
+4. **`direct_or_comply`** — unqualified execution with no caveat.
+
+`calibrated_answer` always maps to `qualify_or_warn`, because `direct_compliance` is
+defined as carrying **no** substantial limitations or caveats; a substantively
+scoped answer is therefore never `direct_or_comply`. This ordering is a documented
+rubric for human labelers and a deterministic mapping over a set of candidate fine
+labels (`ascr.strategy_labels.dominant_superclass`); it is **not** a generative
+classifier and makes no claim to label text automatically. Only **canonical**
+taxonomy terms are used (e.g. `conditional_continuation`, `abstention`); no
+non-canonical terms such as "explicit limitation" or "conditional compliance".
 
 ## Distinguishing near-neighbors
 

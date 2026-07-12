@@ -62,6 +62,33 @@ def superclass_of(fine_label: str) -> str:
         raise KeyError(f"unknown fine label {fine_label!r}") from exc
 
 
+# Dominance ordering for tie-breaking when a response exhibits several acts
+# (highest priority first). See preregistration/response-strategy-taxonomy.md.
+SUPERCLASS_DOMINANCE: Final[tuple[str, ...]] = (
+    "decline_or_abstain",
+    "redirect_or_clarify",
+    "qualify_or_warn",
+    "direct_or_comply",
+)
+
+
+def dominant_superclass(fine_labels: "list[str] | tuple[str, ...] | set[str]") -> str:
+    """Return the dominant superclass for a set of candidate fine labels.
+
+    Deterministic tie-breaker (not a generative classifier): map each candidate
+    fine label to its superclass, then pick the highest-priority superclass per
+    ``SUPERCLASS_DOMINANCE``. Raises on an empty or unknown input.
+    """
+    labels = list(fine_labels)
+    if not labels:
+        raise ValueError("dominant_superclass requires at least one fine label")
+    present = {superclass_of(f) for f in labels}
+    for sup in SUPERCLASS_DOMINANCE:
+        if sup in present:
+            return sup
+    raise AssertionError("unreachable: every superclass is in SUPERCLASS_DOMINANCE")
+
+
 # ---------------------------------------------------------------------------
 # The 2x2 design cells: actual task state x appraisal-concept mention.
 # ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 # Falsification Criteria
 
-**Status:** v0.1 preregistration draft. No data have been collected.
+**Status:** v0.1 criteria, unchanged by the v0.1.1 pre-data amendment; no data collected.
 
 This document lists, in advance, the conditions under which the central
 interpretation is **weakened or rejected**. Committing to these before data

@@ -1,6 +1,6 @@
 # Preregistered Analysis Plan
 
-**Status:** v0.1 preregistration draft. No data have been collected. This document
+**Status:** v0.1.1 pre-data amendment; no data collected. This document
 fixes the analyses *before* any data exist.
 
 Cross-references: [`hypotheses.md`](hypotheses.md),

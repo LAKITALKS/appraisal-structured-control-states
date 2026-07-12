@@ -1,6 +1,6 @@
 # Controls and Baselines
 
-**Status:** v0.1 preregistration draft. No data have been collected.
+**Status:** v0.1.1 pre-data amendment; no data collected.
 
 This document specifies (1) the mandatory lexical-geometry control, (2) the
 competing explanations and baselines the ASCR representation must beat, and (3) the
