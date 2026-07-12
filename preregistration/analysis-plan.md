@@ -92,6 +92,63 @@ as possible) is the operative criterion.
 - Decision rules and failure conditions in
   [`falsification-criteria.md`](falsification-criteria.md).
 
+## 6b. Family-structure test (v0.1.1 amendment)
+
+Preregistered addition (see [`amendment-v0.1.1.md`](amendment-v0.1.1.md) §5). The
+shared-control-family claim is **not** established by H1–H3 alone: succeeding on
+three individual axes is compatible with three independent, already-known
+directions. The family claim requires all three components below. This is a
+precommitment, not a post-hoc discovery.
+
+### A. Shared low-rank model vs separate models
+
+- **Separate models:** independent per-axis linear predictors,
+  `z_u = w_u^T h`, `z_n = w_n^T h`, `z_c = w_c^T h`.
+- **Shared model:** a common low-rank basis `Q` (rank `r`) with axis-specific
+  heads, `z = Q^T h`, `y_j = a_j^T z`.
+- **Fairness:** total effective complexity (free parameters / effective degrees of
+  freedom) is matched between the shared and separate families, or the shared model
+  is *penalized* to be no larger.
+- **Evaluation:** fully unseen matched groups; leave-one-domain-out transfer;
+  matched-group-level cross-validation only; random-subspace and PCA controls of the
+  same rank `r`.
+- **Decision:** the shared space is supported **only** if it delivers at least one
+  of — better held-out generalization, better parameter efficiency, more stable axis
+  structure (e.g. higher subspace-alignment across folds/seeds), or additional
+  response-strategy explanation — relative to equally complex separate models. A 3-D
+  subspace spanned by three axis directions is, by itself, **not** evidence of a
+  family.
+
+### B. Structured behavioral specificity
+
+Preregistered, falsifiable direction→strategy expectations (superclasses from
+[`response-strategy-taxonomy.md`](response-strategy-taxonomy.md)):
+
+- **Uncertainty / unanswerability →** calibrated answer, hedging, clarification,
+  abstention.
+- **Low controllability →** clarification request, conditional continuation,
+  explicit limitation.
+- **Norm tension →** warning, correction, conditional compliance, and refusal only
+  where genuinely required.
+
+The family claim is **weakened** if every direction merely produces a generic
+refusal, negativity, or degradation effect, i.e. if the axes are behaviorally
+interchangeable.
+
+### C. Incremental shared contribution
+
+Nested comparison, evaluated on held-out domains:
+
+- **Base:** known single directions (unanswerability, refusal, difficulty where
+  reproducible) plus simple baselines (see
+  [`controls-and-baselines.md`](controls-and-baselines.md)).
+- **Full:** base **+** the shared ASCR representation.
+
+The family is supported only if the shared representation explains additional,
+robust, held-out response-strategy variance beyond the base, with bootstrap CI
+excluding zero after FDR correction. The full family claim is assessed only once at
+least two (ideally three) axes are adequately operationalized and tested.
+
 ## 7. H4 analysis — ordered emergence (exploratory)
 
 - Layer x position grid of probe reliability for (a) coarse pressure/relevance,

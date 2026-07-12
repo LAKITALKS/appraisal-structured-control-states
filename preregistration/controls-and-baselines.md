@@ -102,3 +102,66 @@ controls — supports the hypothesis.
 Track fluency/perplexity and off-target neutral-task accuracy under every
 intervention. An intervention that shifts strategy only by destroying general
 linguistic competence is treated as uninformative for the hypothesis.
+
+---
+
+## 4. Primary direction derivation (v0.1.1 amendment)
+
+Preregistered addition (see [`amendment-v0.1.1.md`](amendment-v0.1.1.md) §6). The
+v0.1.0 plan named several probes and interventions but did not fix a single primary
+steering direction. To remove analytic degrees of freedom, exactly one primary rule
+is fixed here; everything else is a declared robustness analysis.
+
+1. **Primary decoding:** regularized logistic regression.
+2. **Primary intervention direction:** the **normalized difference-in-means** of
+   activations between task-state-present and task-state-absent, computed **only**
+   from training groups, with the concept-mention factor **balanced** within the
+   training data. Formally, with `mu_present` and `mu_absent` the training-group
+   means at a fixed (layer, token position),
+   `d = (mu_present - mu_absent) / || mu_present - mu_absent ||`.
+3. **Robustness only:** probe-weight, LDA, and ridge directions are declared
+   robustness analyses, never the primary result.
+4. **Layer selection:** chosen using training/validation data only. The test set is
+   never used to choose layer or direction.
+5. **Intervention strengths:** a fixed, preregistered set of values. The best
+   strength is never selected on the final test set.
+6. **Normalization:** the primary direction and every control share **identical
+   norm**.
+7. **Named-direction controls:** matched-norm random directions, PCA directions,
+   and known unanswerability / refusal / difficulty directions where these can be
+   reproduced.
+
+This supersedes the more permissive v0.1.0 phrasing (which listed logistic
+regression, ridge, and LDA as co-equal candidates). The change is documented here,
+in the amendment, and in the CHANGELOG; no data existed when it was made.
+
+---
+
+## 5. Baseline battery (v0.1.1 amendment)
+
+The v0.1.0 baseline list (Section 2 above) is retained and refined. Two baselines
+are elevated to **primary** comparisons:
+
+- **Prompt-embedding baseline** — a strong non-mechanistic sentence/prompt
+  embedding predictor of response strategy. Primary. The task-state representation
+  must beat it and add incremental value on held-out domains.
+- **Difficulty-representation baseline** — a decodable generic-difficulty
+  representation (cf. linear difficulty probes in prior work), included because
+  difficulty is a known confound for the task-state axes. Primary **where
+  reproducible**; otherwise a planned robustness check (see below).
+
+Tiering of baselines by pilot stage:
+
+- **Mandatory in the mini-pilot (per axis):** prompt-embedding, prompt length,
+  token entropy, lexical/bag-of-words, matched-norm random and PCA subspaces.
+- **Added in the full pilot:** sentiment/signed-valence, valence/arousal subspace,
+  confidence/unanswerability direction, single refusal direction,
+  evaluation-awareness direction.
+- **Planned robustness only (no reproducible code/weights):** any baseline whose
+  published direction or weights cannot be reproduced is reported as a planned
+  robustness comparison, clearly labeled as not-yet-run, never as a completed
+  result.
+
+Support for ASCR requires incremental value over the **strongest** primary
+baseline, including the prompt-embedding and difficulty baselines, not merely over
+the weakest.
