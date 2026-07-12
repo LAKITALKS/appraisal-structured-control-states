@@ -9,8 +9,8 @@ abstract: >-
   representations that partially govern response-strategy selection across
   domains. This version reports no experimental results.
 type: dataset
-version: "0.1.0"
-date-released: "2026-07-10"
+version: "0.1.1"
+date-released: "2026-07-12"
 authors:
   - family-names: "Varvatis"
     given-names: "Lazaros"
@@ -25,10 +25,10 @@ preferred-citation:
     - family-names: "Varvatis"
       given-names: "Lazaros"
   year: 2026
-  version: "0.1.0"
-  doi: "10.5281/zenodo.21294933"
-  url: "https://doi.org/10.5281/zenodo.21294933"
-  notes: "Preregistration draft; reports no experimental results."
+  version: "0.1.1"
+  doi: "10.5281/zenodo.21294932"
+  url: "https://doi.org/10.5281/zenodo.21294932"
+  notes: "Pre-data amendment; reports no experimental results. The DOI above is the Zenodo concept DOI (resolves to the latest version). The v0.1.1 version-specific DOI is pending the Zenodo deposit and will be recorded after release; the v0.1.0 version DOI 10.5281/zenodo.21294933 remains the historical archived version."
 keywords:
   - "mechanistic interpretability"
   - "representation engineering"
