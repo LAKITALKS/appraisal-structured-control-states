@@ -118,6 +118,20 @@ Planned initial counts:
 
 Total initial pilot corpus target: **~350 hand-authored, reviewed prompts.**
 
+### Study stages (clarified in v0.1.1, 2nd pass)
+
+To avoid presenting any count as a powered study, three stages are distinguished:
+
+1. **Feasibility (mini-shards, §9).** ASCR-Mini-0 targets **≥ 40 complete matched
+   groups** on the uncertainty axis alone, spread as evenly as feasible across the
+   four domains, all A/B/C/D cells per group. This is a **feasibility size**, not a
+   power analysis, and yields effect-size/variance estimates.
+2. **Pilot.** The ~24 matched-groups-per-axis / ~350-prompt figures above are an
+   **early pilot-stage target**, explicitly **not** a powered study.
+3. **Confirmatory.** Final sizes are fixed by a documented **power/precision
+   analysis** (using feasibility estimates), frozen in a versioned pre-data run plan
+   **before** any confirmatory data collection.
+
 ### Scaling plan (later, not part of v0.1)
 
 If the pilot shows a signal that survives the controls, scale to: more matched
@@ -242,13 +256,30 @@ unreviewed groups.**
 ## 9. Modular mini-shard protocol (v0.1.1 amendment)
 
 The pilot is executable as versioned **mini-shards**, each testing a single axis,
-without pretending to be the full confirmatory study.
+**explicitly as feasibility studies**, without pretending to be the full
+confirmatory study. **No arbitrary success/failure thresholds are used** — in
+particular, no "balanced accuracy ≥ 75 % = success", no "≤ 60 % = failure", and no
+automatic "3-percentage-point" margin.
 
-- **ASCR-Mini-0** — uncertainty/unanswerability; pipeline, stimulus, and H1
-  feasibility; a few preregistered layers; final prompt-token readout; **no** full
-  steering sweep yet.
-- **ASCR-Mini-1** — norm tension.
-- **ASCR-Mini-2** — controllability.
+**ASCR-Mini-0** — axis: uncertainty/unanswerability. Purpose: pipeline validation,
+stimulus QA, split integrity, activation extraction, variance and effect-size
+estimation, and an **early** look at H1 on the uncertainty axis. Mini-0 is
+explicitly **not** a confirmatory H1 test, **not** evidence for the family claim,
+and **not** a falsification verdict on ASCR as a whole.
+
+- **Sample plan (feasibility, not a power analysis):** target **≥ 40 complete
+  matched groups** for Mini-0, spread as evenly as feasible across the four domains,
+  with all four A/B/C/D cells per matched group.
+- **After Mini-0:** effect size, variance, and CIs are reported **in full**; before
+  any powered H1 pilot, a documented **power/precision analysis** is run and its
+  result is **frozen in a versioned pre-data run plan** before further data
+  collection. **No cherry-picking** of positive layers or domains.
+
+**ASCR-Mini-1** — norm tension. **ASCR-Mini-2** — controllability. Same feasibility
+framing.
+
+**Holonomy exclusion.** Mini-0/1/2 collect and analyse **no** holonomy,
+dialogue-loop, path-dependence, or user-signature data (amendment §4).
 
 Each shard carries an **immutable run manifest** with: experiment ID, shard ID,
 prompt-set version, model name, immutable model revision, tokenizer revision, chat
@@ -286,3 +317,18 @@ Rules:
 
 The run-ready gate rejects any externally-sourced item whose provenance is not
 review-approved (`decision == include`, with a human-reviewed label and reviewer).
+
+---
+
+## 11. Generation determinism: temperature and seeds (v0.1.1 amendment, 2nd pass)
+
+- **Primary text generation uses `temperature: 0`.** Per item and per intervention
+  condition, the primary output is a **single deterministic generation**.
+- **Generation seeds are not interpreted as independent text samples.** Seeds
+  primarily affect: matched-group splits; probe initialization / solver;
+  random-direction controls; the bootstrap; and possible numerical nondeterminism.
+- **Hardware, deterministic backend flags, and software versions** are recorded in
+  the run manifest (`ascr.schema.RunManifest.environment` / `decoding`).
+- A later **sampling-robustness analysis with `temperature > 0`** would be
+  **secondary** and requires a **separately frozen** config; it is not part of the
+  primary analysis.

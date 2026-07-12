@@ -7,6 +7,28 @@
 
 config_version: "0.1.1"
 
+# Study staging and run gate (v0.1.1, 2nd pass). These fields are machine-readable
+# so a validation gate can block a real run while placeholders remain. No spurious
+# precision or result values are entered here.
+study_stage: feasibility          # feasibility | pilot | confirmatory
+validation_mode: draft            # draft (no extraction) | run_ready
+mini_shard_id: ASCR-Mini-0        # active shard for this config
+target_matched_groups: 40         # feasibility floor for Mini-0 (not a power analysis)
+no_holonomy_data: true            # ASCR shards collect no holonomy/loop/user-signature data
+axis_isolation_required: true     # primary matched groups manipulate one axis only
+external_label_review_required: true  # external labels need human-reviewed provenance
+temperature_zero_generation_policy:
+  primary_temperature: 0.0
+  deterministic_single_generation: true
+  seeds_are_independent_text_samples: false
+  seeds_govern:
+    - matched_group_splits
+    - probe_initialization_or_solver
+    - random_direction_controls
+    - bootstrap
+    - numerical_nondeterminism
+  sampling_robustness_temperature_gt_zero: secondary_separately_frozen
+
 model:
   # Open-weight, instruction-tuned model in the ~7B-9B range.
   name: "Qwen/Qwen2.5-7B-Instruct"
@@ -74,6 +96,11 @@ analysis:
   primary_direction: difference_in_means_task_state_present_minus_absent
   split_level: matched_group
   transfer: leave_one_domain_out
+  nested_cv: true
+  # H1 primary metric is balanced accuracy on deconfounded cells; the family test
+  # (below) uses held-out log-loss as its primary metric.
+  primary_metric: held_out_log_loss
+  h1_primary_metric: balanced_accuracy_deconfounded_cells
   seeds: [0, 1, 2, 3, 4]
   bootstrap_resamples: 1000
   multiple_comparison_correction: benjamini_hochberg
@@ -87,13 +114,28 @@ analysis:
     - matched_norm_random_subspace
     - pca_subspace
 
-# Family-structure test (v0.1.1 amendment): the family claim is not established by
-# individual axes alone. See preregistration/analysis-plan.md section 6b.
+# Family-structure test (v0.1.1 amendment): the family claim requires A AND B AND C.
+# See preregistration/analysis-plan.md section 6b.
 family_structure_test:
+  require_all_of: [A_shared_vs_separate, B_behavioral_specificity, C_incremental]
   shared_low_rank_vs_separate: true
   structured_behavioral_specificity: true
   incremental_shared_contribution: true
   min_axes_before_family_claim: 2
+  # Rank grid: primary r in {1,2} for three axes; r=3 secondary sensitivity only;
+  # r=1 admissible with two axes. Rank/regularization chosen in the inner CV loop.
+  family_rank_grid: [1, 2]
+  family_rank_grid_secondary: [3]
+  primary_metric: pooled_held_out_log_loss
+  decision_rule: paired_matched_group_bootstrap_ci_below_zero_after_fdr
+  arbitrary_margin: none
+
+# Concept-mention QA thresholds enforced by the run-ready gate (ascr.schema).
+qa_thresholds:
+  min_naturalness_rating: 4
+  max_within_group_naturalness_spread: 1
+  required_disposition: pass
+  naturalness_scale: [1, 5]
 
 intervention:
   methods:
@@ -109,14 +151,23 @@ intervention:
 
 # Modular mini-shard pilot protocol (v0.1.1 amendment). Each shard tests a single
 # axis and carries an immutable run manifest; shards combine only if all
-# compatibility-relevant manifest fields are identical.
+# compatibility-relevant manifest fields are identical. Feasibility studies only —
+# no arbitrary success/failure thresholds. Mini-0/1/2 collect NO holonomy,
+# dialogue-loop, path-dependence, or user-signature data.
 mini_shards:
   - id: ASCR-Mini-0
     axis: uncertainty
+    kind: feasibility
     goal: pipeline_stimulus_and_H1_feasibility
     readout: prompt_final_token
     full_steering_sweep: false
+    target_matched_groups: 40
+    no_holonomy_data: true
   - id: ASCR-Mini-1
     axis: norm_tension
+    kind: feasibility
+    no_holonomy_data: true
   - id: ASCR-Mini-2
     axis: controllability
+    kind: feasibility
+    no_holonomy_data: true

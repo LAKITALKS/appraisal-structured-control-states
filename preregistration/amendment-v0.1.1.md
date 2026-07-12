@@ -223,20 +223,27 @@ enforced by unit tests.
 ## 9. New precisification: modular mini-shards
 
 The pilot is executable as versioned **mini-shards**, each testing a single axis,
-without pretending to be the full confirmatory study:
+**explicitly as feasibility studies** — not the full confirmatory study, and with
+**no arbitrary success/failure thresholds** (no "≥ 75 % = success", no "≤ 60 % =
+failure", no automatic 3-percentage-point margin):
 
-- **ASCR-Mini-0** — uncertainty/unanswerability; pipeline/stimulus/H1 feasibility;
-  a few preregistered layers; final prompt-token readout; no full steering sweep.
-- **ASCR-Mini-1** — norm tension.
-- **ASCR-Mini-2** — controllability.
+- **ASCR-Mini-0** — uncertainty/unanswerability. Purpose: pipeline/stimulus/split
+  validation, activation extraction, variance and effect-size estimation, and an
+  **early** H1 look. Explicitly **not** a confirmatory H1 test, **not** family-claim
+  evidence, and **not** a falsification verdict on ASCR. Sample plan: **≥ 40 complete
+  matched groups** across the four domains (feasibility size, not a power analysis);
+  full effect-size/variance/CI reporting; a documented power/precision analysis is
+  frozen in a versioned pre-data run plan before any powered pilot.
+- **ASCR-Mini-1** — norm tension. **ASCR-Mini-2** — controllability.
 
 Each shard carries an **immutable run manifest** (experiment ID, shard ID,
 prompt-set version, model name, immutable model revision, tokenizer revision, chat
 template, code commit, seed, decoding config, layer, token position, stimulus-file
 hash, environment, timestamp). Shards may be combined only if all
 compatibility-relevant fields are identical. No cherry-picking or merging of only
-positive shards. Details in [`experimental-design.md`](experimental-design.md)
-§"Modular mini-shard protocol".
+positive shards. **Mini-0/1/2 collect no holonomy, dialogue-loop, path-dependence,
+or user-signature data** (§4). Details in
+[`experimental-design.md`](experimental-design.md) §9.
 
 ---
 

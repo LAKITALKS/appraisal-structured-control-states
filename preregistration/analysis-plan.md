@@ -35,6 +35,13 @@ information that the model does not use.
   every reported metric.
 - **Multiple-comparison correction** (Benjamini–Hochberg FDR) across the family of
   probe/axis/layer tests, with the family defined in advance.
+- **Seed semantics (v0.1.1, 2nd pass).** Primary text generation is deterministic
+  (`temperature: 0`, one generation per item and intervention condition). Seeds are
+  **not** independent text samples; they govern matched-group splits, probe
+  initialization/solver, random-direction controls, the bootstrap, and possible
+  numerical nondeterminism. Any `temperature > 0` sampling-robustness analysis is
+  secondary and separately frozen (see
+  [`experimental-design.md`](experimental-design.md) §11).
 
 ## 3. Identifiability, not orthogonality
 
@@ -63,6 +70,20 @@ as possible) is the operative criterion.
   probe on the deconfounded evaluation, with bootstrap CI excluding equality after
   FDR correction. H1 is weakened/rejected under the conditions in
   [`falsification-criteria.md`](falsification-criteria.md).
+
+### H1 prompt-embedding comparison (v0.1.1, 2nd pass — does not redefine H1)
+
+For Mini-0/H1 we additionally report a **prompt-embedding classifier for
+`task_state_present`**, using the **same matched-group splits** and the **same LODO
+folds** as the hidden-state probe. We report task-state decoding from: the hidden
+state; the prompt embedding; lexical / bag-of-words; and prompt length.
+
+- The **H1 decision is unchanged**: task-state probe vs concept-mention probe on the
+  deconfounded cells (above). The prompt-embedding comparison is documented as a
+  **strong competing explanation** and as the **link to H2** (incremental value over
+  a prompt-embedding baseline), **not** as a silent redefinition of H1. A hidden
+  state that merely matches a prompt embedding does not, by itself, establish a
+  task-induced internal state beyond the input's surface encoding.
 
 ## 5. H2 analysis — transfer and incremental value
 
