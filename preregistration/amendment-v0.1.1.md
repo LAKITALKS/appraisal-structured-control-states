@@ -101,7 +101,17 @@ amendment:
 - the mandatory **lexical-geometry** and **competence** controls.
 
 Explicitly **out of scope** for v0.1.1 (not added): any holonomy hypothesis, any
-"H5", and any latent-error-model (LEM) extension.
+"H5", any steer-plus-unsteer null theorem, WILSON as an ASCR baseline, any
+latent-error-model (LEM) module, and any user-signature construct.
+
+### Holonomy exclusion rule (v0.1.1, 2nd pass)
+
+ASCR v0.1.1 remains **entirely scoped to ASCR**. **ASCR-Mini-0, Mini-1, and Mini-2
+collect and analyse no holonomy, dialogue-loop, path-dependence, or user-signature
+data.** A later ASCR-H / holonomy protocol, if pursued at all, will be
+**preregistered only after independent validation of the ASCR control states**, and
+**before** any new data collection of its own. This second-pass revision explicitly
+**declines** the external recommendation to open a v0.2 holonomy amendment now.
 
 ---
 
@@ -173,15 +183,23 @@ difference-in-means intervention direction is now the single primary rule.
 
 ## 7. New precisification: concept-mention (B/D) quality protocol
 
-A binding stimulus-QA protocol governs the concept-mention cells so that cell B is
-not more artificial or metalinguistic than cell A, and concept mention does not
-covary with difficulty. Full protocol in
-[`experimental-design.md`](experimental-design.md) §"Concept-mention stimulus-QA
-protocol". Minimum checks: naturalness, grammatical plausibility, register, prompt
-length, syntactic complexity, domain identity, target task, solvability, the true
-presence/absence of the task state, the concept mention, avoidance of direct label
-leaks, and avoidance of artificial meta-sentences. Bad matched groups are revised
-or discarded **before** any activation is extracted.
+A stimulus-QA protocol governs the concept-mention cells so that cell B is not more
+artificial or metalinguistic than cell A, and concept mention does not covary with
+difficulty. In the 2nd pass it is made **technically binding** with two modes,
+`draft` (incomplete QA allowed; no activation extraction) and `run_ready` (complete,
+typed QA required). Full protocol and typed fields in
+[`experimental-design.md`](experimental-design.md) §8; enforced in code by
+`ascr.schema.validate_qa(..., mode="run_ready")`, `qa_item_passes`,
+`validate_run_ready_group`, and the whole-set gate `check_run_ready`. Item pass
+requires `disposition == pass`, all required booleans True, and
+`naturalness_rating >= 4`; a matched group additionally requires all four cells and a
+within-group naturalness spread of at most one point. **Axis isolation:** primary
+matched groups manipulate only one primary axis, recorded via `primary_axis_isolated`
+and the `*_absent_confirmed` flags; multi-axis items are a separate secondary
+robustness set only (see [`experimental-design.md`](experimental-design.md) §2). Bad
+matched groups are revised or discarded **before** any activation is extracted.
+External items additionally require a review-approved provenance record
+([`experimental-design.md`](experimental-design.md) §10).
 
 ---
 

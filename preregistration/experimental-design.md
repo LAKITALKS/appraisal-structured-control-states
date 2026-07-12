@@ -41,18 +41,39 @@ task-state factor** (cells C, D vs A, B) rather than the **vocabulary factor**
 
 ## 2. Candidate axes
 
-### Primary pilot axes
+### Primary pilot axes (definitions sharpened in v0.1.1, 2nd pass)
 
-1. **Uncertainty / unanswerability.** Task state present = the task genuinely
-   cannot be answered from the information given (missing premise, undecidable
-   question). Concept mention = the prompt uses uncertainty vocabulary.
-2. **Rule / instruction conflict (norm tension).** Task state present = the task
-   contains two incompatible instructions or a norm/instruction collision. Concept
-   mention = the prompt uses conflict/tension vocabulary.
-3. **Controllability / coping capacity.** Task state present = the task is
-   structurally low-controllability for the model (no tool, no information, no
-   permissible action that resolves it). Concept mention = the prompt uses
-   control/coping vocabulary.
+The three primary axes are defined so their **task-state-present** conditions are
+mutually exclusive; controllability is explicitly separated from unanswerability and
+from norm tension.
+
+1. **Uncertainty / unanswerability.** Task state present = the information needed to
+   answer is **missing**, or the question is **undecidable as posed**. Crucially, the
+   model would in principle have a permissible answer/action path **if the missing
+   information were supplied**. Concept mention = the prompt uses uncertainty
+   vocabulary.
+2. **Low controllability / coping capacity.** Task state present = the
+   decision-relevant information **is present** and the model **can determine what
+   would need to be done**, but **execution is impossible** because a tool, access,
+   action channel, or actual means of acting is missing. Missing information must
+   **not** be the reason; a norm/policy conflict must **not** be the reason.
+   *Example structure:* "Here is the full content and the desired change. Apply the
+   change directly in the external system." — the model knows the action but has no
+   access. Concept mention = the prompt uses control/coping vocabulary.
+3. **Norm tension (rule / instruction conflict).** Task state present = information
+   **and** in-principle capability are present, but **two instructions, norms, or
+   admissible requirements collide**. Concept mention = the prompt uses
+   conflict/tension vocabulary.
+
+### Axis-isolation rule (v0.1.1, 2nd pass)
+
+**Primary matched groups may manipulate only one primary axis at a time.** Each
+item records the axis-isolation QA flags relevant to its target axis, e.g.
+`primary_axis_isolated`, and the confirmations that the *other* task states are
+absent: `unanswerability_absent_confirmed`, `norm_tension_absent_confirmed`,
+`controllability_absent_confirmed` (as applicable to the target axis). Multi-axis
+items are admissible **only** as a separately labelled secondary robustness set and
+**must not** enter the primary single-axis analysis.
 
 ### Secondary / exploratory axes
 
@@ -180,36 +201,41 @@ trigger.
 
 ---
 
-## 8. Concept-mention stimulus-QA protocol (v0.1.1 amendment)
+## 8. Concept-mention stimulus-QA protocol (technically binding in v0.1.1, 2nd pass)
 
-A binding quality-assurance protocol governs the concept-mention cells (B and D)
-so that concept mention does not covary with difficulty and cell B is not more
-artificial or metalinguistic than cell A. This is applied **before any activation
-is extracted**; matched groups that fail are revised or discarded.
+A quality-assurance protocol governs the concept-mention cells (B and D) so that
+concept mention does not covary with difficulty and cell B is not more artificial or
+metalinguistic than cell A. In the 2nd pass this is made **technically binding**
+with two validation modes enforced in code
+([`../experiments/src/ascr/schema.py`](../experiments/src/ascr/schema.py)):
 
-Each item is checked for: **naturalness**, **grammatical plausibility**,
-**register**, **prompt length**, **syntactic complexity**, **domain identity**, the
-intended **target task**, **solvability**, the true **presence/absence of the task
-state**, the **concept mention**, absence of **direct label leaks**, and absence of
-**artificial meta-sentences**. These checks are recorded in the optional `qa`
-metadata block of each prompt item (see
-[`../experiments/src/ascr/schema.py`](../experiments/src/ascr/schema.py),
-`REQUIRED_QA_FIELDS`).
+- **`draft`** — incomplete QA is allowed during authoring; **no activation
+  extraction is permitted**.
+- **`run_ready`** — every item and every matched group must carry a complete, typed
+  QA record; no run may proceed otherwise.
 
-For matched groups:
+**Typed QA fields (run_ready).** Each item's `qa` block must contain:
+`naturalness_rating` (integer 1–5), and booleans `grammatical`, `register_match`,
+`domain_match`, `target_task_match`, `solvable_as_intended`,
+`task_state_present_confirmed`, `concept_mention_confirmed`, `label_leak_free`,
+`no_artificial_meta_sentence`, `primary_axis_isolated`; plus `reviewer_id`
+(non-empty), `review_timestamp` (ISO-8601), and `disposition` (`pass` / `revise` /
+`discard`).
 
-- A–D share the **same underlying base task**.
-- Concept mention must **not** simultaneously change difficulty.
-- Cell B must not read as more artificial or metalinguistic than cell A.
-- Concept markers appear in **several natural paraphrases**, not a single template.
-- **Marker masking** and synonym-based robustness are evaluated.
-- A small **naturalness rating** is collected.
-- **Prompt embeddings, length, and register features** are stored as
-  baselines/covariates.
+**Item pass rule.** `disposition == pass`; all required booleans equal their
+expected value (True); and `naturalness_rating >= 4`.
 
-Disposition of bad groups: any matched group failing the checks above is either
-revised until it passes or discarded from the corpus; the disposition is logged.
-No model activations are collected from unreviewed groups.
+**Matched-group pass rule.** All four A/B/C/D cells present; every item passes; and
+the **within-group naturalness spread across A/B/C/D is at most one scale point**.
+
+**Whole-set gate.** `ascr.schema.check_run_ready(...)` validates an entire stimulus
+set and blocks a run unless every matched group is run_ready, the model revision is
+frozen (not a placeholder), the configured sample-size floor of complete groups is
+met, and any externally-sourced items are review-approved (see §10). Marker masking
+and synonym-based robustness are evaluated; prompt embeddings, length, and register
+features are stored as baselines/covariates. Groups failing QA are `revise`d or
+`discard`ed; the disposition is logged. **No activations are collected from
+unreviewed groups.**
 
 ---
 
@@ -235,3 +261,28 @@ manifest fields are identical (`ascr.schema.manifests_compatible`). Any change t
 model, prompt construction, readout, or code is recorded as a new prompt-set
 version or a separate experiment. There is **no** cherry-picking or merging of only
 positive shards; all run shards are reported.
+
+---
+
+## 10. External-data provenance protocol (v0.1.1 amendment, 2nd pass)
+
+Any item adapted from an external dataset, and any source collection, records a
+provenance block (`ascr.schema.EXTERNAL_PROVENANCE_FIELDS`): `dataset_name`,
+`version`, `split`, `original_id`, `license`, `source`, `retrieval_date`,
+`original_label`, `human_reviewed_label`, `reviewer_id`, `adjustments`,
+`contamination_risk`, and `decision` (`include` / `revise` / `exclude`).
+
+Rules:
+
+- **No external answerability/unanswerability label is used unreviewed.** Every
+  label used in ASCR is confirmed by a human against the actual prompt and context.
+- Borderline cases are **discarded** or separately flagged.
+- Training-data overlap is documented **as far as it is publicly checkable**.
+  Unknown training data is described as **unknown**, not as "contamination-free".
+- **No specific contamination claim** about a named dataset or model is included
+  unless verified against a primary source for the actual model and dataset used.
+- License and provenance metadata must be complete **before** the dataset is
+  released.
+
+The run-ready gate rejects any externally-sourced item whose provenance is not
+review-approved (`decision == include`, with a human-reviewed label and reviewer).

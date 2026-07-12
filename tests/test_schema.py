@@ -252,19 +252,29 @@ def test_placeholder_revision_detected() -> None:
 
 
 def _qa_ok() -> dict[str, object]:
-    return {k: True for k in REQUIRED_QA_FIELDS}
+    """A complete, typed, run_ready-passing QA record."""
+    from ascr.schema import QA_BOOLEAN_FIELDS
+
+    qa: dict[str, object] = {name: True for name in QA_BOOLEAN_FIELDS}
+    qa.update(
+        naturalness_rating=5,
+        reviewer_id="rev-1",
+        review_timestamp="2026-07-12T10:00:00Z",
+        disposition="pass",
+    )
+    return qa
 
 
-def test_item_accepts_complete_qa_block() -> None:
-    item = item_from_dict(_base_item(qa=_qa_ok()))
+def test_item_accepts_qa_block_in_draft_mode() -> None:
+    # A partial QA block is allowed while authoring (draft mode).
+    item = item_from_dict(_base_item(qa={"grammatical": True}))
     assert item.qa is not None
 
 
-def test_item_rejects_incomplete_qa_block() -> None:
-    bad = _qa_ok()
-    del bad["naturalness"]
-    with pytest.raises(ValidationError):
-        item_from_dict(_base_item(qa=bad))
+def test_item_accepts_complete_typed_qa_block() -> None:
+    item = item_from_dict(_base_item(qa=_qa_ok()))
+    assert item.qa is not None
+    item.validate(mode="run_ready")  # complete typed QA passes strict validation
 
 
 def test_complete_matched_group_helper() -> None:
