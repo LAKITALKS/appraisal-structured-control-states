@@ -98,3 +98,44 @@ def test_superclasses_partition_the_fine_labels() -> None:
 def test_superclass_of_rejects_unknown_label() -> None:
     with pytest.raises(KeyError):
         sl.superclass_of("teleport")
+
+
+# --- Dominance / tie-breaker (v0.1.1, 2nd pass) ---
+
+
+def test_dominance_ordering_covers_all_superclasses() -> None:
+    assert set(sl.SUPERCLASS_DOMINANCE) == set(sl.STRATEGY_SUPERCLASSES)
+    assert len(sl.SUPERCLASS_DOMINANCE) == len(sl.STRATEGY_SUPERCLASSES)
+    # Highest priority is decline/abstain; lowest is direct/comply.
+    assert sl.SUPERCLASS_DOMINANCE[0] == "decline_or_abstain"
+    assert sl.SUPERCLASS_DOMINANCE[-1] == "direct_or_comply"
+
+
+def test_dominant_superclass_single_label_matches_mapping() -> None:
+    for fine in sl.RESPONSE_STRATEGIES:
+        assert sl.dominant_superclass([fine]) == sl.superclass_of(fine)
+
+
+@pytest.mark.parametrize(
+    "labels,expected",
+    [
+        (["direct_compliance", "abstention"], "decline_or_abstain"),
+        (["calibrated_answer", "clarification_request"], "redirect_or_clarify"),
+        (["direct_compliance", "warning"], "qualify_or_warn"),
+        (["direct_compliance"], "direct_or_comply"),
+        (["refusal", "clarification_request", "warning"], "decline_or_abstain"),
+    ],
+)
+def test_dominant_superclass_tiebreak(labels, expected) -> None:
+    assert sl.dominant_superclass(labels) == expected
+
+
+def test_calibrated_answer_never_direct_or_comply() -> None:
+    assert sl.superclass_of("calibrated_answer") == "qualify_or_warn"
+
+
+def test_dominant_superclass_rejects_empty_and_unknown() -> None:
+    with pytest.raises(ValueError):
+        sl.dominant_superclass([])
+    with pytest.raises(KeyError):
+        sl.dominant_superclass(["not_a_label"])
