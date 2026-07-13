@@ -24,9 +24,13 @@ made before the first data collection and are documented in
 - The preprint was **compiled** (`paper/preprint.pdf`, 11 pages; tectonic).
 - PR #1 was **merged to `main`** and v0.1.1 **released on GitHub** (tag `v0.1.1`),
   release date 2026-07-13.
-- The **Zenodo archival version and its version-specific DOI are pending**; the
-  concept DOI `10.5281/zenodo.21294932` and the v0.1.0 version DOI
-  `10.5281/zenodo.21294933` are unchanged. v0.1.0 remains untouched.
+- v0.1.1 is **archived on Zenodo** as a new version under the existing concept
+  record: version DOI **`10.5281/zenodo.21335529`**. The concept DOI
+  `10.5281/zenodo.21294932` and the v0.1.0 version DOI `10.5281/zenodo.21294933`
+  are unchanged. v0.1.0 remains untouched.
+- The `v0.1.1` tag and its release asset are the pre-DOI archival build; the DOI was
+  added to `README.md`, `CITATION.cff`, and `paper/` in a follow-up
+  `record v0.1.1 zenodo doi` commit, and the tag is intentionally left unmoved.
 
 ### Added
 - `preregistration/amendment-v0.1.1.md`: the pre-data amendment note.

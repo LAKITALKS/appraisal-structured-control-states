@@ -28,9 +28,9 @@ preferred-citation:
       given-names: "Lazaros"
   year: 2026
   version: "0.1.1"
-  doi: "10.5281/zenodo.21294932"
-  url: "https://doi.org/10.5281/zenodo.21294932"
-  notes: "Pre-data amendment; reports no experimental results. The DOI above is the Zenodo concept DOI (resolves to the latest version). The v0.1.1 version-specific DOI is pending the Zenodo deposit and will be recorded after release; the v0.1.0 version DOI 10.5281/zenodo.21294933 remains the historical archived version."
+  doi: "10.5281/zenodo.21335529"
+  url: "https://doi.org/10.5281/zenodo.21335529"
+  notes: "Pre-data amendment; reports no experimental results. The DOI above is the v0.1.1 version-specific Zenodo DOI. The concept DOI 10.5281/zenodo.21294932 resolves to the latest version; the v0.1.0 version DOI 10.5281/zenodo.21294933 remains the historical archived version."
 keywords:
   - "mechanistic interpretability"
   - "representation engineering"

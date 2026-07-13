@@ -128,21 +128,20 @@ interventions with matched-norm random/PCA controls. Details in
 
 ```bash
 python -m pytest          # run the unit tests
-make paper                # build paper/preprint.pdf (requires latexmk)
+make paper                # build paper/preprint.pdf (latexmk or tectonic)
 ```
 
-> **Build note:** `paper/preprint.pdf` is the compiled version of
-> `paper/main.tex` (latexmk/pdflatex, TeX Live; 9 pages, zero warnings, no
-> undefined citations). To rebuild it yourself, run `make paper` with a standard
-> LaTeX installation.
+> **Build note:** `paper/preprint.pdf` is the compiled version of `paper/main.tex`
+> (11 pages; no undefined citations, no missing references). `make paper` prefers
+> `latexmk` + TeX Live and falls back to the self-contained `tectonic` engine.
 
 ## How to cite
 
 Please cite via [`CITATION.cff`](CITATION.cff). Zenodo DOIs:
 
 - **All versions (concept DOI):** [10.5281/zenodo.21294932](https://doi.org/10.5281/zenodo.21294932) — always resolves to the latest archived version.
+- **v0.1.1 (this pre-data amendment, current):** [10.5281/zenodo.21335529](https://doi.org/10.5281/zenodo.21335529) — cite this version-specific DOI for the present preregistration.
 - **v0.1.0 (historical version DOI):** [10.5281/zenodo.21294933](https://doi.org/10.5281/zenodo.21294933) — the original archived preregistration.
-- **v0.1.1 (this pre-data amendment):** version-specific DOI **pending** the Zenodo deposit for the v0.1.1 release; it will be recorded here in a follow-up DOI-metadata commit. Until then, cite the concept DOI above (or the v0.1.0 version DOI for the original preregistration).
 
 The v0.1.0 archived record remains unchanged. The badge above points to the concept
 DOI so it tracks the latest version.
