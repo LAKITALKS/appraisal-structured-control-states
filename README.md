@@ -8,8 +8,19 @@ Response-Strategy Modulation*
 **Short name:** ASCR (a working abbreviation used in this repository; not an
 established field term).
 
-**Status:** `v0.1 preregistration draft` — this repository reports **no**
-experimental results, datasets, model runs, or figures.
+**Status:** `v0.1.1 pre-data amendment` — this repository still reports **no**
+experimental results, datasets, model runs, or figures. v0.1.1 tightens the v0.1.0
+preregistration *before any data collection*.
+
+The v0.1.1 amendment has completed its pre-data methodological review cycle and is
+currently awaiting PDF compilation and final human release review. No model runs or
+experimental results exist. The amendment was reviewed across multiple independent
+methodological and prior-art cycles before any data collection, and the current
+GitHub state is still an open **draft** pull request.
+
+- [**v0.1.1 pre-data amendment**](preregistration/amendment-v0.1.1.md)
+- [**v0.1.1 pre-data review status**](preregistration/v0.1.1-review-status.md)
+- [**Draft PR #1**](https://github.com/LAKITALKS/appraisal-structured-control-states/pull/1)
 
 ---
 
@@ -125,16 +136,14 @@ make paper                # build paper/preprint.pdf (requires latexmk)
 
 ## How to cite
 
-Version **v0.1.0** has been publicly archived on Zenodo. Please cite via
-[`CITATION.cff`](CITATION.cff), using the version-specific DOI for the present
-preregistration.
+Please cite via [`CITATION.cff`](CITATION.cff). Zenodo DOIs:
 
-- **This exact version (v0.1.0):** [10.5281/zenodo.21294933](https://doi.org/10.5281/zenodo.21294933)
-- **All versions (concept DOI):** [10.5281/zenodo.21294932](https://doi.org/10.5281/zenodo.21294932)
+- **All versions (concept DOI):** [10.5281/zenodo.21294932](https://doi.org/10.5281/zenodo.21294932) — always resolves to the latest archived version.
+- **v0.1.0 (historical version DOI):** [10.5281/zenodo.21294933](https://doi.org/10.5281/zenodo.21294933) — the original archived preregistration.
+- **v0.1.1 (this pre-data amendment):** version-specific DOI **pending** the Zenodo deposit for the v0.1.1 release; it will be recorded here in a follow-up DOI-metadata commit. Until then, cite the concept DOI above (or the v0.1.0 version DOI for the original preregistration).
 
-Citations of this preregistration should use the version-specific DOI,
-[10.5281/zenodo.21294933](https://doi.org/10.5281/zenodo.21294933). The concept
-DOI always resolves to the latest archived version.
+The v0.1.0 archived record remains unchanged. The badge above points to the concept
+DOI so it tracks the latest version.
 
 ## Author
 

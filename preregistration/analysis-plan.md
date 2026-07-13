@@ -1,6 +1,6 @@
 # Preregistered Analysis Plan
 
-**Status:** v0.1 preregistration draft. No data have been collected. This document
+**Status:** v0.1.1 pre-data amendment; no data collected. This document
 fixes the analyses *before* any data exist.
 
 Cross-references: [`hypotheses.md`](hypotheses.md),
@@ -35,6 +35,13 @@ information that the model does not use.
   every reported metric.
 - **Multiple-comparison correction** (Benjamini–Hochberg FDR) across the family of
   probe/axis/layer tests, with the family defined in advance.
+- **Seed semantics (v0.1.1, 2nd pass).** Primary text generation is deterministic
+  (`temperature: 0`, one generation per item and intervention condition). Seeds are
+  **not** independent text samples; they govern matched-group splits, probe
+  initialization/solver, random-direction controls, the bootstrap, and possible
+  numerical nondeterminism. Any `temperature > 0` sampling-robustness analysis is
+  secondary and separately frozen (see
+  [`experimental-design.md`](experimental-design.md) §11).
 
 ## 3. Identifiability, not orthogonality
 
@@ -64,6 +71,20 @@ as possible) is the operative criterion.
   FDR correction. H1 is weakened/rejected under the conditions in
   [`falsification-criteria.md`](falsification-criteria.md).
 
+### H1 prompt-embedding comparison (v0.1.1, 2nd pass — does not redefine H1)
+
+For Mini-0/H1 we additionally report a **prompt-embedding classifier for
+`task_state_present`**, using the **same matched-group splits** and the **same LODO
+folds** as the hidden-state probe. We report task-state decoding from: the hidden
+state; the prompt embedding; lexical / bag-of-words; and prompt length.
+
+- The **H1 decision is unchanged**: task-state probe vs concept-mention probe on the
+  deconfounded cells (above). The prompt-embedding comparison is documented as a
+  **strong competing explanation** and as the **link to H2** (incremental value over
+  a prompt-embedding baseline), **not** as a silent redefinition of H1. A hidden
+  state that merely matches a prompt embedding does not, by itself, establish a
+  task-induced internal state beyond the input's surface encoding.
+
 ## 5. H2 analysis — transfer and incremental value
 
 - **Transfer:** train on `n-1` domains, test on the held-out domain; repeat over
@@ -91,6 +112,89 @@ as possible) is the operative criterion.
   off-target neutral tasks; large degradation invalidates the intervention.
 - Decision rules and failure conditions in
   [`falsification-criteria.md`](falsification-criteria.md).
+
+## 6b. Family-structure test (v0.1.1 amendment)
+
+Preregistered addition (see [`amendment-v0.1.1.md`](amendment-v0.1.1.md) §5). The
+shared-control-family claim is **not** established by H1–H3 alone: succeeding on
+three individual axes is compatible with three independent, already-known
+directions. This is a precommitment, not a post-hoc discovery.
+
+> **Decision rule (binding).** The family claim is supported **only if all three
+> components A, B, and C independently meet their preregistered criteria below.**
+> No single advantage from any list is sufficient; A ∧ B ∧ C is required. All
+> secondary metrics are reported in full but never substitute for the primary
+> per-component decision.
+
+### A. Shared low-rank model vs separate models
+
+- **Shared model:** a common shared bottleneck `Q` (rank `r`), `z = Q^T h`, with
+  **axis-specific logistic heads** `y_j = softmax(a_j^T z)`, trained multi-task.
+- **Comparator:** **separate, regularized per-axis** logistic models, one per axis.
+- **Splits:** identical matched-group splits for shared and separate models;
+  **leave-one-domain-out (LODO)**; strictly **nested** cross-validation
+  (rank and regularization chosen only in the inner training/validation loop, never
+  on the outer test fold). Random-subspace and PCA controls of the same rank `r`.
+- **Rank selection (fixed grid).** With **three** axes tested, the primary rank grid
+  is `r ∈ {1, 2}`; `r = 3` may appear **only** as a secondary sensitivity analysis,
+  because three directions trivially span an at-most-3-D space. With **two** axes
+  tested, the shared-compression test with `r = 1` is admissible, but the full
+  family claim remains provisional until three axes are tested.
+- **Primary metric:** **pooled held-out log-loss (cross-entropy)** over axes and
+  LODO folds.
+- **Secondary metrics (reported, non-deciding):** macro balanced accuracy, per-axis
+  balanced accuracy, subspace stability across seeds/folds, and effective model
+  complexity.
+- **Decision (A):** the **paired matched-group bootstrap** of
+  `log_loss_shared − log_loss_separate` must lie **entirely below zero** after the
+  preregistered FDR correction. No arbitrary margin (e.g. no "3 percentage points")
+  is added; the criterion is a paired CI strictly below zero. A 3-D subspace spanned
+  by three axis directions is, by itself, **not** evidence of a family.
+
+### B. Structured behavioral specificity
+
+Preregistered, falsifiable direction→strategy expectations, stated with **canonical
+taxonomy terms only** (fine labels / superclasses from
+[`response-strategy-taxonomy.md`](response-strategy-taxonomy.md)):
+
+- **Uncertainty / unanswerability →** `calibrated_answer`, `hedging`,
+  `clarification_request`, `abstention`.
+- **Low controllability →** `clarification_request`, `conditional_continuation`,
+  `abstention`.
+- **Norm tension →** `warning`, `correction`, `conditional_continuation`, and
+  `refusal` only where genuinely required.
+
+Define an **intervention-effect matrix** `E[axis, response_superclass]`. For each
+axis a preregistered **target set** of strategies is fixed (above). Compute a
+**selectivity contrast** per axis:
+
+```
+selectivity(axis) = mean effect on preregistered target strategies
+                    - mean absolute effect on off-target strategies
+```
+
+- **Decision (B):** component B is supported **only if**, for the tested axes, the
+  **bootstrap CI of the selectivity contrast is above zero**; the direction does
+  **not** mainly produce generic refusal, negativity, or fluency-degradation
+  effects; the **competence controls pass**; and the effect **persists after lexical
+  normalization**.
+
+### C. Incremental shared contribution
+
+Nested comparison, evaluated on held-out domains:
+
+- **Base:** known single directions (unanswerability, refusal, difficulty where
+  reproducible) plus simple baselines (see
+  [`controls-and-baselines.md`](controls-and-baselines.md)).
+- **Full:** base **+** the shared ASCR representation.
+- **Primary metric:** **held-out response-strategy log-loss.**
+- **Decision (C):** component C is supported **only if** the **paired bootstrap CI**
+  of the improvement (base − full log-loss) lies **entirely above zero** after FDR
+  correction.
+
+**Family claim = A ∧ B ∧ C.** The full family claim is assessed only once at least
+two (ideally three) axes are adequately operationalized and tested; with two axes it
+remains provisional.
 
 ## 7. H4 analysis — ordered emergence (exploratory)
 

@@ -10,10 +10,10 @@ official publisher page, or the authors' own primary write-up). Anything that
 could not be verified in the current pass is listed under **Unverified** and is
 deliberately excluded from `references.bib` until a human reviewer confirms it.
 
-Verification pass date: 2026-07-10.
+Verification pass dates: 2026-07-10 (v0.1.0), 2026-07-12 (v0.1.1 amendment).
 Method: web search restricted to primary-source domains (arxiv.org,
 aclanthology.org, proceedings.neurips.cc, openreview.net) plus retrieval of
-arXiv abstract pages for exact author lists.
+arXiv abstract pages for exact titles, author lists, and submission dates.
 
 ---
 
@@ -37,6 +37,13 @@ arXiv abstract pages for exact author lists.
 | `sun2026valencearousal` | Valence-Arousal Subspace in LLMs: Circular Emotion Geometry and Multi-Behavioral Control | arXiv:2604.03147 | Preprint |
 | `mack2024melbo` | Mechanistically Eliciting Latent Behaviors in Language Models | AI Alignment Forum (authors' primary write-up) | Technical report |
 | `gurnee2026workspace` | Verbalizable Representations Form a Global Workspace in Language Models | transformer-circuits.pub/2026/workspace | Transformer Circuits Thread |
+| `slobodkin2023unanswerability` | The Curious Case of Hallucinatory (Un)answerability: Finding Truths in the Hidden States of Over-Confident Large Language Models | arXiv:2310.11877 | Preprint |
+| `wagner2026twoaxes` | Two Axes of LLM Abstention: Answer Correctness and Question Answerability | arXiv:2607.08456 | Preprint |
+| `wang2026privacy` | Do LLMs Know What Is Private Internally? Probing and Steering Contextual Privacy Norms in Large Language Model Representations | arXiv:2604.00209 | Preprint |
+| `zeng2025roleconflict` | Who is In Charge? Dissecting Role Conflicts in Instruction Following | arXiv:2510.01228 | Preprint |
+| `lee2025difficulty` | Probing the Difficulty Perception Mechanism of Large Language Models | arXiv:2510.05969 | Preprint |
+| `patel2026uncertaintycorrectness` | Are LLM Uncertainty and Correctness Encoded by the Same Features? A Functional Dissociation via Sparse Autoencoders | arXiv:2604.19974 | Preprint |
+| `nguyen2025matsteer` | Multi-Attribute Steering of Language Models via Targeted Intervention | arXiv:2502.12446 | ACL 2025 |
 
 Notes on individual entries:
 
@@ -65,16 +72,37 @@ Notes on individual entries:
   only as a scholarly reference; the citation confers no authorship or endorsement
   on this repository.
 
+Notes on entries added in the v0.1.1 amendment (all verified 2026-07-12 by
+retrieving the arXiv abstract page for exact title, author order, and submission
+date):
+
+- `slobodkin2023unanswerability`: Slobodkin, Goldman, Caciularu, Dagan, Ravfogel;
+  submitted 2023-10-18. Venue not independently confirmed in this pass, so it is
+  recorded as a preprint (arXiv:2310.11877) rather than claiming a specific
+  proceedings.
+- `wagner2026twoaxes`: single author Benedikt J. Wagner; submitted 2026-07-09.
+- `wang2026privacy`: Haoran Wang, Li Xiong, Kai Shu; submitted 2026-03-31. Full
+  title includes the subtitle "Probing and Steering Contextual Privacy Norms in
+  Large Language Model Representations".
+- `zeng2025roleconflict`: Siqi Zeng; submitted 2025-09-23.
+- `lee2025difficulty`: Lee, Yin, Leong, Zhang, Gong, Ni, Yang, Shen; submitted
+  2025-10-07.
+- `patel2026uncertaintycorrectness`: Patel, Chen (Tiejin), Wei, Papalexakis, Chen
+  (Jia); submitted 2026-04-21.
+- `nguyen2025matsteer`: Nguyen, Prasad, Stengel-Eskin, Bansal; submitted
+  2025-02-18; the arXiv record states an ACL 2025 camera-ready version.
+
 ---
 
 ## Unverified (excluded from `references.bib` pending human review)
 
-None. As of the 2026-07-10 verification pass, every work considered for the
+None. As of the 2026-07-12 verification pass, every work considered for the
 bibliography has been confirmed against a primary source. The
 previously-unconfirmed workspace reference
-(*"Verbalizable Representations Form a Global Workspace in Language Models"*) has
-been verified against its official Transformer Circuits publication and moved to
-the Verified table above (`gurnee2026workspace`).
+(*"Verbalizable Representations Form a Global Workspace in Language Models"*) was
+verified against its official Transformer Circuits publication (v0.1.0 pass) and
+moved to the Verified table above (`gurnee2026workspace`). The seven works added in
+the v0.1.1 amendment were each verified against their arXiv abstract pages.
 
 ---
 

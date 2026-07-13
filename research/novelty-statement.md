@@ -30,6 +30,38 @@ Existing, verified work provides evidence for the components separately:
 - Emotion-concept vectors, appraisal variables during emotion inference, and
   valence/arousal geometry
   [`tak2025emotioninfer`; `sofroniew2026emotion`; `sun2026valencearousal`].
+- Hidden-state (un)answerability and abstention decomposed into distinct axes
+  [`slobodkin2023unanswerability`; `wagner2026twoaxes`].
+- Task-induced norm/role representations that are separately steerable
+  [`wang2026privacy`; `zeng2025roleconflict`].
+- Task-induced difficulty as a linear, decodable property
+  [`lee2025difficulty`].
+- Functional dissociation of uncertainty from correctness features
+  [`patel2026uncertaintycorrectness`].
+- Multi-attribute steering with per-attribute orthogonality constraints
+  [`nguyen2025matsteer`].
+
+### Boundary tightened in the v0.1.1 amendment
+
+The newly verified prior art (2026-07-12) narrows the novelty of the **individual
+axes** considerably: uncertainty/answerability, norm/role tension, and difficulty
+are each already decodable and, in several cases, steerable task-induced states.
+This makes explicit a distinction that must be defended, not assumed:
+
+> Demonstrating several individual task-state directions — even three — is **not**
+> the same as demonstrating a shared, appraisal-structured control *family*. Three
+> already-known directions spanning a 3-D subspace are not a family.
+
+The defensible novelty therefore rests on the **shared structure**, tested by the
+preregistered family-structure test (amendment §5): a shared low-rank model must
+beat equally complex separate directions on held-out domains, show structured
+behavioral specificity, and add incremental response-strategy variance beyond known
+single directions and simple baselines (including a difficulty-representation
+baseline). Multi-attribute steering [`nguyen2025matsteer`] is the closest prior
+method, but it enforces near-orthogonality across externally-labeled attributes and
+does not test a shared task-induced control family; ASCR's identifiability
+(not-orthogonality) framing and family-structure test are the distinguishing
+contribution.
 
 ## What ASCR proposes
 

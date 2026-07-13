@@ -1,9 +1,9 @@
 {
   "title": "Toward Appraisal-Structured Latent Control Representations in Language Models: A Preregistered Hypothesis and Experimental Design for Task-Induced Response-Strategy Modulation",
-  "description": "A preregistered hypothesis and experimental-design note proposing that several known single-behavior latent directions in language models (refusal, abstention, uncertainty reporting, evaluation awareness) may be special cases of a more general family of task-induced, appraisal-structured latent control representations that partially govern response-strategy selection across semantic domains. This version reports no experimental results.",
+  "description": "A preregistered hypothesis and experimental-design note proposing that several known single-behavior latent directions in language models (refusal, abstention, uncertainty reporting, evaluation awareness) may be special cases of a more general family of task-induced, appraisal-structured latent control representations that partially govern response-strategy selection across semantic domains. Version 0.1.1 is a transparent pre-data amendment of the archived v0.1.0 preregistration: it tightens the design before any data collection by adding an explicit family-structure test, a fixed direction-derivation rule, a concept-mention stimulus-QA protocol, two-tier response-strategy superclasses, a modular mini-shard protocol, a distinct-replication-model constraint, and expanded verified prior art. No data have been collected; this version reports no experimental results.",
   "upload_type": "publication",
   "publication_type": "preprint",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "language": "eng",
   "access_right": "open",
   "license": "CC-BY-4.0",

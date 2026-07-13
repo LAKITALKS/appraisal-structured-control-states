@@ -1,6 +1,6 @@
 # Response-Strategy Taxonomy
 
-**Status:** v0.1 preregistration draft.
+**Status:** v0.1.1 pre-data amendment; no data collected.
 
 The target variable of ASCR is a higher-level **response strategy** (policy mode),
 not the raw next-token distribution. This document defines the strategy labels, the
@@ -31,6 +31,53 @@ it has goals in any agentive sense.
 
 These labels form the `expected_strategy_space` for each item (the plausible
 strategies given the task), and the observed strategy for each generated response.
+
+## Primary superclasses (v0.1.1 amendment)
+
+The nine fine labels above are **retained unchanged**. For the primary pilot
+analysis, four robust **superclasses** are added; the fine taxonomy remains the
+secondary and qualitative analysis. Every fine label maps to **exactly one**
+superclass (enforced by the unit tests and by
+[`../experiments/src/ascr/strategy_labels.py`](../experiments/src/ascr/strategy_labels.py)):
+
+| Superclass | Fine labels |
+| --- | --- |
+| `direct_or_comply` | `direct_compliance` |
+| `qualify_or_warn` | `calibrated_answer`, `hedging`, `warning`, `correction` |
+| `redirect_or_clarify` | `clarification_request`, `conditional_continuation` |
+| `decline_or_abstain` | `abstention`, `refusal` |
+
+Rationale for the grouping: `qualify_or_warn` collects responses that still engage
+the task while scoping, caveating, or correcting it; `redirect_or_clarify` collects
+responses that reshape or defer the task pending more input or a narrowed scope;
+`decline_or_abstain` collects non-engagement on either epistemic (`abstention`) or
+normative (`refusal`) grounds; `direct_or_comply` is unqualified compliance.
+
+The four superclasses are the **primary** analysis target (more robust, higher
+per-class counts, less evaluator-dependent). The nine fine labels remain for
+**secondary** analysis, qualitative detail, and a later larger study. The fine
+taxonomy is not otherwise modified.
+
+### Dominance / tie-breaker rule (v0.1.1, 2nd pass)
+
+When a single response plausibly exhibits more than one communicative act, the
+**dominant** superclass is chosen by this fixed priority ordering (highest first):
+
+1. **`decline_or_abstain`** — full non-answer on epistemic or normative grounds.
+2. **`redirect_or_clarify`** — a follow-up question, or continuation only under a
+   stated condition / partial scope.
+3. **`qualify_or_warn`** — a substantive answer carrying a substantial confidence
+   limitation, warning, or correction.
+4. **`direct_or_comply`** — unqualified execution with no caveat.
+
+`calibrated_answer` always maps to `qualify_or_warn`, because `direct_compliance` is
+defined as carrying **no** substantial limitations or caveats; a substantively
+scoped answer is therefore never `direct_or_comply`. This ordering is a documented
+rubric for human labelers and a deterministic mapping over a set of candidate fine
+labels (`ascr.strategy_labels.dominant_superclass`); it is **not** a generative
+classifier and makes no claim to label text automatically. Only **canonical**
+taxonomy terms are used (e.g. `conditional_continuation`, `abstention`); no
+non-canonical terms such as "explicit limitation" or "conditional compliance".
 
 ## Distinguishing near-neighbors
 

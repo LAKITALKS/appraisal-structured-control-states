@@ -35,7 +35,7 @@
 \small Independent Researcher, Berlin, Germany\\
 \small \texttt{varvatislazaros@gmail.com}}
 
-\date{Version 0.1 --- Preregistration draft}
+\date{Version 0.1.1 --- Pre-Data Amendment (2026-07-12)}
 
 \begin{document}
 \maketitle
@@ -67,6 +67,17 @@ predictive information-bottleneck reading as optional. The novelty status is a
 contribution is their unifying, falsifiable synthesis. This note reports no
 experimental results and makes no claims about subjective experience, feeling, or
 related notions.
+
+\medskip
+\noindent\textbf{v0.1.1 pre-data amendment.} This is the v0.1.1 revision, a
+transparent amendment made \emph{before any data collection}. It sharpens one point
+in particular: demonstrating several individual task-state directions is not
+evidence of a shared control \emph{family}, so v0.1.1 adds an explicit
+family-structure test, a fixed primary direction-derivation rule, a concept-mention
+stimulus-quality protocol, a two-tier response-strategy taxonomy, a modular
+mini-shard protocol, a distinct-replication-model constraint, and expanded verified
+prior art. The full amendment is documented in the repository at
+\texttt{preregistration/amendment-v0.1.1.md}. No data have been collected.
 \end{abstract}
 
 \section{Introduction}
@@ -178,12 +189,18 @@ one behavior family (refusal) rather than a general situation representation.
 \paragraph{Uncertainty, answerability, and evaluation awareness.}
 SCIURus locates uncertainty in the same circuitry responsible for factuality
 \citep{teplica2025sciurus}; linear directions detect (un)answerability and control
-abstention \citep{lavi2025unanswerability}. Models linearly represent whether they
+abstention \citep{lavi2025unanswerability}, and hidden states encode query
+answerability early in decoding \citep{slobodkin2023unanswerability}. Abstention
+itself decomposes into distinct axes of answer correctness and question
+answerability \citep{wagner2026twoaxes}, and a functional dissociation via sparse
+autoencoders separates uncertainty features from correctness features
+\citep{patel2026uncertaintycorrectness}. Models linearly represent whether they
 are being evaluated \citep{nguyen2025evalaware}, and this state can be steered so a
 model acts ``deployed'' \citep{hua2025evaldeployed}. Internal-activation safety
 signals separate unsafe-input recognition from the refusal decision
 \citep{han2025safeswitch}. Several of these are genuinely \emph{task-induced}
-states, and they motivate the conjecture that a broader family exists.
+states, and they motivate the conjecture that a broader family exists; they also
+narrow the novelty of any \emph{single} ASCR axis.
 
 \paragraph{Task representations and affect geometry.}
 Task representations form just-in-time and transfer across instances
@@ -195,6 +212,21 @@ geometry affords multi-behavioral control \citep{sun2026valencearousal}. This wo
 supplies the multi-axis, appraisal-structured vocabulary we borrow, but it targets
 emotion concepts or affective generation rather than the model's own
 response-strategy selection.
+
+\paragraph{Norm/role tension, difficulty, and multi-attribute steering.}
+Task-induced norm and role conflicts are separately decodable and steerable:
+contextual privacy norms decompose into steerable contextual-integrity parameters
+\citep{wang2026privacy}, and system-versus-user role conflicts are linearly encoded
+and manipulable \citep{zeng2025roleconflict}, both close to the norm-tension axis.
+Generic task difficulty is itself a linear, decodable property
+\citep{lee2025difficulty}, which we therefore treat as a mandatory baseline rather
+than as appraisal structure. Most directly, multi-attribute steering learns several
+attribute directions jointly while enforcing near-orthogonality to reduce
+interference \citep{nguyen2025matsteer}. These works establish the individual axes
+and the feasibility of multi-attribute control, but they do not test whether the
+axes form a \emph{shared task-induced control family}; and in contrast to their
+orthogonality constraints, we frame the axes as identifiable and selectively
+manipulable rather than necessarily orthogonal.
 
 \paragraph{Privileged, verbalizable representations.}
 A separate line of work reports that language models maintain a small, privileged
@@ -213,10 +245,14 @@ response-strategy selection, not by verbalizability.
 To our knowledge, we found no prior work that \emph{jointly} tests (i) a
 task-induced, system-relative state dissociated by design from concept tracking,
 (ii) an integrated multi-axis appraisal structure governing response strategy,
-(iii) cross-domain transfer of that structure, and (iv) a mandatory
-lexical-geometry control. The components are established separately; the proposed
-contribution is their unifying, falsifiable synthesis. A companion prior-art matrix
-in the repository records this component-by-component.
+(iii) cross-domain transfer of that structure, (iv) a mandatory lexical-geometry
+control, and (v) an explicit test that the axes form a \emph{shared} control family
+rather than several independent known directions. The components are established
+separately; the proposed contribution is their unifying, falsifiable synthesis. As
+sharpened in the v0.1.1 pre-data amendment, demonstrating several individual
+task-state directions is not itself evidence of a shared family, so the family claim
+carries its own preregistered test (Section~\ref{sec:hypotheses} and the amendment).
+A companion prior-art matrix in the repository records this component-by-component.
 
 \section{Appraisal-Structured Latent Control Representations}
 \label{sec:ascr}
@@ -297,6 +333,21 @@ Coarse signed-relevance or task-pressure signals may become decodable earlier th
 integrated task-appraisal structure, while explicit response-strategy commitment
 may appear later or closer to generation. This is labeled secondary because the
 literature does not justify a strong confirmatory ordering claim.
+
+\paragraph{Family-structure test (v0.1.1 amendment).}
+Succeeding on H1--H3 for several axes is compatible with several independent,
+already-known directions and does not, by itself, establish a shared
+appraisal-structured control \emph{family}. The v0.1.1 pre-data amendment therefore
+preregisters a separate family-structure test with three components that must
+\emph{all} hold, i.e. the family claim requires $A \wedge B \wedge C$: (A) a shared
+low-rank model beats equally complex separate per-axis models on pooled held-out
+log-loss under nested cross-validation (rank grid restricted so that three axis
+directions cannot trivially count as a family); (B) structured behavioral
+specificity, where each axis moves a preregistered target set of response strategies
+rather than producing a generic refusal, negativity, or fluency-degradation effect;
+and (C) an incremental shared contribution to held-out response-strategy prediction
+beyond known single directions and simple baselines. The full decision rules are in
+the preregistration (\texttt{preregistration/analysis-plan.md} and the amendment).
 
 \section{Preregistered Experimental Design}
 \label{sec:design}

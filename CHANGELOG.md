@@ -3,21 +3,70 @@
 All notable changes to this repository are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for its metadata version field.
 
-## [Unreleased] — post-release metadata
+## [0.1.1] — 2026-07-12 (pre-data amendment)
 
-Metadata-only update; no scientific content changed and no new version was created.
+A transparent pre-data amendment of the archived v0.1.0 preregistration. **No data
+have been collected**; no model has been run; no results exist. All changes were
+made before the first data collection and are documented in
+`preregistration/amendment-v0.1.1.md`.
+
+### Review completion status
+- v0.1.1 went through **two pre-data correction cycles** (see
+  `preregistration/v0.1.1-review-status.md`).
+- The **family claim now requires A ∧ B ∧ C** together (shared-vs-separate model,
+  behavioral specificity, incremental contribution) — several individual decodable
+  directions are not sufficient.
+- Stimulus QA is **technically enforced** as a `run_ready` gate before any run.
+- **No dataset and no results exist.** The PR is **still a draft**; PDF build and
+  release remain open. v0.1.1 is **not** published.
+- Test suite: **70 passing** at the time of this entry.
 
 ### Added
-- Zenodo archive identifiers in `README.md` and `CITATION.cff`: the version DOI
-  `10.5281/zenodo.21294933` (v0.1.0) and the concept DOI
-  `10.5281/zenodo.21294932` (all versions), plus a DOI badge.
+- `preregistration/amendment-v0.1.1.md`: the pre-data amendment note.
+- Preregistered **family-structure test** (shared low-rank vs separate models,
+  structured behavioral specificity, incremental shared contribution) in
+  `analysis-plan.md`.
+- Fixed **primary direction-derivation** rule (regularized logistic regression;
+  normalized difference-in-means intervention direction from training groups with
+  the concept-mention factor balanced) in `controls-and-baselines.md`.
+- Binding **concept-mention (B/D) stimulus-QA protocol** and a **modular mini-shard
+  protocol** with immutable run manifests in `experimental-design.md`.
+- Two-tier **response-strategy taxonomy**: four primary superclasses mapping the
+  nine retained fine labels, in `response-strategy-taxonomy.md` and in
+  `ascr.strategy_labels`.
+- Seven primary-source-verified prior-art works and matching baselines
+  (prompt-embedding and difficulty-representation baselines elevated to primary).
+- Code + tests: `RunManifest`, QA metadata, superclass mapping, config-version,
+  replication-model and placeholder-revision checks (test suite 29 → 43).
+- Earlier in this cycle: Zenodo identifiers and DOI badge for v0.1.0 (concept DOI
+  `10.5281/zenodo.21294932`, v0.1.0 version DOI `10.5281/zenodo.21294933`).
 
 ### Changed
-- Replaced the "DOI pending" note in `README.md` with the archived DOI details.
+- Version strings to `0.1.1` across `pyproject.toml`, `CITATION.cff`,
+  `.zenodo.json`, `README.md`, and the paper.
+- README status to `v0.1.1 pre-data amendment` with a visible amendment link.
+- The permissive v0.1.0 "logistic regression / ridge / LDA as candidates" phrasing
+  is superseded by a single primary direction-derivation rule (documented, not
+  silent).
+- The replication model is constrained to differ from the primary model; the config
+  placeholder is now `TO_BE_SELECTED_BEFORE_CONFIRMATORY_REPLICATION`.
+
+### Scientific rationale
+- The central sharpening: demonstrating several individual task-state directions is
+  **not** evidence of a shared ASCR control family. v0.1.1 defines, before data
+  collection, the additional evidence required for the family claim, and tightens
+  the novelty boundary against newly verified prior art.
 
 ### Unchanged
-- The archived v0.1.0 GitHub release, its Git tag, and `paper/preprint.pdf` remain
-  exactly as published; no scientific claims were altered.
+- The archived **v0.1.0 GitHub release, its Git tag, and its Zenodo record** remain
+  exactly as published; v0.1.0 is not overwritten or re-tagged.
+- The core hypotheses **H1–H4**, the 2×2 design, the three primary axes, the four
+  domains, the non-claims, and the mandatory lexical-geometry/competence controls
+  are unchanged. No holonomy hypothesis, no "H5", and no LEM extension were added.
+
+### No-data declaration
+- No datasets, activations, model outputs, probe/steering results, figures, or
+  statistics exist or were produced. This release tightens the preregistration only.
 
 ## [0.1.0] — 2026-07-10
 
