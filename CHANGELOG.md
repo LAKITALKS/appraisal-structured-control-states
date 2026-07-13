@@ -10,6 +10,17 @@ have been collected**; no model has been run; no results exist. All changes were
 made before the first data collection and are documented in
 `preregistration/amendment-v0.1.1.md`.
 
+### Review completion status
+- v0.1.1 went through **two pre-data correction cycles** (see
+  `preregistration/v0.1.1-review-status.md`).
+- The **family claim now requires A ∧ B ∧ C** together (shared-vs-separate model,
+  behavioral specificity, incremental contribution) — several individual decodable
+  directions are not sufficient.
+- Stimulus QA is **technically enforced** as a `run_ready` gate before any run.
+- **No dataset and no results exist.** The PR is **still a draft**; PDF build and
+  release remain open. v0.1.1 is **not** published.
+- Test suite: **70 passing** at the time of this entry.
+
 ### Added
 - `preregistration/amendment-v0.1.1.md`: the pre-data amendment note.
 - Preregistered **family-structure test** (shared low-rank vs separate models,

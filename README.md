@@ -10,8 +10,17 @@ established field term).
 
 **Status:** `v0.1.1 pre-data amendment` — this repository still reports **no**
 experimental results, datasets, model runs, or figures. v0.1.1 tightens the v0.1.0
-preregistration *before any data collection*; see the
-[**v0.1.1 pre-data amendment**](preregistration/amendment-v0.1.1.md).
+preregistration *before any data collection*.
+
+The v0.1.1 amendment has completed its pre-data methodological review cycle and is
+currently awaiting PDF compilation and final human release review. No model runs or
+experimental results exist. The amendment was reviewed across multiple independent
+methodological and prior-art cycles before any data collection, and the current
+GitHub state is still an open **draft** pull request.
+
+- [**v0.1.1 pre-data amendment**](preregistration/amendment-v0.1.1.md)
+- [**v0.1.1 pre-data review status**](preregistration/v0.1.1-review-status.md)
+- [**Draft PR #1**](https://github.com/LAKITALKS/appraisal-structured-control-states/pull/1)
 
 ---
 
