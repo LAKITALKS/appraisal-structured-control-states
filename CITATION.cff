@@ -10,9 +10,9 @@ abstract: >-
   domains. This version reports no experimental results.
 type: dataset
 version: "0.1.1"
-# date-released is intentionally omitted: v0.1.1 is not yet released. The final
-# release date is added at the actual release. (Amendment authored 2026-07-12;
-# amendment date and release date are separate.)
+# Release date of the v0.1.1 GitHub release (amendment authored 2026-07-12;
+# amendment date and release date are separate).
+date-released: "2026-07-13"
 authors:
   - family-names: "Varvatis"
     given-names: "Lazaros"

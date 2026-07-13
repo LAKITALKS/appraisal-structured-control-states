@@ -17,9 +17,16 @@ made before the first data collection and are documented in
   behavioral specificity, incremental contribution) — several individual decodable
   directions are not sufficient.
 - Stimulus QA is **technically enforced** as a `run_ready` gate before any run.
-- **No dataset and no results exist.** The PR is **still a draft**; PDF build and
-  release remain open. v0.1.1 is **not** published.
-- Test suite: **70 passing** at the time of this entry.
+- **No dataset and no results exist.**
+- Test suite: **70 passing**.
+
+### Release
+- The preprint was **compiled** (`paper/preprint.pdf`, 11 pages; tectonic).
+- PR #1 was **merged to `main`** and v0.1.1 **released on GitHub** (tag `v0.1.1`),
+  release date 2026-07-13.
+- The **Zenodo archival version and its version-specific DOI are pending**; the
+  concept DOI `10.5281/zenodo.21294932` and the v0.1.0 version DOI
+  `10.5281/zenodo.21294933` are unchanged. v0.1.0 remains untouched.
 
 ### Added
 - `preregistration/amendment-v0.1.1.md`: the pre-data amendment note.

@@ -12,15 +12,17 @@ established field term).
 experimental results, datasets, model runs, or figures. v0.1.1 tightens the v0.1.0
 preregistration *before any data collection*.
 
-The v0.1.1 amendment has completed its pre-data methodological review cycle and is
-currently awaiting PDF compilation and final human release review. No model runs or
-experimental results exist. The amendment was reviewed across multiple independent
-methodological and prior-art cycles before any data collection, and the current
-GitHub state is still an open **draft** pull request.
+The v0.1.1 amendment completed its pre-data methodological review cycle (reviewed
+across multiple independent methodological and prior-art cycles before any data
+collection) and has been **merged to `main` and released on GitHub as `v0.1.1`**.
+The compiled 11-page preprint is `paper/preprint.pdf`. No model runs or experimental
+results exist. The **Zenodo archival version and its version-specific DOI are
+pending** (the GitHub release triggers the Zenodo deposit; the new DOI is recorded
+in a follow-up commit once Zenodo publishes).
 
 - [**v0.1.1 pre-data amendment**](preregistration/amendment-v0.1.1.md)
 - [**v0.1.1 pre-data review status**](preregistration/v0.1.1-review-status.md)
-- [**Draft PR #1**](https://github.com/LAKITALKS/appraisal-structured-control-states/pull/1)
+- [**GitHub release v0.1.1**](https://github.com/LAKITALKS/appraisal-structured-control-states/releases/tag/v0.1.1)
 
 ---
 
