@@ -15,6 +15,7 @@ from typing import Any
 from .strategy_labels import (
     AXES,
     DOMAINS,
+    PRIMARY_AXES,
     RESPONSE_STRATEGIES,
     design_cell,
 )
@@ -26,9 +27,13 @@ class ValidationError(ValueError):
 
 # Sentinels that must be replaced before the first data collection / replication.
 PLACEHOLDER_MODEL_REVISION = "TO_BE_FROZEN_BEFORE_DATA_GENERATION"
+PLACEHOLDER_TOKENIZER_REVISION = "TO_BE_FROZEN_BEFORE_DATA_GENERATION"
+PLACEHOLDER_EMBEDDING_MODEL = "TO_BE_SELECTED_BY_AUTHOR_BEFORE_MINI_0"
+PLACEHOLDER_EMBEDDING_REVISION = "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION"
 PLACEHOLDER_REPLICATION_MODEL = "TO_BE_SELECTED_BEFORE_CONFIRMATORY_REPLICATION"
+SUPPORTED_CONFIG_VERSIONS: tuple[str, ...] = ("0.1.1", "0.1.2")
 
-# --- Concept-mention / naturalness QA schema (v0.1.1 amendment, 2nd pass) ---
+# --- Concept-mention / naturalness QA schema (strengthened in v0.1.2) ---
 #
 # Two validation modes: "draft" (incomplete QA allowed; NO activation extraction)
 # and "run_ready" (complete, typed QA required before any real run).
@@ -41,12 +46,15 @@ QA_BOOLEAN_FIELDS: tuple[str, ...] = (
     "domain_match",
     "target_task_match",
     "solvable_as_intended",
-    "task_state_present_confirmed",
-    "concept_mention_confirmed",
     "label_leak_free",
     "no_artificial_meta_sentence",
     "primary_axis_isolated",
 )
+QA_DESIGN_VALUE_FIELDS: tuple[str, ...] = (
+    "observed_task_state_present",
+    "observed_concept_mention_present",
+)
+QA_AXIS_ABSENCE_FIELD = "non_target_axes_absent_confirmed"
 QA_DISPOSITIONS: tuple[str, ...] = ("pass", "revise", "discard")
 QA_MIN_NATURALNESS = 4
 QA_MAX_GROUP_NATURALNESS_SPREAD = 1
@@ -55,7 +63,13 @@ QA_MAX_GROUP_NATURALNESS_SPREAD = 1
 REQUIRED_QA_FIELDS: tuple[str, ...] = (
     ("naturalness_rating",)
     + QA_BOOLEAN_FIELDS
-    + ("reviewer_id", "review_timestamp", "disposition")
+    + QA_DESIGN_VALUE_FIELDS
+    + (
+        QA_AXIS_ABSENCE_FIELD,
+        "reviewer_id",
+        "review_timestamp",
+        "disposition",
+    )
 )
 
 # External-data provenance fields (v0.1.1 amendment, item 6).
@@ -121,6 +135,18 @@ def validate_qa(
     for name in QA_BOOLEAN_FIELDS:
         if not isinstance(qa[name], bool):
             raise ValidationError(f"{item_id}: qa.{name} must be a bool")
+    for name in QA_DESIGN_VALUE_FIELDS:
+        if not isinstance(qa[name], bool):
+            raise ValidationError(f"{item_id}: qa.{name} must be a bool")
+    axis_absence = qa[QA_AXIS_ABSENCE_FIELD]
+    if not isinstance(axis_absence, dict):
+        raise ValidationError(
+            f"{item_id}: qa.{QA_AXIS_ABSENCE_FIELD} must be a mapping"
+        )
+    if any(not isinstance(k, str) or not isinstance(v, bool) for k, v in axis_absence.items()):
+        raise ValidationError(
+            f"{item_id}: qa.{QA_AXIS_ABSENCE_FIELD} must map axis names to bools"
+        )
     _require_nonempty_str(qa["reviewer_id"], f"{item_id}: qa.reviewer_id")
     if not _is_iso8601(qa["review_timestamp"]):
         raise ValidationError(
@@ -132,8 +158,19 @@ def validate_qa(
         )
 
 
-def qa_item_passes(qa: dict[str, Any]) -> bool:
-    """True if a *typed, run_ready-valid* QA record meets the pass criteria."""
+def qa_item_passes(
+    qa: dict[str, Any],
+    *,
+    task_state_present: bool | None = None,
+    concept_mention_present: bool | None = None,
+    target_axis: str | None = None,
+) -> bool:
+    """True if a typed QA record meets the v0.1.2 item-level pass criteria.
+
+    Historical draft QA can still be read, but a run-ready item supplies its
+    registered factor values and target axis so that A/B and C/D are checked
+    correctly and the other primary axes are explicitly confirmed absent.
+    """
     try:
         validate_qa(qa, mode="run_ready")
     except ValidationError:
@@ -142,6 +179,21 @@ def qa_item_passes(qa: dict[str, Any]) -> bool:
         return False
     if any(qa[name] is not True for name in QA_BOOLEAN_FIELDS):
         return False
+    if task_state_present is not None and (
+        qa["observed_task_state_present"] is not task_state_present
+    ):
+        return False
+    if concept_mention_present is not None and (
+        qa["observed_concept_mention_present"] is not concept_mention_present
+    ):
+        return False
+    if target_axis is not None:
+        expected_absent = set(PRIMARY_AXES) - ({target_axis} if target_axis in PRIMARY_AXES else set())
+        confirmations = qa[QA_AXIS_ABSENCE_FIELD]
+        if set(confirmations) != expected_absent:
+            return False
+        if any(confirmations[axis] is not True for axis in expected_absent):
+            return False
     return qa["naturalness_rating"] >= QA_MIN_NATURALNESS
 
 
@@ -244,9 +296,15 @@ class PromptItem:
                 raise ValidationError(
                     f"{self.item_id}: run_ready requires a complete QA record"
                 )
-            if not qa_item_passes(self.qa):
+            if not qa_item_passes(
+                self.qa,
+                task_state_present=self.task_state_present,
+                concept_mention_present=self.concept_mention_present,
+                target_axis=self.axis,
+            ):
                 raise ValidationError(
-                    f"{self.item_id}: QA does not pass (disposition/flags/naturalness)"
+                    f"{self.item_id}: QA does not pass "
+                    "(factor values/axis isolation/disposition/flags/naturalness)"
                 )
             if self.provenance is not None and not provenance_is_run_ready(
                 self.provenance
@@ -329,6 +387,28 @@ def item_from_dict(data: dict[str, Any]) -> PromptItem:
     return item
 
 
+def item_to_dict(item: PromptItem) -> dict[str, Any]:
+    """Serialize a prompt item without weakening its typed nested metadata."""
+
+    item.validate()
+    result: dict[str, Any] = {
+        "item_id": item.item_id,
+        "axis": item.axis,
+        "domain": item.domain,
+        "task_state_present": item.task_state_present,
+        "concept_mention_present": item.concept_mention_present,
+        "prompt_text": item.prompt_text,
+        "matched_group_id": item.matched_group_id,
+        "expected_strategy_space": list(item.expected_strategy_space),
+        "notes": item.notes,
+    }
+    if item.qa is not None:
+        result["qa"] = dict(item.qa)
+    if item.provenance is not None:
+        result["provenance"] = dict(item.provenance)
+    return result
+
+
 def validate_matched_group(items: list[PromptItem]) -> None:
     """Validate a set of siblings sharing a ``matched_group_id``.
 
@@ -374,7 +454,7 @@ def design_cell_labels() -> tuple[str, ...]:
 
 
 # ---------------------------------------------------------------------------
-# Run-ready gate (v0.1.1 amendment, 2nd pass). NO run may proceed unless the whole
+# Run-ready gate (strengthened in v0.1.2). NO run may proceed unless the whole
 # stimulus set is run_ready. Draft items are for authoring only.
 # ---------------------------------------------------------------------------
 def validate_run_ready_group(items: list[PromptItem]) -> None:
@@ -402,6 +482,9 @@ def check_run_ready(
     items: list[PromptItem],
     *,
     model_revision: str | None = None,
+    tokenizer_revision: str | None = None,
+    prompt_embedding_model: str | None = None,
+    prompt_embedding_revision: str | None = None,
     min_complete_groups: int | None = None,
 ) -> list[str]:
     """Return a list of run-readiness problems (empty list == run_ready).
@@ -429,6 +512,23 @@ def check_run_ready(
             "model revision is still a placeholder; freeze the immutable hash "
             "before any run"
         )
+    if tokenizer_revision is not None and is_placeholder_revision(tokenizer_revision):
+        problems.append(
+            "tokenizer revision is still a placeholder; freeze the immutable hash "
+            "before any run"
+        )
+    if prompt_embedding_model is not None and is_placeholder_revision(
+        prompt_embedding_model
+    ):
+        problems.append(
+            "prompt-embedding model is still an author-decision placeholder"
+        )
+    if prompt_embedding_revision is not None and is_placeholder_revision(
+        prompt_embedding_revision
+    ):
+        problems.append(
+            "prompt-embedding revision is still a placeholder; freeze it before Mini-0"
+        )
     if min_complete_groups is not None and complete < min_complete_groups:
         problems.append(
             f"only {complete} complete run_ready matched groups; "
@@ -446,25 +546,36 @@ def is_run_ready(
     items: list[PromptItem],
     *,
     model_revision: str | None = None,
+    tokenizer_revision: str | None = None,
+    prompt_embedding_model: str | None = None,
+    prompt_embedding_revision: str | None = None,
     min_complete_groups: int | None = None,
 ) -> bool:
     """True if the whole stimulus set passes the run-ready gate."""
     return not check_run_ready(
         items,
         model_revision=model_revision,
+        tokenizer_revision=tokenizer_revision,
+        prompt_embedding_model=prompt_embedding_model,
+        prompt_embedding_revision=prompt_embedding_revision,
         min_complete_groups=min_complete_groups,
     )
 
 
 # ---------------------------------------------------------------------------
-# Mini-shard run manifests (v0.1.1 amendment).
+# Mini-shard and smoke-run manifests (v0.1.2 correction).
 # ---------------------------------------------------------------------------
 # Fields that must be identical for two shards to be safely combined.
 _MANIFEST_COMPAT_FIELDS: tuple[str, ...] = (
+    "run_kind",
+    "eligible_for_scientific_analysis",
+    "prompt_set_id",
     "prompt_set_version",
     "model_name",
     "model_revision",
     "tokenizer_revision",
+    "prompt_embedding_model",
+    "prompt_embedding_revision",
     "chat_template",
     "code_commit",
     "decoding",
@@ -472,6 +583,8 @@ _MANIFEST_COMPAT_FIELDS: tuple[str, ...] = (
     "token_position",
     "environment",
 )
+
+RUN_KINDS: tuple[str, ...] = ("technical_smoke", "scientific_feasibility")
 
 
 @dataclass(frozen=True, slots=True)
@@ -484,10 +597,15 @@ class RunManifest:
 
     experiment_id: str
     shard_id: str
+    run_kind: str
+    eligible_for_scientific_analysis: bool
+    prompt_set_id: str
     prompt_set_version: str
     model_name: str
     model_revision: str
     tokenizer_revision: str
+    prompt_embedding_model: str
+    prompt_embedding_revision: str
     chat_template: str
     code_commit: str
     seed: int
@@ -495,6 +613,7 @@ class RunManifest:
     layer: Any
     token_position: Any
     stimulus_file_hash: str
+    output_directory: str
     environment: str
     timestamp: str
 
@@ -507,13 +626,17 @@ class RunManifest:
         for name in (
             "experiment_id",
             "shard_id",
+            "prompt_set_id",
             "prompt_set_version",
             "model_name",
             "model_revision",
             "tokenizer_revision",
+            "prompt_embedding_model",
+            "prompt_embedding_revision",
             "chat_template",
             "code_commit",
             "stimulus_file_hash",
+            "output_directory",
             "environment",
             "timestamp",
         ):
@@ -522,11 +645,51 @@ class RunManifest:
             raise ValidationError("manifest.seed must be an int")
         if not isinstance(self.decoding, dict):
             raise ValidationError("manifest.decoding must be a mapping")
-        if require_frozen_revision and is_placeholder_revision(self.model_revision):
+        if self.run_kind not in RUN_KINDS:
+            raise ValidationError(f"manifest.run_kind must be one of {RUN_KINDS}")
+        if not isinstance(self.eligible_for_scientific_analysis, bool):
             raise ValidationError(
-                "manifest.model_revision is still a placeholder; freeze the "
-                "immutable revision hash before data collection"
+                "manifest.eligible_for_scientific_analysis must be a bool"
             )
+        if self.run_kind == "technical_smoke":
+            if self.eligible_for_scientific_analysis:
+                raise ValidationError("technical smoke artifacts cannot be scientific")
+            if not self.prompt_set_id.startswith("DISPOSABLE_"):
+                raise ValidationError(
+                    "technical smoke prompt_set_id must begin with DISPOSABLE_"
+                )
+            if "smoke" not in self.output_directory.lower():
+                raise ValidationError(
+                    "technical smoke output_directory must be visibly smoke-specific"
+                )
+            if self.shard_id.startswith("ASCR-Mini-"):
+                raise ValidationError(
+                    "technical smoke manifests cannot use a registered Mini shard id"
+                )
+        else:
+            if not self.eligible_for_scientific_analysis:
+                raise ValidationError(
+                    "scientific feasibility manifests must declare scientific eligibility"
+                )
+            if self.prompt_set_id.startswith("DISPOSABLE_"):
+                raise ValidationError(
+                    "scientific feasibility cannot use a disposable smoke prompt set"
+                )
+            if not self.shard_id.startswith("ASCR-Mini-"):
+                raise ValidationError(
+                    "scientific feasibility requires a registered ASCR-Mini shard id"
+                )
+        if require_frozen_revision:
+            for name in (
+                "model_revision",
+                "tokenizer_revision",
+                "prompt_embedding_model",
+                "prompt_embedding_revision",
+            ):
+                if is_placeholder_revision(getattr(self, name)):
+                    raise ValidationError(
+                        f"manifest.{name} is still a placeholder; freeze it before a run"
+                    )
 
 
 def manifests_compatible(a: RunManifest, b: RunManifest) -> bool:
@@ -546,17 +709,33 @@ class PilotConfig:
     config_version: str
     model_name: str
     model_revision: str
+    tokenizer_revision: str
     replication_model: str | None
+    prompt_embedding_model: str
+    prompt_embedding_revision: str
+    prompt_embedding_selection_status: str
+    prompt_embedding_license: str
+    prompt_embedding_pooling_rule: str
     axes: tuple[str, ...]
     domains: tuple[str, ...]
     layers: str
     seeds: tuple[int, ...]
+    validation_mode: str
+    run_kind: str
+    eligible_for_scientific_analysis: bool
+    target_matched_groups: int | None
     raw: dict[str, Any] = field(default_factory=dict, repr=False)
 
     @property
     def revision_is_frozen(self) -> bool:
         """True once the model revision is no longer a placeholder."""
         return not is_placeholder_revision(self.model_revision)
+
+    @property
+    def is_historical(self) -> bool:
+        """Whether this is a readable historical v0.1.1 configuration."""
+
+        return self.config_version == "0.1.1"
 
 
 def parse_config(data: dict[str, Any]) -> PilotConfig:
@@ -570,6 +749,11 @@ def parse_config(data: dict[str, Any]) -> PilotConfig:
 
     config_version = data["config_version"]
     _require_nonempty_str(str(config_version), "config_version")
+    if str(config_version) not in SUPPORTED_CONFIG_VERSIONS:
+        raise ValidationError(
+            f"unsupported config_version {config_version!r}; "
+            f"expected one of {SUPPORTED_CONFIG_VERSIONS}"
+        )
 
     model = data["model"]
     model_name = model.get("name")
@@ -578,6 +762,10 @@ def parse_config(data: dict[str, Any]) -> PilotConfig:
     # The immutable revision hash must be recorded before data generation. Until
     # then it is intentionally the sentinel string below.
     _require_nonempty_str(model_revision, "model.revision")
+    tokenizer_revision = model.get(
+        "tokenizer_revision", PLACEHOLDER_TOKENIZER_REVISION
+    )
+    _require_nonempty_str(tokenizer_revision, "model.tokenizer_revision")
 
     # Replication model (v0.1.1 amendment): must differ from the primary model once
     # an actual model is chosen; a placeholder is allowed until then.
@@ -592,6 +780,30 @@ def parse_config(data: dict[str, Any]) -> PilotConfig:
                 "model.replication_model must differ from model.name once selected; "
                 f"both are {model_name!r}"
             )
+
+    embedding = data.get("prompt_embedding", {})
+    prompt_embedding_model = embedding.get("model_name", PLACEHOLDER_EMBEDDING_MODEL)
+    prompt_embedding_revision = embedding.get(
+        "revision", PLACEHOLDER_EMBEDDING_REVISION
+    )
+    prompt_embedding_selection_status = embedding.get(
+        "selection_status", "AUTHOR_APPROVAL_REQUIRED"
+    )
+    prompt_embedding_license = embedding.get(
+        "license", "TO_BE_RECORDED_AFTER_AUTHOR_SELECTION"
+    )
+    prompt_embedding_pooling_rule = embedding.get(
+        "pooling_rule", "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION"
+    )
+    _require_nonempty_str(prompt_embedding_model, "prompt_embedding.model_name")
+    _require_nonempty_str(prompt_embedding_revision, "prompt_embedding.revision")
+    _require_nonempty_str(
+        prompt_embedding_selection_status, "prompt_embedding.selection_status"
+    )
+    _require_nonempty_str(prompt_embedding_license, "prompt_embedding.license")
+    _require_nonempty_str(
+        prompt_embedding_pooling_rule, "prompt_embedding.pooling_rule"
+    )
 
     design = data["design"]
     axes = tuple(design.get("axes", ()))
@@ -611,16 +823,99 @@ def parse_config(data: dict[str, Any]) -> PilotConfig:
     if not seeds:
         raise ValidationError("config analysis.seeds must be non-empty")
 
+    validation_mode = data.get("validation_mode", "draft")
+    if validation_mode not in QA_MODES:
+        raise ValidationError(f"validation_mode must be one of {QA_MODES}")
+    run_kind = data.get("run_kind", "scientific_feasibility")
+    if run_kind not in RUN_KINDS:
+        raise ValidationError(f"run_kind must be one of {RUN_KINDS}")
+    eligible = data.get("eligible_for_scientific_analysis", True)
+    if not isinstance(eligible, bool):
+        raise ValidationError("eligible_for_scientific_analysis must be bool")
+    if run_kind == "technical_smoke" and eligible:
+        raise ValidationError("technical_smoke cannot be eligible for scientific analysis")
+    target = data.get("target_matched_groups")
+    if target is not None and (
+        not isinstance(target, int) or isinstance(target, bool) or target <= 0
+    ):
+        raise ValidationError("target_matched_groups must be a positive integer")
+
     return PilotConfig(
         config_version=str(config_version),
         model_name=model_name,
         model_revision=model_revision,
+        tokenizer_revision=tokenizer_revision,
         replication_model=replication_model,
+        prompt_embedding_model=prompt_embedding_model,
+        prompt_embedding_revision=prompt_embedding_revision,
+        prompt_embedding_selection_status=prompt_embedding_selection_status,
+        prompt_embedding_license=prompt_embedding_license,
+        prompt_embedding_pooling_rule=prompt_embedding_pooling_rule,
         axes=axes,
         domains=domains,
         layers=layers,
         seeds=seeds,
+        validation_mode=validation_mode,
+        run_kind=run_kind,
+        eligible_for_scientific_analysis=eligible,
+        target_matched_groups=target,
         raw=data,
+    )
+
+
+def config_run_ready_problems(config: PilotConfig) -> list[str]:
+    """Return v0.1.2 configuration blockers without executing a model."""
+
+    problems: list[str] = []
+    if config.is_historical:
+        problems.append("historical v0.1.1 config is readable but cannot be v0.1.2 run_ready")
+    if config.validation_mode != "run_ready":
+        problems.append("validation_mode is draft; scientific data generation is blocked")
+    for label, value in (
+        ("model revision", config.model_revision),
+        ("tokenizer revision", config.tokenizer_revision),
+        ("prompt-embedding model", config.prompt_embedding_model),
+        ("prompt-embedding revision", config.prompt_embedding_revision),
+        ("prompt-embedding license", config.prompt_embedding_license),
+        ("prompt-embedding pooling rule", config.prompt_embedding_pooling_rule),
+    ):
+        if is_placeholder_revision(value):
+            problems.append(f"{label} is still a placeholder")
+    if config.prompt_embedding_selection_status != "AUTHOR_APPROVED_AND_FROZEN":
+        problems.append("prompt-embedding selection still requires author approval")
+    if config.target_matched_groups is None:
+        problems.append("target matched-group count is missing")
+    if config.raw.get("no_holonomy_data") is not True:
+        problems.append("no_holonomy_data must be true for every ASCR shard")
+    activations = config.raw.get("activations", {})
+    layer_candidates = activations.get("primary_layer_candidates")
+    if layer_candidates is None or is_placeholder_revision(str(layer_candidates)):
+        problems.append("primary layer candidate grid is not frozen")
+    h1_layer_family = (
+        config.raw.get("fdr_families", {})
+        .get("h1_layer_position_sensitivity", {})
+        .get("status")
+    )
+    if h1_layer_family is None or is_placeholder_revision(str(h1_layer_family)):
+        problems.append("H1 layer/position FDR family is not frozen")
+    if config.run_kind == "technical_smoke":
+        if config.eligible_for_scientific_analysis:
+            problems.append("technical smoke configuration cannot be scientific")
+    elif not config.eligible_for_scientific_analysis:
+        problems.append("scientific feasibility config must declare scientific eligibility")
+    return problems
+
+
+def config_can_generate_scientific_data(config: PilotConfig) -> bool:
+    """True only for a fully frozen scientific configuration.
+
+    This function is a pre-data guard. It does not generate data or call a model.
+    """
+
+    return (
+        config.run_kind == "scientific_feasibility"
+        and config.eligible_for_scientific_analysis
+        and not config_run_ready_problems(config)
     )
 
 

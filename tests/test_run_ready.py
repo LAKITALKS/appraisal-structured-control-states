@@ -1,4 +1,4 @@
-"""Tests for the v0.1.1 (2nd pass) run-ready gate: typed QA, matched-group QA,
+"""Tests for the v0.1.2 run-ready gate: typed QA, matched-group QA,
 external provenance, the config gate, and status/metadata consistency.
 
 No model is run; these validate the pre-data enforcement machinery only.
@@ -31,10 +31,24 @@ REPO = pathlib.Path(schema.__file__).resolve().parents[3]
 # --------------------------------------------------------------------------- #
 # Helpers
 # --------------------------------------------------------------------------- #
-def _qa(naturalness: int = 5, **overrides: object) -> dict[str, object]:
+def _qa(
+    naturalness: int = 5,
+    *,
+    task_state: bool = True,
+    concept_mention: bool = False,
+    axis: str = "uncertainty",
+    **overrides: object,
+) -> dict[str, object]:
     qa: dict[str, object] = {name: True for name in QA_BOOLEAN_FIELDS}
     qa.update(
         naturalness_rating=naturalness,
+        observed_task_state_present=task_state,
+        observed_concept_mention_present=concept_mention,
+        non_target_axes_absent_confirmed={
+            name: True
+            for name in ("uncertainty", "norm_tension", "controllability")
+            if name != axis
+        },
         reviewer_id="rev-1",
         review_timestamp="2026-07-12T10:00:00Z",
         disposition="pass",
@@ -65,7 +79,17 @@ def _item(cell_flags: tuple[bool, bool], *, qa: dict[str, object] | None,
 
 def _full_group(naturals: tuple[int, int, int, int] = (5, 5, 4, 5)):
     cells = [(False, False), (False, True), (True, False), (True, True)]
-    return [_item(c, qa=_qa(naturalness=n)) for c, n in zip(cells, naturals)]
+    return [
+        _item(
+            c,
+            qa=_qa(
+                naturalness=n,
+                task_state=c[0],
+                concept_mention=c[1],
+            ),
+        )
+        for c, n in zip(cells, naturals)
+    ]
 
 
 # --------------------------------------------------------------------------- #
@@ -101,7 +125,10 @@ def test_qa_item_passes_requires_pass_flags_and_naturalness() -> None:
 
 
 def test_missing_axis_isolation_flag_fails_item_run_ready() -> None:
-    item = _item((True, False), qa=_qa(primary_axis_isolated=False))
+    item = _item(
+        (True, False),
+        qa=_qa(task_state=True, concept_mention=False, primary_axis_isolated=False),
+    )
     with pytest.raises(ValidationError):
         item.validate(mode="run_ready")
 
@@ -163,7 +190,11 @@ def test_external_item_without_review_blocks_run() -> None:
 
     group = _full_group()
     # attach an unreviewed provenance to one item
-    flagged = _item((True, True), qa=_qa(), provenance=_provenance(decision="revise"))
+    flagged = _item(
+        (True, True),
+        qa=_qa(task_state=True, concept_mention=True),
+        provenance=_provenance(decision="revise"),
+    )
     problems = check_run_ready(group[:3] + [flagged])
     assert any("provenance" in p for p in problems)
 
@@ -208,9 +239,9 @@ def test_config_replication_differs_from_primary() -> None:
 
 
 # --------------------------------------------------------------------------- #
-# Status / metadata consistency (v0.1.1)
+# Status / metadata consistency (v0.1.2)
 # --------------------------------------------------------------------------- #
-def test_changed_docs_declare_v011_status() -> None:
+def test_changed_docs_declare_v012_status() -> None:
     changed = [
         "preregistration/experimental-design.md",
         "preregistration/analysis-plan.md",
@@ -219,17 +250,17 @@ def test_changed_docs_declare_v011_status() -> None:
     ]
     for rel in changed:
         head = (REPO / rel).read_text(encoding="utf-8")[:400]
-        assert "v0.1.1 pre-data amendment" in head, rel
+        assert "v0.1.2 pre-data methodological correction" in head, rel
         assert "v0.1 preregistration draft" not in head, rel
 
 
-def test_unchanged_hypothesis_docs_marked_unchanged() -> None:
+def test_hypothesis_docs_identify_v012_rule_correction() -> None:
     for rel in (
         "preregistration/hypotheses.md",
         "preregistration/falsification-criteria.md",
     ):
         head = (REPO / rel).read_text(encoding="utf-8")[:400]
-        assert "unchanged by the v0.1.1 pre-data amendment" in head, rel
+        assert "v0.1.2" in head, rel
 
 
 def test_no_result_files_committed_under_experiments() -> None:

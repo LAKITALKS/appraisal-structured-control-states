@@ -2,7 +2,8 @@
 
 **Project:** Toward Appraisal-Structured Latent Control Representations in Language
 Models (ASCR)
-**Status:** v0.1 hypotheses, unchanged by the v0.1.1 pre-data amendment; no data collected.
+**Status:** v0.1 hypotheses; H1's decision statistic is corrected by the v0.1.2
+pre-data methodological correction; no data collected.
 **Author:** Lazaros Varvatis, Independent Researcher, Berlin, Germany.
 
 This document states the hypotheses that the pilot is designed to test. Each is
@@ -54,14 +55,15 @@ condition* tracks that condition more strongly than it tracks lexical concept
 mentions.
 
 **Prediction.** In the 2x2 design (task-state present/absent x concept mentioned
-present/absent), a probe for the actual task-state factor achieves materially
-higher held-out balanced accuracy for the *task-state* factor than for the
-*concept-mention* factor, and this ordering holds on prompts where the two factors
-are deconfounded.
+present/absent), a task-state probe transfers from concept-absent cells A/C to
+concept-present cells B/D and in the reverse direction, while also transferring to
+an unseen semantic domain. The pooled out-of-fold balanced-accuracy interval is
+evaluated under the v0.1.2 decision rule.
 
-**Primary. Falsified if** the probe tracks concept vocabulary at least as well as
-actual task state, or if apparent task-state decoding disappears once lexical
-concept mentions are controlled.
+**Primary. Weakened if** the upper 95% cluster-bootstrap interval of the pooled
+double-crossed LODO balanced accuracy is at or below 0.5 after technical and QA
+gates pass. An interval overlapping 0.5 is indeterminate. The historical B/C
+probe-accuracy difference is non-identifying and non-deciding.
 
 ---
 

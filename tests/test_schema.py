@@ -15,6 +15,7 @@ from ascr.schema import (
     is_complete_matched_group,
     is_placeholder_revision,
     item_from_dict,
+    item_to_dict,
     manifests_compatible,
     parse_config,
     validate_matched_group,
@@ -157,10 +158,11 @@ def test_matched_group_rejects_mixed_axis() -> None:
 # ---------------------------------------------------------------------------
 def _base_config() -> dict[str, object]:
     return {
-        "config_version": "0.1.1",
+        "config_version": "0.1.2",
         "model": {
             "name": "Qwen/Qwen2.5-7B-Instruct",
             "revision": "TO_BE_FROZEN_BEFORE_DATA_GENERATION",
+            "tokenizer_revision": "TO_BE_FROZEN_BEFORE_DATA_GENERATION",
             "replication_model": "TO_BE_SELECTED_BEFORE_CONFIRMATORY_REPLICATION",
         },
         "design": {
@@ -174,6 +176,11 @@ def _base_config() -> dict[str, object]:
         },
         "activations": {"layers": "all"},
         "analysis": {"seeds": [0, 1, 2, 3, 4]},
+        "prompt_embedding": {
+            "model_name": "TO_BE_SELECTED_BY_AUTHOR_BEFORE_MINI_0",
+            "revision": "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION",
+            "selection_status": "AUTHOR_APPROVAL_REQUIRED",
+        },
     }
 
 
@@ -200,7 +207,7 @@ def test_parse_config_requires_seeds() -> None:
 
 def test_parse_config_requires_sections() -> None:
     with pytest.raises(ValidationError):
-        parse_config({"config_version": "0.1.1", "model": {"name": "x", "revision": "y"}})
+        parse_config({"config_version": "0.1.2", "model": {"name": "x", "revision": "y"}})
 
 
 def test_parse_config_requires_config_version() -> None:
@@ -236,14 +243,14 @@ def test_load_config_reads_pilot_yaml(tmp_path=None) -> None:
     cfg = schema.load_config(pilot)
     assert cfg.model_name.startswith("Qwen/")
     assert cfg.seeds
-    assert cfg.config_version == "0.1.1"
+    assert cfg.config_version == "0.1.2"
     # Replication model must not be the primary model (v0.1.1 amendment).
     assert cfg.replication_model != cfg.model_name
 
 
 # ---------------------------------------------------------------------------
-# v0.1.1 amendment: placeholder revision, QA metadata, matched-group completeness,
-# mini-shard manifests, and the no-results guard.
+# v0.1.2: placeholder revisions, QA metadata, matched-group completeness,
+# mini-shard/smoke manifests, and the no-results guard.
 # ---------------------------------------------------------------------------
 def test_placeholder_revision_detected() -> None:
     assert is_placeholder_revision(PLACEHOLDER_MODEL_REVISION)
@@ -258,6 +265,12 @@ def _qa_ok() -> dict[str, object]:
     qa: dict[str, object] = {name: True for name in QA_BOOLEAN_FIELDS}
     qa.update(
         naturalness_rating=5,
+        observed_task_state_present=True,
+        observed_concept_mention_present=False,
+        non_target_axes_absent_confirmed={
+            "norm_tension": True,
+            "controllability": True,
+        },
         reviewer_id="rev-1",
         review_timestamp="2026-07-12T10:00:00Z",
         disposition="pass",
@@ -277,6 +290,11 @@ def test_item_accepts_complete_typed_qa_block() -> None:
     item.validate(mode="run_ready")  # complete typed QA passes strict validation
 
 
+def test_item_serialization_preserves_v012_qa() -> None:
+    item = item_from_dict(_base_item(qa=_qa_ok()))
+    assert item_from_dict(item_to_dict(item)) == item
+
+
 def test_complete_matched_group_helper() -> None:
     assert is_complete_matched_group(_full_group())
     # Drop one cell -> not complete.
@@ -287,10 +305,15 @@ def _manifest(**overrides: object) -> RunManifest:
     base: dict[str, object] = dict(
         experiment_id="ASCR-pilot",
         shard_id="ASCR-Mini-0",
+        run_kind="scientific_feasibility",
+        eligible_for_scientific_analysis=True,
+        prompt_set_id="ASCR-Mini-0-prompts",
         prompt_set_version="unc-v1",
         model_name="Qwen/Qwen2.5-7B-Instruct",
         model_revision="deadbeefcafe",
         tokenizer_revision="tok-1",
+        prompt_embedding_model="BAAI/bge-base-en-v1.5",
+        prompt_embedding_revision="embed-1",
         chat_template="qwen-chatml",
         code_commit="abc1234",
         seed=0,
@@ -298,6 +321,7 @@ def _manifest(**overrides: object) -> RunManifest:
         layer=16,
         token_position="prompt_final",
         stimulus_file_hash="sha256:aaa",
+        output_directory="experiments/results/ASCR-Mini-0/",
         environment="py3.11-linux",
         timestamp="2026-07-12T00:00:00Z",
     )

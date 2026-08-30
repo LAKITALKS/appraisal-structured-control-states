@@ -1,6 +1,6 @@
 # Results (placeholder)
 
-This directory is intentionally empty in v0.1. **No results exist yet.**
+This directory is intentionally empty in v0.1.2. **No results exist yet.**
 
 This repository is a preregistered hypothesis and design note; it reports no
 experimental results, no probe accuracies, no steering effects, and no plots.

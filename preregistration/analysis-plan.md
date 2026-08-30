@@ -1,12 +1,13 @@
 # Preregistered Analysis Plan
 
-**Status:** v0.1.1 pre-data amendment; no data collected. This document
-fixes the analyses *before* any data exist.
+**Status:** v0.1.2 pre-data methodological correction; no data collected. This
+document fixes the analyses *before* any data exist.
 
 Cross-references: [`hypotheses.md`](hypotheses.md),
 [`experimental-design.md`](experimental-design.md),
 [`controls-and-baselines.md`](controls-and-baselines.md),
-[`falsification-criteria.md`](falsification-criteria.md).
+[`falsification-criteria.md`](falsification-criteria.md), and
+[`amendment-v0.1.2.md`](amendment-v0.1.2.md).
 
 ---
 
@@ -26,15 +27,19 @@ information that the model does not use.
 
 ## 2. Splits, seeds, and uncertainty
 
-- **Train / validation / test** splits at the level of **matched groups**, never
-  individual items, so that A/B/C/D siblings never straddle a split.
+- **Train / validation / test** assignments are made at the level of **whole
+  matched groups**, never individual items. Cell restrictions select siblings for
+  a particular fit, but unused siblings never migrate to the opposite side.
 - **Leave-one-domain-out** evaluation for every transfer claim.
 - **Multiple random seeds** (preregistered count, e.g. 5) for every probe and
   intervention; report mean and spread.
-- **Bootstrap confidence intervals** (e.g. 1000 resamples over matched groups) for
-  every reported metric.
-- **Multiple-comparison correction** (Benjamini–Hochberg FDR) across the family of
-  probe/axis/layer tests, with the family defined in advance.
+- **Bootstrap confidence intervals** use 1,000 resamples over matched groups for
+  the H1/H2 feasibility analyses; the resampling unit is the complete group.
+- **Nested selection:** layer and regularization are selected only from the outer
+  training domains using inner matched-group folds. Outer test labels,
+  activations, outputs, and outcomes are unavailable to selection.
+- **Multiple-comparison correction** uses the explicit families in §9. A single
+  predeclared pooled statistic is not corrected merely for being primary.
 - **Seed semantics (v0.1.1, 2nd pass).** Primary text generation is deterministic
   (`temperature: 0`, one generation per item and intervention condition). Seeds are
   **not** independent text samples; they govern matched-group splits, probe
@@ -59,43 +64,69 @@ are measured and reported, not assumed away. Where axes are correlated, selectiv
 manipulability (moving one strategy-relevant axis while holding others fixed as far
 as possible) is the operative criterion.
 
-## 4. H1 analysis — task-state dissociation
+## 4. H1 analysis — double-crossed task-state transfer
 
-- Fit two probes per axis: one for `task_state_present`, one for
-  `concept_mention_present`.
-- Primary contrast: held-out **balanced accuracy** for the task-state probe vs the
-  concept probe, evaluated on deconfounded cells (task state present, concept
-  absent = cell C; task state absent, concept present = cell B).
-- Decision: H1 is supported if the task-state probe reliably exceeds the concept
-  probe on the deconfounded evaluation, with bootstrap CI excluding equality after
-  FDR correction. H1 is weakened/rejected under the conditions in
-  [`falsification-criteria.md`](falsification-criteria.md).
+The v0.1.1 B/C accuracy-difference statistic is non-identifying because task-state
+and concept-mention labels are exact complements on `{B, C}`. It is fully reported
+as a **non-deciding diagnostic only**; see
+[`amendment-v0.1.2.md`](amendment-v0.1.2.md) §2.
 
-### H1 prompt-embedding comparison (v0.1.1, 2nd pass — does not redefine H1)
+The replacement primary feasibility analysis predicts `task_state_present` under
+two cross-mention directions inside each outer LODO fold:
 
-For Mini-0/H1 we additionally report a **prompt-embedding classifier for
-`task_state_present`**, using the **same matched-group splits** and the **same LODO
-folds** as the hidden-state probe. We report task-state decoding from: the hidden
-state; the prompt embedding; lexical / bag-of-words; and prompt length.
+- **concept absent → present:** train on A/C from the three outer-training domains;
+  test on B/D from the held-out domain;
+- **concept present → absent:** train on B/D from the three outer-training domains;
+  test on A/C from the held-out domain.
 
-- The **H1 decision is unchanged**: task-state probe vs concept-mention probe on the
-  deconfounded cells (above). The prompt-embedding comparison is documented as a
-  **strong competing explanation** and as the **link to H2** (incremental value over
-  a prompt-embedding baseline), **not** as a silent redefinition of H1. A hidden
-  state that merely matches a prompt embedding does not, by itself, establish a
-  task-induced internal state beyond the input's surface encoding.
+All four domains serve once as the outer test domain. Whole matched groups stay on
+one side of each boundary. For every outer fold and direction, logistic
+regularization and network layer are selected with inner group folds using only
+outer-training domains: the source-concept cells of inner-training groups fit the
+probe, and the opposite-concept cells of disjoint inner-validation groups score
+the candidate. The selected probe is refit on all permitted outer-training groups
+and evaluated once on the untouched domain. `ascr.splits` makes these boundaries
+machine-checkable.
 
-## 5. H2 analysis — transfer and incremental value
+The primary H1 statistic is **balanced accuracy on pooled out-of-fold predictions
+across all four domains and both directions**. AUROC is secondary. Confidence
+intervals use a cluster bootstrap over matched groups. Domain- and
+direction-specific results are mandatory; no favorable subset may be selected.
 
-- **Transfer:** train on `n-1` domains, test on the held-out domain; repeat over
-  all domains. Report per-domain and pooled transfer metrics with bootstrap CIs.
-- **Incremental value:** nested model comparison. Base model = all simple baselines
-  in [`controls-and-baselines.md`](controls-and-baselines.md) (lexical, length,
-  sentiment, valence/arousal, difficulty, confidence/unanswerability, single
-  refusal direction). Full model = base + task-state representation. Report the
-  improvement in held-out predictive performance and whether its CI excludes zero.
-- Decision: H2 is supported if the task-state representation transfers above chance
-  and above the strongest single baseline, *and* adds incremental value.
+- **Positive feasibility:** lower 95% CI > 0.5.
+- **Weakened:** upper 95% CI ≤ 0.5, conditional on passing all technical and QA
+  gates.
+- **Indeterminate:** CI overlaps 0.5.
+- **Bidirectional robustness:** both direction-specific aggregates must support
+  transfer.
+
+Mini-0 remains a feasibility analysis, not a powered confirmatory H1 test and not
+evidence for the family claim.
+
+## 5. H2 analysis — incremental value beyond prompt representation
+
+H2 is separate from H1. Under the **same outer groups, directions, LODO folds, and
+training-only selection boundary**, compare the hidden-state classifier with one
+author-approved, frozen prompt-embedding classifier. The embedding input is the
+canonical user-visible prompt text; chat-template and special-token artifacts are
+excluded. Model name, immutable revision, license, pooling, and input handling must
+be frozen before Mini-0. No post-data model selection is permitted.
+
+No embedding model is selected yet. The three verified candidates, recommendation,
+and blocking author decision are recorded in the v0.1.2 amendment and
+`experiments/configs/pilot.yaml`.
+
+- **Primary metric:** paired held-out log-loss on the same matched groups (hidden
+  state vs prompt embedding).
+- **Secondary metric:** paired balanced-accuracy difference.
+- **Uncertainty:** paired cluster bootstrap over held-out matched groups.
+- **Interpretation:** H1 can pass while H2 fails. If hidden-state performance does
+  not add to the frozen prompt representation, the incremental ASCR interpretation
+  is weakened even if task state remains decodable.
+
+TF-IDF/Bag-of-Words remains a cross-mention diagnostic rather than the primary H2
+comparator. Under ordinary LODO, it and the full registered baseline battery remain
+secondary comparisons.
 
 ## 6. H3 analysis — causal intervention
 
@@ -211,9 +242,38 @@ remains provisional.
 - If agreement is low or labels are evaluator-dependent, the response-strategy
   target is considered unstable and H3 conclusions are withheld.
 
-## 9. Pre-commitment
+## 9. Multiple-comparison families (v0.1.2 correction)
 
-- Metrics, splits, seed counts, correction family, and decision thresholds are
+The inferential families are separated by hypothesis. A significant secondary
+layer, position, direction, or domain result cannot replace a failed or
+indeterminate primary aggregate.
+
+1. **H1 primary aggregate:** the single pooled out-of-fold balanced-accuracy
+   statistic; no FDR correction.
+2. **H1 direction/domain secondary family:** 16 tests, comprising balanced
+   accuracy and AUROC for each of 2 transfer directions × 4 held-out domains;
+   Benjamini–Hochberg (BH).
+3. **H1 layer/position sensitivity family:** BH over each member of the Cartesian
+   product of the author-approved frozen layer grid, frozen position grid, and 2
+   directions (balanced accuracy). The exact grid remains a blocking decision and
+   must be frozen before Mini-0.
+4. **H2 primary aggregate:** the single paired hidden-state-minus-prompt-embedding
+   held-out-log-loss statistic; no FDR correction.
+5. **H2 direction/domain secondary family:** 8 balanced-accuracy differences for
+   2 directions × 4 domains; BH.
+6. **H3 intervention family:** a visible decision block. Exact members require the
+   later author-approved intervention layer × strength × axis grid and must be
+   frozen in a separate pre-data run plan before H3.
+7. **Family-structure primary family:** exactly A shared-vs-separate log-loss, B
+   strategy-selectivity contrast, and C incremental response-strategy log-loss;
+   BH. The substantive decision remains A ∧ B ∧ C.
+
+The machine-readable member names and decision blocks are in
+`experiments/configs/pilot.yaml`.
+
+## 10. Pre-commitment
+
+- Metrics, splits, seed counts, fixed correction families, and decision thresholds are
   fixed here before data collection.
 - Any deviation is reported as a deviation, with rationale, in the run log of the
   first data-bearing release.

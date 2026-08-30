@@ -8,20 +8,20 @@ Response-Strategy Modulation*
 **Short name:** ASCR (a working abbreviation used in this repository; not an
 established field term).
 
-**Status:** `v0.1.1 pre-data amendment` — this repository still reports **no**
-experimental results, datasets, model runs, or figures. v0.1.1 tightens the v0.1.0
-preregistration *before any data collection*.
+**Status:** `v0.1.2 pre-data methodological correction` — review branch only; no
+data, model runs, activations, generations, interventions, or results exist.
 
-The v0.1.1 amendment completed its pre-data methodological review cycle (reviewed
-across multiple independent methodological and prior-art cycles before any data
-collection) and has been **merged to `main` and released on GitHub as `v0.1.1`**.
-The compiled 11-page preprint is `paper/preprint.pdf`. No model runs or experimental
-results exist. The **Zenodo archival version and its version-specific DOI are
-pending** (the GitHub release triggers the Zenodo deposit; the new DOI is recorded
-in a follow-up commit once Zenodo publishes).
+v0.1.2 publicly repairs a non-identifying H1 decision statistic before data
+collection. The replacement uses bidirectional concept-mention transfer within
+outer leave-one-domain-out folds, training-only nested selection, explicit H1/H2
+separation, typed axis-isolation QA, a defined Layer-0 baseline, and a structural
+boundary between technical smoke logs and scientific feasibility artifacts. It is
+not merged, tagged, released, or archived. Archived v0.1.0 and v0.1.1 remain
+unchanged.
 
-- [**v0.1.1 pre-data amendment**](preregistration/amendment-v0.1.1.md)
-- [**v0.1.1 pre-data review status**](preregistration/v0.1.1-review-status.md)
+- [**v0.1.2 methodological correction**](preregistration/amendment-v0.1.2.md)
+- [**v0.1.2 review status**](preregistration/v0.1.2-review-status.md)
+- [**Historical v0.1.1 amendment**](preregistration/amendment-v0.1.1.md)
 - [**GitHub release v0.1.1**](https://github.com/LAKITALKS/appraisal-structured-control-states/releases/tag/v0.1.1)
 
 ---
@@ -97,6 +97,8 @@ anthropomorphic commitment. The information-bottleneck formalization is optional
 │   └── figures/                   # placeholder (no result figures)
 ├── preregistration/
 │   ├── hypotheses.md              # H1–H4
+│   ├── amendment-v0.1.2.md        # current pre-data correction
+│   ├── v0.1.2-review-status.md     # implementation/review gate
 │   ├── experimental-design.md     # 2x2 design, axes, domains, model plan
 │   ├── analysis-plan.md           # probes, transfer, identifiability
 │   ├── controls-and-baselines.md  # baselines + lexical-geometry control
@@ -107,7 +109,7 @@ anthropomorphic commitment. The information-bottleneck formalization is optional
 │   ├── citation-verification.md   # verification log (source of truth)
 │   └── novelty-statement.md
 ├── experiments/
-│   ├── configs/pilot.yaml         # intended pilot configuration
+│   ├── configs/                    # pilot config + unfrozen Mini-0 run template
 │   ├── data/ notebooks/ results/  # placeholders (empty; README only)
 │   └── src/ascr/                  # tested design-time scaffold
 └── tests/                         # unit tests (all passing)
@@ -120,7 +122,10 @@ A feasibility pilot (not a powered study): three primary axes
 (software debugging, scheduling/planning, policy-constrained assistance, document
 editing), on an open-weight ~7–9B instruction-tuned model (default
 `Qwen/Qwen2.5-7B-Instruct`, with the exact revision hash frozen before data
-generation). Interpretable linear probes, leave-one-domain-out transfer, and causal
+generation). H1 uses double-crossed concept-mention transfer across outer LODO
+folds with whole matched groups and training-only layer/regularization selection.
+H2 separately compares hidden states with an author-approved frozen prompt
+embedding. Interpretable linear probes and later causal
 interventions with matched-norm random/PCA controls. Details in
 [`preregistration/experimental-design.md`](preregistration/experimental-design.md).
 
@@ -131,20 +136,26 @@ python -m pytest          # run the unit tests
 make paper                # build paper/preprint.pdf (latexmk or tectonic)
 ```
 
-> **Build note:** `paper/preprint.pdf` is the compiled version of `paper/main.tex`
-> (11 pages; no undefined citations, no missing references). `make paper` prefers
-> `latexmk` + TeX Live and falls back to the self-contained `tectonic` engine.
+> **Build note:** `paper/preprint.pdf` is built from `paper/main.tex`. `make paper`
+> prefers `latexmk` + TeX Live and falls back to the self-contained `tectonic`
+> engine. The current v0.1.2 branch build is 12 pages; it compiled with Tectonic
+> 0.16.9 after the local TinyTeX installation lacked `enumitem.sty`. The PDF is a
+> local review artifact and is not an archival release. The build fixes
+> `SOURCE_DATE_EPOCH` to the amendment date and enables Tectonic's deterministic
+> mode so repeated fallback builds are byte-reproducible.
 
 ## How to cite
 
 Please cite via [`CITATION.cff`](CITATION.cff). Zenodo DOIs:
 
 - **All versions (concept DOI):** [10.5281/zenodo.21294932](https://doi.org/10.5281/zenodo.21294932) — always resolves to the latest archived version.
-- **v0.1.1 (this pre-data amendment, current):** [10.5281/zenodo.21335529](https://doi.org/10.5281/zenodo.21335529) — cite this version-specific DOI for the present preregistration.
+- **v0.1.1 (latest archived version):** [10.5281/zenodo.21335529](https://doi.org/10.5281/zenodo.21335529) — use this version-specific DOI when citing the archived v0.1.1 preregistration.
 - **v0.1.0 (historical version DOI):** [10.5281/zenodo.21294933](https://doi.org/10.5281/zenodo.21294933) — the original archived preregistration.
 
-The v0.1.0 archived record remains unchanged. The badge above points to the concept
-DOI so it tracks the latest version.
+v0.1.2 has no version-specific DOI because it is not released. Cite its exact
+review commit only if this unreleased correction must be discussed; do not cite it
+as an archived version. The badge points to the concept DOI and therefore resolves
+to the latest **archived** version. Both historical records remain unchanged.
 
 ## Author
 

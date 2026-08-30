@@ -12,8 +12,11 @@ from __future__ import annotations
 
 from .schema import (
     EXTERNAL_PROVENANCE_FIELDS,
+    PLACEHOLDER_EMBEDDING_MODEL,
+    PLACEHOLDER_EMBEDDING_REVISION,
     PLACEHOLDER_MODEL_REVISION,
     PLACEHOLDER_REPLICATION_MODEL,
+    PLACEHOLDER_TOKENIZER_REVISION,
     PROVENANCE_DECISIONS,
     QA_BOOLEAN_FIELDS,
     QA_DISPOSITIONS,
@@ -24,10 +27,13 @@ from .schema import (
     RunManifest,
     ValidationError,
     check_run_ready,
+    config_can_generate_scientific_data,
+    config_run_ready_problems,
     is_complete_matched_group,
     is_placeholder_revision,
     is_run_ready,
     item_from_dict,
+    item_to_dict,
     load_config,
     manifests_compatible,
     parse_config,
@@ -37,6 +43,20 @@ from .schema import (
     validate_provenance,
     validate_qa,
     validate_run_ready_group,
+)
+from .pooling import (
+    final_non_padding_index,
+    mean_pool_user_content_embeddings,
+    user_content_pool_mask,
+)
+from .splits import (
+    CONCEPT_ABSENT_TO_PRESENT,
+    CONCEPT_PRESENT_TO_ABSENT,
+    TRANSFER_DIRECTIONS,
+    CrossMentionOuterFold,
+    InnerSelectionFold,
+    plan_double_crossed_lodo,
+    plan_inner_selection_folds,
 )
 from .strategy_labels import (
     AXES,
@@ -55,7 +75,7 @@ from .strategy_labels import (
     superclass_of,
 )
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 __all__ = [
     "AXES",
@@ -64,8 +84,11 @@ __all__ = [
     "EXPLORATORY_AXES",
     "EXTERNAL_PROVENANCE_FIELDS",
     "FINE_TO_SUPERCLASS",
+    "PLACEHOLDER_EMBEDDING_MODEL",
+    "PLACEHOLDER_EMBEDDING_REVISION",
     "PLACEHOLDER_MODEL_REVISION",
     "PLACEHOLDER_REPLICATION_MODEL",
+    "PLACEHOLDER_TOKENIZER_REVISION",
     "PROVENANCE_DECISIONS",
     "PRIMARY_AXES",
     "QA_BOOLEAN_FIELDS",
@@ -80,6 +103,8 @@ __all__ = [
     "SUPERCLASS_DOMINANCE",
     "ValidationError",
     "check_run_ready",
+    "config_can_generate_scientific_data",
+    "config_run_ready_problems",
     "design_cell",
     "dominant_superclass",
     "is_complete_matched_group",
@@ -88,6 +113,7 @@ __all__ = [
     "is_primary_axis",
     "is_valid_strategy",
     "item_from_dict",
+    "item_to_dict",
     "load_config",
     "manifests_compatible",
     "parse_config",
@@ -98,5 +124,15 @@ __all__ = [
     "validate_provenance",
     "validate_qa",
     "validate_run_ready_group",
+    "CONCEPT_ABSENT_TO_PRESENT",
+    "CONCEPT_PRESENT_TO_ABSENT",
+    "TRANSFER_DIRECTIONS",
+    "CrossMentionOuterFold",
+    "InnerSelectionFold",
+    "final_non_padding_index",
+    "mean_pool_user_content_embeddings",
+    "plan_double_crossed_lodo",
+    "plan_inner_selection_folds",
+    "user_content_pool_mask",
     "__version__",
 ]

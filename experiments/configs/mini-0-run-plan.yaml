@@ -1,0 +1,31 @@
+# ASCR-Mini-0 v0.1.2 pre-data run-plan template.
+# This file is intentionally NOT run_ready. Every sentinel below blocks execution
+# until an author-approved revision records the final pre-data choices.
+
+run_plan_version: "0.1.2"
+status: PRE_DATA_UNFROZEN
+experiment_id: "TO_BE_ASSIGNED_BEFORE_MINI_0"
+shard_id: ASCR-Mini-0
+run_kind: scientific_feasibility
+eligible_for_scientific_analysis: true
+prompt_set_id: "TO_BE_ASSIGNED_AFTER_STIMULUS_QA"
+prompt_set_version: "TO_BE_FROZEN_AFTER_STIMULUS_QA"
+target_matched_groups: 40
+model_name: "Qwen/Qwen2.5-7B-Instruct"
+model_revision: "TO_BE_FROZEN_BEFORE_DATA_GENERATION"
+tokenizer_revision: "TO_BE_FROZEN_BEFORE_DATA_GENERATION"
+prompt_embedding_model: "TO_BE_SELECTED_BY_AUTHOR_BEFORE_MINI_0"
+prompt_embedding_revision: "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION"
+chat_template: "TO_BE_HASHED_WITH_TOKENIZER_REVISION"
+code_commit: "TO_BE_FROZEN_BEFORE_MINI_0"
+layer_candidates: "TO_BE_FROZEN_BEFORE_MINI_0"
+token_position: final_non_padding_prompt_token
+layer_zero_pooling: mean_pooled_user_content_token_embeddings
+bootstrap_resamples: 1000
+inner_matched_group_folds: 3
+outer_folds: leave_one_domain_out_all_four_domains
+transfer_directions:
+  - concept_absent_to_present
+  - concept_present_to_absent
+no_holonomy_data: true
+no_data_declaration: "No model run is authorized by this unfrozen template."

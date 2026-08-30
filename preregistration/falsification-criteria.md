@@ -1,6 +1,7 @@
 # Falsification Criteria
 
-**Status:** v0.1 criteria, unchanged by the v0.1.1 pre-data amendment; no data collected.
+**Status:** v0.1 criteria with the H1 decision rule corrected by the v0.1.2
+pre-data methodological correction; no data collected.
 
 This document lists, in advance, the conditions under which the central
 interpretation is **weakened or rejected**. Committing to these before data
@@ -17,8 +18,11 @@ simple baselines, or lexical-phrase reweighting.
 
 ## The central interpretation is weakened or rejected if any of the following hold
 
-1. **Vocabulary, not state.** Probes primarily track appraisal-related *words*
-   rather than the real task state (fails H1).
+1. **No cross-mention task-state transfer.** Under the double-crossed LODO design,
+   the upper 95% cluster-bootstrap interval of pooled out-of-fold task-state
+   balanced accuracy is at or below 0.5 after all technical and QA gates pass
+   (weakens H1). An interval overlapping 0.5 is indeterminate, not positive.
+   Direction-specific failure blocks a bidirectional-robustness claim.
 2. **No transfer.** Cross-domain transfer fails; probes trained on some domains do
    not generalize to a held-out domain (fails H2).
 3. **Baselines suffice.** Lexical classifiers or simple prompt embeddings perform
@@ -44,7 +48,7 @@ simple baselines, or lexical-phrase reweighting.
 
 ## Decision discipline
 
-- Each numbered condition maps to a preregistered metric and threshold in
+- Each numbered condition maps to a preregistered metric and decision rule in
   [`analysis-plan.md`](analysis-plan.md).
 - Partial outcomes are reported honestly: e.g. H1 and H2 supported but H3
   necessity not met is reported as such, and does **not** license the full claim.

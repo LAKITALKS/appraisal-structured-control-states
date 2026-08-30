@@ -3,6 +3,72 @@
 All notable changes to this repository are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for its metadata version field.
 
+## [0.1.2] — Unreleased (pre-data methodological correction)
+
+This review-branch correction was prepared before any data collection. It does not
+alter the archived v0.1.0 or v0.1.1 versions and is not yet merged, tagged,
+released, or archived.
+
+### Added
+
+- `preregistration/amendment-v0.1.2.md`, formally documenting why the historical
+  B/C H1 accuracy-difference statistic is non-identifying and defining its
+  replacement.
+- A double-crossed H1 split planner: both concept-mention transfer directions
+  within all four outer LODO folds, with whole matched groups confined to one side.
+- Nested matched-group selection plans that expose only outer-training domains to
+  layer and logistic-regularization selection.
+- Pure Layer-0 user-content mask/pooling and final-non-padding-index utilities.
+- Explicit `technical_smoke` versus `scientific_feasibility` manifest types and
+  structural incompatibility rules.
+- A v0.1.2 Mini-0 run-plan template containing blocking pre-data sentinels.
+- A deterministic paper-build setting tied to the amendment date, preventing
+  review PDFs from differing only in generated timestamp metadata.
+- Tests for the corrected H1 design, leakage boundary, tokenizer masks, axis QA,
+  smoke separation, historical readability, metadata, and no-data guards (90
+  passing in the completed branch verification).
+
+### Changed
+
+- H1's primary feasibility statistic is pooled out-of-fold balanced accuracy under
+  bidirectional cross-mention LODO transfer. AUROC is secondary; matched groups are
+  the bootstrap unit. The historical B/C statistic is non-deciding.
+- H2 is a separate gate comparing hidden-state and frozen prompt-embedding models
+  on identical splits, with held-out log-loss primary. Prompt-embedding selection
+  remains an explicit author decision that blocks `run_ready`.
+- TF-IDF is diagnostic under cross-mention transfer and secondary under ordinary
+  LODO, not the primary H2 comparator.
+- Run-ready QA now records observed factor values and exact confirmation that the
+  other two primary axes are absent; partial v0.1.1 QA remains draft-readable only.
+- Multiple-comparison families are named separately for H1, H2, H3, and the family
+  test. Unresolved layer/intervention grids remain visible decision blocks.
+- Repository versions advance to 0.1.2 on this branch; top-level CFF type is
+  corrected to `software`, while the preferred paper citation remains a report.
+
+### Scientific rationale
+
+On cells B and C, task-state and concept-mention labels are exact complements.
+Comparing each probe's accuracy against its own labels yields zero both for two
+perfect probes and for two chance probes, so the statistic cannot identify the
+intended dissociation. Cross-mention transfer tests whether task-state decoding
+survives concept-level change without conflating H1 with H2 incremental value.
+
+### Unchanged
+
+- H1–H4 statements, the 2×2 design, three primary axes, four domains, response
+  taxonomy, direction derivation, lexical/competence controls, and the family
+  decision **A ∧ B ∧ C**.
+- Historical tags, GitHub releases, Zenodo records, concept DOI
+  `10.5281/zenodo.21294932`, v0.1.0 DOI `10.5281/zenodo.21294933`, and v0.1.1 DOI
+  `10.5281/zenodo.21335529`.
+- No H5, holonomy, LEM, dialogue-loop, path-dependence, or user-signature content.
+
+### No-data declaration
+
+- No dataset, model run, model response, activation, intervention, statistic, or
+  scientific result was produced. The only tokenizer inspection used disposable
+  strings and loaded no model weights.
+
 ## [0.1.1] — 2026-07-12 (pre-data amendment)
 
 A transparent pre-data amendment of the archived v0.1.0 preregistration. **No data

@@ -1,13 +1,14 @@
 # Preregistered Experimental Design
 
-**Status:** v0.1.1 pre-data amendment; no data collected. All numbers
+**Status:** v0.1.2 pre-data methodological correction; no data collected. All numbers
 below are *planned* pilot parameters, not results.
 
 This document specifies the pilot: the factorial design, the candidate axes and
 domains, the model and activation-extraction plan, and the dataset construction
 rules. Probing, transfer, intervention, and controls are detailed in
 [`analysis-plan.md`](analysis-plan.md) and
-[`controls-and-baselines.md`](controls-and-baselines.md).
+[`controls-and-baselines.md`](controls-and-baselines.md). The correction is logged
+in [`amendment-v0.1.2.md`](amendment-v0.1.2.md).
 
 ---
 
@@ -33,9 +34,11 @@ Prompts are built in **matched groups**: one base task instantiated across all
 four cells so that A/B/C/D differ only along the two intended factors. Each matched
 group shares a `matched_group_id`.
 
-The primary analysis asks whether activation patterns follow the **actual
-task-state factor** (cells C, D vs A, B) rather than the **vocabulary factor**
-(cells B, D vs A, C).
+The primary H1 analysis uses **double-crossed transfer**: fit task-state decoding on
+A/C and evaluate on B/D, then reverse B/D → A/C, always across an outer held-out
+domain and whole matched groups. This directly tests whether task-state decoding
+survives a change in concept-mention level. The historical v0.1.1 B/C
+accuracy-difference statistic is non-identifying and is non-deciding after v0.1.2.
 
 ---
 
@@ -65,15 +68,19 @@ from norm tension.
    admissible requirements collide**. Concept mention = the prompt uses
    conflict/tension vocabulary.
 
-### Axis-isolation rule (v0.1.1, 2nd pass)
+### Axis-isolation rule (machine-readable in v0.1.2)
 
-**Primary matched groups may manipulate only one primary axis at a time.** Each
-item records the axis-isolation QA flags relevant to its target axis, e.g.
-`primary_axis_isolated`, and the confirmations that the *other* task states are
-absent: `unanswerability_absent_confirmed`, `norm_tension_absent_confirmed`,
-`controllability_absent_confirmed` (as applicable to the target axis). Multi-axis
-items are admissible **only** as a separately labelled secondary robustness set and
-**must not** enter the primary single-axis analysis.
+**Primary matched groups may manipulate only one primary axis at a time.** The
+item's typed `axis` is its target. Run-ready QA records
+`observed_task_state_present` and `observed_concept_mention_present`, which must
+exactly equal the registered item values (task state false in A/B and true in C/D;
+concept mention false in A/C and true in B/D). The mapping
+`non_target_axes_absent_confirmed` must contain exactly the other two primary axes,
+each `true`, in addition to `primary_axis_isolated: true`. This is validated by
+`ascr.schema`; a free-text note is insufficient. Multi-axis items are admissible
+**only** as a separately labelled secondary robustness set and **must not** enter
+the primary single-axis analysis. Legacy partial v0.1.1 QA can be read in `draft`
+mode but cannot pass v0.1.2 `run_ready`.
 
 ### Secondary / exploratory axes
 
@@ -132,7 +139,7 @@ To avoid presenting any count as a powered study, three stages are distinguished
    analysis** (using feasibility estimates), frozen in a versioned pre-data run plan
    **before** any confirmatory data collection.
 
-### Scaling plan (later, not part of v0.1)
+### Scaling plan (later, not part of Mini-0)
 
 If the pilot shows a signal that survives the controls, scale to: more matched
 groups per axis (target ~200/axis), the two exploratory axes, an additional
@@ -151,8 +158,9 @@ Qwen/Qwen2.5-7B-Instruct
 
 An open-weight, instruction-tuned model in the ~7B–9B range. **The exact immutable
 model revision hash must be recorded in the run config before any data
-generation.** Decoding settings (temperature, top-p, max tokens, seed) are fixed
-and recorded per run.
+generation.** The tokenizer revision is frozen separately, and the exact chat
+template is recorded. Decoding settings (temperature, top-p, max tokens, seed) are
+fixed and recorded per run.
 
 ### Replication model (constraint tightened in v0.1.1)
 
@@ -190,6 +198,25 @@ Every stored activation row carries: `item_id`, `axis`, `domain`, `cell` (A/B/C/
 `task_state_present`, `concept_mention_present`, `matched_group_id`, layer, token
 position, and a `prompt_vs_generated` flag.
 
+### Token indexing and Layer 0 (v0.1.2 correction)
+
+The final prompt-token index is the greatest index with `attention_mask == 1`, so
+the rule is independent of padding side. A tokenizer-only inspection on disposable
+strings at the nonbinding Qwen repository snapshot
+`a09a35458c702b33eeacc393d103063234e8bc28` found that the final token produced by
+the intended assistant-generation template is newline token ID 198 and that the
+last four template tokens were identical across the inspected prompts. This loaded
+no model weights and produced no ASCR observation. The binding tokenizer revision
+remains an unresolved run blocker.
+
+For hidden transformer layers, the primary readout remains the final non-padding
+prompt token. At **Layer 0**, that identical assistant-prefix final-token embedding
+is only a sanity check. The informative baseline is the mean-pooled embedding over
+the explicitly marked user-visible content span, using
+`user_content AND attention_mask AND NOT special_token`. Padding, system text,
+role markers, assistant prefix, and special/template tokens are excluded. The mask
+and pooling rule is validated by pure design-time code in `ascr.pooling`.
+
 ---
 
 ## 6. Response-strategy labeling
@@ -215,7 +242,7 @@ trigger.
 
 ---
 
-## 8. Concept-mention stimulus-QA protocol (technically binding in v0.1.1, 2nd pass)
+## 8. Concept-mention stimulus-QA protocol (strengthened in v0.1.2)
 
 A quality-assurance protocol governs the concept-mention cells (B and D) so that
 concept mention does not covary with difficulty and cell B is not more artificial or
@@ -231,21 +258,26 @@ with two validation modes enforced in code
 **Typed QA fields (run_ready).** Each item's `qa` block must contain:
 `naturalness_rating` (integer 1–5), and booleans `grammatical`, `register_match`,
 `domain_match`, `target_task_match`, `solvable_as_intended`,
-`task_state_present_confirmed`, `concept_mention_confirmed`, `label_leak_free`,
-`no_artificial_meta_sentence`, `primary_axis_isolated`; plus `reviewer_id`
+`label_leak_free`, `no_artificial_meta_sentence`, `primary_axis_isolated`; typed
+booleans `observed_task_state_present` and `observed_concept_mention_present`;
+the typed mapping `non_target_axes_absent_confirmed`; plus `reviewer_id`
 (non-empty), `review_timestamp` (ISO-8601), and `disposition` (`pass` / `revise` /
 `discard`).
 
-**Item pass rule.** `disposition == pass`; all required booleans equal their
-expected value (True); and `naturalness_rating >= 4`.
+**Item pass rule.** `disposition == pass`; all quality-confirmation flags are true;
+the two observed design-factor values equal the item's registered values; the
+non-target-axis mapping contains exactly the required axes, all true; and
+`naturalness_rating >= 4`.
 
 **Matched-group pass rule.** All four A/B/C/D cells present; every item passes; and
 the **within-group naturalness spread across A/B/C/D is at most one scale point**.
 
 **Whole-set gate.** `ascr.schema.check_run_ready(...)` validates an entire stimulus
 set and blocks a run unless every matched group is run_ready, the model revision is
-frozen (not a placeholder), the configured sample-size floor of complete groups is
-met, and any externally-sourced items are review-approved (see §10). Marker masking
+frozen, the tokenizer revision is frozen, the author-approved prompt-embedding
+model and revision are frozen, the layer candidate grid is frozen, the configured
+sample-size floor is met, and any externally-sourced items are review-approved (see
+§10). Marker masking
 and synonym-based robustness are evaluated; prompt embeddings, length, and register
 features are stored as baselines/covariates. Groups failing QA are `revise`d or
 `discard`ed; the disposition is logged. **No activations are collected from
@@ -253,7 +285,7 @@ unreviewed groups.**
 
 ---
 
-## 9. Modular mini-shard protocol (v0.1.1 amendment)
+## 9. Modular mini-shard and smoke protocol (corrected in v0.1.2)
 
 The pilot is executable as versioned **mini-shards**, each testing a single axis,
 **explicitly as feasibility studies**, without pretending to be the full
@@ -282,9 +314,10 @@ framing.
 dialogue-loop, path-dependence, or user-signature data (amendment §4).
 
 Each shard carries an **immutable run manifest** with: experiment ID, shard ID,
-prompt-set version, model name, immutable model revision, tokenizer revision, chat
+run kind, scientific-eligibility flag, prompt-set ID and version, model name,
+immutable model and tokenizer revisions, prompt-embedding name and revision, chat
 template, code commit, seed, decoding configuration, layer, token position,
-stimulus-file hash, environment, and timestamp (validated by
+stimulus-file hash, output directory, environment, and timestamp (validated by
 `ascr.schema.RunManifest`).
 
 **Combination rule.** Shards may be combined only if all compatibility-relevant
@@ -292,6 +325,19 @@ manifest fields are identical (`ascr.schema.manifests_compatible`). Any change t
 model, prompt construction, readout, or code is recorded as a new prompt-set
 version or a separate experiment. There is **no** cherry-picking or merging of only
 positive shards; all run shards are reported.
+
+### Non-scientific technical smoke runs
+
+A technical smoke run is not a Mini shard. It must use non-registered disposable
+prompts, a `DISPOSABLE_` prompt-set identifier, a non-`ASCR-Mini-` shard ID, a
+smoke-specific output directory, `run_kind: technical_smoke`, and
+`eligible_for_scientific_analysis: false`. Such artifacts never enter effect-size,
+variance, bootstrap, power/precision, or layer-selection calculations and cannot
+be cited as preliminary evidence. They are discarded or archived only as clearly
+separated technical logs. Mini-0 instead uses `run_kind:
+scientific_feasibility`, remains subject to every run-ready gate, and is
+structurally incompatible with a smoke manifest. This repository implements the
+boundary only; it performs no smoke run.
 
 ---
 

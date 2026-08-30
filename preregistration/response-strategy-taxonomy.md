@@ -1,6 +1,7 @@
 # Response-Strategy Taxonomy
 
-**Status:** v0.1.1 pre-data amendment; no data collected.
+**Status:** v0.1.2 pre-data methodological correction; taxonomy unchanged and no
+data collected.
 
 The target variable of ASCR is a higher-level **response strategy** (policy mode),
 not the raw next-token distribution. This document defines the strategy labels, the

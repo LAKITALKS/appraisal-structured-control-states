@@ -1,6 +1,6 @@
 # Controls and Baselines
 
-**Status:** v0.1.1 pre-data amendment; no data collected.
+**Status:** v0.1.2 pre-data methodological correction; no data collected.
 
 This document specifies (1) the mandatory lexical-geometry control, (2) the
 competing explanations and baselines the ASCR representation must beat, and (3) the
@@ -137,14 +137,19 @@ in the amendment, and in the CHANGELOG; no data existed when it was made.
 
 ---
 
-## 5. Baseline battery (v0.1.1 amendment)
+## 5. Baseline battery (H1/H2 roles corrected in v0.1.2)
 
 The v0.1.0 baseline list (Section 2 above) is retained and refined. Two baselines
 are elevated to **primary** comparisons:
 
-- **Prompt-embedding baseline** — a strong non-mechanistic sentence/prompt
-  embedding predictor of response strategy. Primary. The task-state representation
-  must beat it and add incremental value on held-out domains.
+- **Prompt-embedding baseline** — the primary non-mechanistic H2 comparator under
+  the same double-crossed outer groups, directions, LODO folds, and training-only
+  hyperparameter selection as the hidden-state probe. Its input is canonical
+  user-visible prompt text, excluding chat-template/special-token artifacts. Exact
+  model, immutable revision, license, pooling, and input handling must be frozen
+  before Mini-0; the unresolved author decision is documented in
+  [`amendment-v0.1.2.md`](amendment-v0.1.2.md). Held-out log-loss is primary and
+  paired balanced-accuracy difference secondary.
 - **Difficulty-representation baseline** — a decodable generic-difficulty
   representation (cf. linear difficulty probes in prior work), included because
   difficulty is a known confound for the task-state axes. Primary **where
@@ -165,3 +170,13 @@ Tiering of baselines by pilot stage:
 Support for ASCR requires incremental value over the **strongest** primary
 baseline, including the prompt-embedding and difficulty baselines, not merely over
 the weakest.
+
+### Cross-mention role of lexical baselines
+
+TF-IDF/Bag-of-Words is retained but is **diagnostic/descriptive** under the H1/H2
+cross-mention transfer boundary; predictable failure under a vocabulary shift is
+not the primary H2 comparison. Under ordinary standard LODO it remains a secondary
+comparison together with prompt length, token entropy, difficulty, prompt
+embeddings, and the other registered baselines. This classification does not alter
+H1: H1 is task-state transfer across concept level, while H2 asks whether hidden
+states improve on the frozen prompt representation.
