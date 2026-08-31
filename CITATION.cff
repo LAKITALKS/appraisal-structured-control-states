@@ -7,7 +7,7 @@ abstract: >-
   uncertainty reporting, evaluation awareness) may be special cases of a more
   general family of task-induced, appraisal-structured latent control
   representations that partially govern response-strategy selection across
-  domains. Version 0.1.2 is an unreleased pre-data methodological correction of
+  domains. Version 0.1.2 is a pre-data methodological correction of
   the H1 and H2 decision rules, frozen analysis specification, pre-run artifact
   gate, and response-label reliability protocol; it reports no experimental
   results.
@@ -29,7 +29,7 @@ preferred-citation:
   year: 2026
   version: "0.1.2"
   url: "https://github.com/LAKITALKS/appraisal-structured-control-states"
-  notes: "Unreleased pre-data methodological correction; reports no experimental results and has no version-specific DOI. Historical identifiers are: concept DOI 10.5281/zenodo.21294932, v0.1.0 DOI 10.5281/zenodo.21294933, and v0.1.1 DOI 10.5281/zenodo.21335529."
+  notes: "Pre-data methodological correction; reports no experimental results. The v0.1.2 version-specific Zenodo DOI is pending. Historical identifiers are: concept DOI 10.5281/zenodo.21294932, v0.1.0 DOI 10.5281/zenodo.21294933, and v0.1.1 DOI 10.5281/zenodo.21335529."
 keywords:
   - "mechanistic interpretability"
   - "representation engineering"

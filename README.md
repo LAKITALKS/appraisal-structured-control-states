@@ -8,8 +8,9 @@ Response-Strategy Modulation*
 **Short name:** ASCR (a working abbreviation used in this repository; not an
 established field term).
 
-**Status:** `v0.1.2 pre-data methodological correction` — review branch only; no
-data, model runs, activations, generations, interventions, or results exist.
+**Status:** `v0.1.2 pre-data methodological correction` — GitHub release;
+version-specific Zenodo DOI pending. No data, model runs, activations,
+generations, interventions, or results exist.
 
 v0.1.2 publicly repairs a non-identifying H1 decision statistic before data
 collection. The replacement uses bidirectional concept-mention transfer within
@@ -26,8 +27,8 @@ exactly one canonical release build. A final pre-release review makes the run ga
 fail closed unless configuration, frozen Mini-0 plan, immutable manifest, and
 canonical stimulus hash all agree; separates Mini-0 from the later H3 gate; fixes
 H2's independent comparator selection and sparse-class/convergence handling; and
-registers a deterministic two-human response-label reliability protocol. It is not merged, tagged, released, or
-archived. Archived v0.1.0 and v0.1.1 remain unchanged.
+registers a deterministic two-human response-label reliability protocol. Historical
+v0.1.0 and v0.1.1 records remain unchanged.
 
 - [**v0.1.2 methodological correction**](preregistration/amendment-v0.1.2.md)
 - [**v0.1.2 review status**](preregistration/v0.1.2-review-status.md)
@@ -160,21 +161,21 @@ make paper-verify         # build twice from clean and require identical SHA-256
 > valid but byte-different PDFs and would silently change the archival artifact.
 > `make paper-dev` runs `latexmk` as a clearly labelled **noncanonical development
 > build**; its output must never be committed as `paper/preprint.pdf`. No byte
-> identity is claimed across engines. The current v0.1.2 branch build is 13 pages.
-> The PDF is a local review artifact and is not an archival release.
+> identity is claimed across engines. The v0.1.2 release PDF is 13 pages and is
+> the verified GitHub Release artifact; Zenodo archival is pending.
 
 ## How to cite
 
 Please cite via [`CITATION.cff`](CITATION.cff). Zenodo DOIs:
 
 - **All versions (concept DOI):** [10.5281/zenodo.21294932](https://doi.org/10.5281/zenodo.21294932) — always resolves to the latest archived version.
-- **v0.1.1 (latest archived version):** [10.5281/zenodo.21335529](https://doi.org/10.5281/zenodo.21335529) — use this version-specific DOI when citing the archived v0.1.1 preregistration.
+- **v0.1.2:** GitHub Release published; version-specific Zenodo DOI pending.
+- **v0.1.1 (historical version DOI):** [10.5281/zenodo.21335529](https://doi.org/10.5281/zenodo.21335529) — the archived v0.1.1 preregistration.
 - **v0.1.0 (historical version DOI):** [10.5281/zenodo.21294933](https://doi.org/10.5281/zenodo.21294933) — the original archived preregistration.
 
-v0.1.2 has no version-specific DOI because it is not released. Cite its exact
-review commit only if this unreleased correction must be discussed; do not cite it
-as an archived version. The badge points to the concept DOI and therefore resolves
-to the latest **archived** version. Both historical records remain unchanged.
+The v0.1.2 version-specific Zenodo DOI will be added after archival. Until then,
+the badge and concept DOI remain [10.5281/zenodo.21294932](https://doi.org/10.5281/zenodo.21294932).
+Historical v0.1.0 and v0.1.1 DOI records remain unchanged.
 
 ## Author
 
