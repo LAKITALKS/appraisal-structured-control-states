@@ -1,28 +1,71 @@
-# ASCR pilot configuration (v0.1.1 pre-data amendment).
+# ASCR pilot configuration (v0.1.2 pre-data methodological correction).
 #
-# This file records the intended pilot configuration. No data have been
-# collected. The exact immutable model revision hash MUST be recorded in
-# `model.revision` before any activations are extracted; until then it holds the
-# sentinel value below and no data generation may proceed.
+# This is a design-time configuration. It cannot authorize extraction while
+# `validation_mode` is `draft` or any blocking sentinel remains. No model has been
+# run and no scientific data have been produced.
 
-config_version: "0.1.1"
+config_version: "0.1.2"
+study_stage: pre_data_feasibility_design
+run_gate_stage: mini0_scientific
+validation_mode: draft
+run_kind: scientific_feasibility
+eligible_for_scientific_analysis: true
+mini_shard_id: ASCR-Mini-0
+target_axis: uncertainty
+target_matched_groups: 40  # feasibility size, not a power analysis
+no_holonomy_data: true
+axis_isolation_required: true
+external_label_review_required: true
 
-# Study staging and run gate (v0.1.1, 2nd pass). These fields are machine-readable
-# so a validation gate can block a real run while placeholders remain. No spurious
-# precision or result values are entered here.
-study_stage: feasibility          # feasibility | pilot | confirmatory
-validation_mode: draft            # draft (no extraction) | run_ready
-mini_shard_id: ASCR-Mini-0        # active shard for this config
-target_matched_groups: 40         # feasibility floor for Mini-0 (not a power analysis)
-no_holonomy_data: true            # ASCR shards collect no holonomy/loop/user-signature data
-axis_isolation_required: true     # primary matched groups manipulate one axis only
-external_label_review_required: true  # external labels need human-reviewed provenance
+run_gate:
+  requires_validation_mode: run_ready
+  blocking_sentinels:
+    - model.revision
+    - model.tokenizer_revision
+    - prompt_embedding.model_name
+    - prompt_embedding.revision
+    - prompt_embedding.license
+    - prompt_embedding.pooling_rule
+    - prompt_embedding.truncation_rule
+    - prompt_embedding.max_input_length
+    - activations.primary_layer_candidates
+    - activations.primary_position_candidates
+    - fdr_families.h1_layer_position_sensitivity.status
+    - fdr_families.h1_layer_position_sensitivity.raw_p_value_procedure
+  author_approval_required:
+    - prompt_embedding.selection_status
+  scientific_generation_allowed_while_draft: false
+  # The future extraction runner must call the integrated configuration-plus-
+  # stimulus gate (`ascr.schema.integrated_pre_run_gate_problems`) and find it
+  # empty BEFORE it constructs, downloads, or loads any model, tokenizer, or
+  # prompt-embedding model. The individual helpers are design-time guards only.
+  integrated_gate_function: ascr.schema.integrated_pre_run_gate_problems
+  integrated_gate_must_pass_before_model_construction: true
+  remaining_mini0_author_decisions:
+    - prompt_embedding_selection_and_immutable_details
+    - qwen_model_revision
+    - tokenizer_revision
+    - primary_layer_candidate_grid
+    - exact_position_sensitivity_grid
+  deferred_non_mini0_author_decisions:
+    - later_h3_intervention_grid
+  resolved_in_v012_correction_pass:
+    - h2_primary_target_and_class_vocabulary
+    - h2_log_loss_sign_convention
+    - h2_positive_weakened_indeterminate_rules
+    - logistic_regression_pipeline_and_solver
+    - regularization_C_grid
+    - inner_selection_objectives_and_tie_breaking
+    - inner_leave_one_training_domain_out_structure
+    - seed_roles_and_no_seed_pooling
+    - cluster_bootstrap_algorithm
+    - benjamini_hochberg_raw_p_value_procedures
+
 temperature_zero_generation_policy:
   primary_temperature: 0.0
   deterministic_single_generation: true
   seeds_are_independent_text_samples: false
   seeds_govern:
-    - matched_group_splits
     - probe_initialization_or_solver
     - random_direction_controls
     - bootstrap
@@ -30,12 +73,9 @@ temperature_zero_generation_policy:
   sampling_robustness_temperature_gt_zero: secondary_separately_frozen
 
 model:
-  # Open-weight, instruction-tuned model in the ~7B-9B range.
   name: "Qwen/Qwen2.5-7B-Instruct"
-  # Immutable revision (commit hash) of the model weights. Freeze before data gen.
   revision: "TO_BE_FROZEN_BEFORE_DATA_GENERATION"
-  # Replication model MUST differ from the primary model (v0.1.1 amendment).
-  # Held as a placeholder until a documented, compatibility-checked choice is made.
+  tokenizer_revision: "TO_BE_FROZEN_BEFORE_DATA_GENERATION"
   replication_model: "TO_BE_SELECTED_BEFORE_CONFIRMATORY_REPLICATION"
   decoding:
     temperature: 0.0
@@ -43,34 +83,70 @@ model:
     max_new_tokens: 256
     seed: 0
 
+# No author-level selection has been made. Candidate facts below were checked
+# against official Hugging Face model cards on 2026-08-30. The recommendation is
+# pre-data advice only; run_ready remains blocked until the author approves exactly
+# one model and freezes all selected fields.
+prompt_embedding:
+  selection_status: AUTHOR_APPROVAL_REQUIRED
+  model_name: "TO_BE_SELECTED_BY_AUTHOR_BEFORE_MINI_0"
+  revision: "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION"
+  license: "TO_BE_RECORDED_AFTER_AUTHOR_SELECTION"
+  pooling_rule: "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION"
+  truncation_rule: "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION"
+  max_input_length: "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION"
+  input_text: canonical_user_visible_prompt_text
+  exclude_chat_template_and_special_tokens: true
+  # Model-card pooling and normalization run first; the training-only
+  # StandardScaler + logistic-regression pipeline runs afterwards.
+  pipeline_order_relative_to_classifier: model_card_pooling_and_normalization_first
+  recommended_candidate: "BAAI/bge-base-en-v1.5"
+  recommendation_rationale: raw_prompt_compatible_mit_licensed_512_token_cls_pooling
+  candidates:
+    - name: "BAAI/bge-base-en-v1.5"
+      inspected_revision: "a5beb1e3e68b9ab74eb54cfd186867f64f240e1a"
+      license: mit
+      language_scope: english
+      max_positions: 512
+      embedding_dimension: 768
+      documented_pooling: cls_then_l2_normalize
+      primary_source: "https://huggingface.co/BAAI/bge-base-en-v1.5/tree/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a"
+    - name: "intfloat/e5-base-v2"
+      inspected_revision: "f52bf8ec8c7124536f0efb74aca902b2995e5bcd"
+      license: mit
+      language_scope: english
+      max_positions: 512
+      embedding_dimension: 768
+      documented_pooling: attention_mask_mean_then_l2_normalize
+      input_prefix_requirement: "query: "
+      primary_source: "https://huggingface.co/intfloat/e5-base-v2/tree/f52bf8ec8c7124536f0efb74aca902b2995e5bcd"
+    - name: "sentence-transformers/all-MiniLM-L6-v2"
+      inspected_revision: "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
+      license: apache-2.0
+      language_scope: english_training_description
+      default_truncation_wordpieces: 256
+      embedding_dimension: 384
+      documented_pooling: attention_mask_mean_then_l2_normalize
+      primary_source: "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/tree/1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
+
 design:
-  # Primary, load-bearing axes for the pilot.
-  axes:
-    - uncertainty
-    - norm_tension
-    - controllability
-  # Exploratory axes are documented but not part of the primary analysis.
-  exploratory_axes:
-    - signed_relevance
-    - goal_congruence
-    - response_pressure
+  axes: [uncertainty, norm_tension, controllability]
+  exploratory_axes: [signed_relevance, goal_congruence, response_pressure]
   domains:
     - software_debugging
     - scheduling_planning
     - policy_constrained_assistance
     - document_editing
-  # Held-out domain for the leave-one-domain-out transfer test.
-  held_out_domain: document_editing
   cells:
     - A_neutral_control
     - B_concept_tracking_only
     - C_pure_task_induction
     - D_combined
-  # Pilot target counts (feasibility pilot, not a powered study).
-  matched_groups_per_axis: 24
-  target_total_items: 350
+  matched_groups_per_axis: 24  # historical pilot sketch, not a powered target
+  target_total_items: 350      # approximate later-pilot scale, not Mini-0
+  primary_split_unit: matched_group
+  whole_group_side_assignment: true
 
-# Two-tier response-strategy analysis (v0.1.1 amendment).
 response_strategy:
   primary_superclasses:
     - direct_or_comply
@@ -79,32 +155,269 @@ response_strategy:
     - decline_or_abstain
   secondary: fine_grained_nine_labels
 
+# Tokenizer-only inspection used disposable strings and no model weights. This
+# upstream snapshot is inspection provenance, not the binding run revision.
+tokenizer_inspection:
+  model_repository: "Qwen/Qwen2.5-7B-Instruct"
+  inspected_revision: "a09a35458c702b33eeacc393d103063234e8bc28"
+  inspected_on: "2026-08-30"
+  binding_for_run: false
+  tokenizer_class: Qwen2TokenizerFast
+  padding_side: right
+  pad_token_id: 151643
+  final_non_padding_prompt_token_id: 198
+  final_non_padding_prompt_token_text: newline
+  final_token_is_assistant_generation_template: true
+  final_four_tokens_identical_across_disposable_prompts: true
+
 activations:
-  # Record residual-stream activations; keep token position, layer, and
-  # prompt-vs-generated flags distinct.
-  layers: "all"           # or a preregistered subset if compute-limited
-  prompt_final_token: true
+  layers: all
+  primary_layer_candidates: "TO_BE_FROZEN_BEFORE_MINI_0"
+  primary_position_candidates: "TO_BE_FROZEN_BEFORE_MINI_0"
+  hidden_layer_primary_readout: final_non_padding_prompt_token
   early_generated_tokens: 4
+  layer_zero:
+    final_token_embedding_role: sanity_check_only_if_identical
+    informative_baseline: mean_pooled_user_content_token_embeddings
+    include: user_visible_user_content_span
+    exclude:
+      - padding
+      - system_span
+      - user_role_marker
+      - assistant_generation_prefix
+      - special_tokens
+    mask_rule: user_content_and_attention_and_not_special
 
 analysis:
-  probes:
-    - logistic_regression
-    - ridge_regression
-    - linear_discriminant_analysis
-  # Primary intervention-direction rule (v0.1.1 amendment).
   primary_decoder: logistic_regression
+  robustness_decoders: [ridge_regression, linear_discriminant_analysis]
   primary_direction: difference_in_means_task_state_present_minus_absent
   split_level: matched_group
-  transfer: leave_one_domain_out
+  transfer: double_crossed_leave_one_domain_out
   nested_cv: true
-  # H1 primary metric is balanced accuracy on deconfounded cells; the family test
-  # (below) uses held-out log-loss as its primary metric.
+  # H1 and H2 have different primary metrics; see analysis.h1 and analysis.h2.
+  # This key is retained only as the H2 primary metric name.
   primary_metric: held_out_log_loss
-  h1_primary_metric: balanced_accuracy_deconfounded_cells
+
+  # --- Seed semantics (frozen in the v0.1.2 correction pass) -----------------
   seeds: [0, 1, 2, 3, 4]
+  primary_seed: 0
+  sensitivity_seeds: [1, 2, 3, 4]
+  bootstrap_seed: 20260830
+  permutation_seed: 20260831
+  primary_decision_uses_primary_seed_only: true
+  pool_predictions_across_seeds: false
+  split_assignments_depend_on_seed: false
+  seeds_are_independent_scientific_samples: false
+  sensitivity_seed_role: reported_separately_never_replaces_primary
+  deterministic_solver_random_state_note: >-
+    A deterministic solver does not produce independent scientific results merely
+    because random_state changes.
+
+  # --- Primary probe pipeline (frozen; never selected after data exist) ------
+  probe_pipeline:
+    order: [standard_scaler, logistic_regression]
+    scaler: sklearn.preprocessing.StandardScaler
+    scaler_fit_scope: relevant_training_subset_only
+    estimator: sklearn.linear_model.LogisticRegression
+    penalty: l2
+    solver: lbfgs
+    fit_intercept: true
+    class_weight: null
+    max_iter: 5000
+    tol: 1.0e-6
+    dtype: float64
+    sklearn_version: RECORDED_IN_RUN_ENVIRONMENT_AT_RUN_TIME
+    regularization_grid_C: [1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0, 10.0, 100.0]
+    grid_frozen_before_data: true
+    prompt_embedding_pipeline_order:
+      - model_card_pooling
+      - model_card_normalization
+      - standard_scaler
+      - logistic_regression
+    sparse_baseline_pipeline: tfidf_then_logistic_regression_without_dense_centering
+    sparse_baselines_are_secondary: true
+    sparse_baselines_inherit_dense_centering: false
+
+  # --- Hyperparameter selection objectives and tie-breaking -----------------
+  hyperparameter_selection:
+    selection_scope: outer_training_domains_only
+    h1_inner_objective: highest_pooled_inner_validation_balanced_accuracy
+    h2_inner_objective: lowest_pooled_inner_validation_response_strategy_log_loss
+    first_tie_break: smaller_C_stronger_regularization
+    second_tie_break_hidden_state: earlier_layer_index
+    h2_hidden_state_selects: [layer, C]
+    h2_prompt_embedding_selects: [C]
+    h2_classifiers_use_same_inner_folds_target_items_and_objective: true
+    h2_classifiers_select_independently: true
+    smaller_C_tie_break_applied_separately: true
+    earlier_layer_tie_break_applies_to: hidden_state_only
+    numerical_tie_tolerance: 1.0e-12
+    layer_grid_status: TO_BE_FROZEN_BEFORE_MINI_0
+
+  # --- Inner validation structure -------------------------------------------
+  inner_validation:
+    scheme: leave_one_training_domain_out
+    folds: 3
+    validation_domain_per_fold: one_of_the_three_outer_training_domains
+    fit_domains_per_fold: the_other_two_outer_training_domains
+    whole_matched_groups_disjoint: true
+    concept_transfer_direction_crossed: true
+    outer_test_domain_excluded: true
+    replaced: round_robin_mixed_domain_inner_folds
+
+  # --- Cluster bootstrap (frozen algorithm) ---------------------------------
   bootstrap_resamples: 1000
-  multiple_comparison_correction: benjamini_hochberg
-  # Primary baselines the task-state representation must beat (v0.1.1 amendment).
+  bootstrap_unit: matched_group
+  bootstrap:
+    resamples: 1000
+    resampling_unit: complete_matched_group_cluster
+    stratified_within_held_out_domain: true
+    preserves_groups_contributed_per_domain: true
+    group_predictions_travel_together: true
+    h1_predictions_per_held_out_group: 4
+    h2_pairs_resampled_together: true
+    interval_type: percentile
+    interval_percentiles: [2.5, 97.5]
+    seed: 20260830
+    resample_items: false
+    resample_cells: false
+    resample_directions: false
+    resample_seeds: false
+
+  h1:
+    target: task_state_present
+    directions:
+      concept_absent_to_present:
+        train_cells: [A_neutral_control, C_pure_task_induction]
+        test_cells: [B_concept_tracking_only, D_combined]
+      concept_present_to_absent:
+        train_cells: [B_concept_tracking_only, D_combined]
+        test_cells: [A_neutral_control, C_pure_task_induction]
+    outer_evaluation: leave_one_domain_out_all_four_domains
+    inner_selection:
+      unit: matched_group
+      scheme: leave_one_training_domain_out
+      folds: 3
+      data_scope: outer_training_domains_only
+      selects: [network_layer, logistic_regularization]
+      objective: highest_pooled_inner_validation_balanced_accuracy
+      validation_uses_opposite_concept_level: true
+    primary_metric: balanced_accuracy
+    secondary_metric: auroc
+    aggregate: pooled_out_of_fold_predictions_across_domains_and_directions
+    positive_rule: lower_95pct_cluster_bootstrap_ci_above_0.5
+    weakened_rule: upper_95pct_cluster_bootstrap_ci_at_or_below_0.5_if_gates_pass
+    indeterminate_rule: ci_overlaps_0.5
+    bidirectional_claim_requires_both_direction_specific_results: true
+    historical_bc_accuracy_difference: non_deciding_diagnostic
+
+  h2:
+    # H2 tests incremental prediction of the model's realized response strategy
+    # beyond a non-mechanistic representation of the prompt. It is NOT a second
+    # task-state classification test.
+    target: response_strategy_superclass
+    target_classes:
+      - direct_or_comply
+      - qualify_or_warn
+      - redirect_or_clarify
+      - decline_or_abstain
+    fine_label_role: secondary
+    label_source: registered_meaning_based_labeling_protocol
+    label_reliability_gate_blocks_inference: true
+    comparison: hidden_state_vs_frozen_prompt_embedding
+    same_target_and_items_for_both_classifiers: true
+    split_identity_with_h1: true
+    inner_selection:
+      unit: matched_group
+      scheme: leave_one_training_domain_out
+      folds: 3
+      data_scope: outer_training_domains_only
+      selects: [network_layer, logistic_regularization]
+      objective: lowest_pooled_inner_validation_response_strategy_log_loss
+      uses_outer_test_labels_predictions_or_outcomes: false
+    primary_metric: held_out_response_strategy_log_loss
+    primary_estimand: log_loss_prompt_embedding_minus_log_loss_hidden_state
+    sign_convention: positive_favors_hidden_state
+    secondary_metric: balanced_accuracy_difference
+    secondary_sign_convention: balanced_accuracy_hidden_state_minus_prompt_embedding
+    paired_bootstrap_unit: matched_group
+    positive_rule: lower_95pct_paired_cluster_bootstrap_ci_above_0
+    weakened_rule: upper_95pct_paired_cluster_bootstrap_ci_at_or_below_0_if_gates_pass
+    indeterminate_rule: ci_overlaps_0
+    comparator_blocked_until_frozen:
+      - prompt_embedding.model_name
+      - prompt_embedding.revision
+      - prompt_embedding.license
+      - prompt_embedding.pooling_rule
+      - prompt_embedding.truncation_rule
+      - prompt_embedding.max_input_length
+    estimability:
+      evaluation_vocabulary: fixed_four_response_strategy_superclasses
+      evaluation_class_order:
+        - direct_or_comply
+        - qualify_or_warn
+        - redirect_or_clarify
+        - decline_or_abstain
+      single_class_training_fold: NOT_ESTIMABLE
+      single_class_inner_fit_fold: affected_outer_fold_NOT_ESTIMABLE
+      single_class_final_outer_fit: affected_outer_fold_NOT_ESTIMABLE
+      any_required_outer_fold_not_estimable_makes_aggregate: indeterminate
+      not_estimable_primary_aggregate_is: indeterminate
+      post_data_class_merging_forbidden: true
+      post_data_fold_domain_direction_dropping_forbidden: true
+      silent_exclusion_forbidden: true
+      unseen_test_class: reported_as_unseen_class_generalization_failure
+      missing_training_class_probability: 0.0
+      probability_columns_aligned_before_clipping: true
+      convergence_failure: candidate_invalid_then_outer_fold_NOT_ESTIMABLE_if_none_converges
+      unconverged_models_may_not_score: true
+      log_loss_probability_clipping:
+        epsilon: 1.0e-15
+        rule: clip_to_epsilon_and_one_minus_epsilon_then_renormalize_over_four_classes
+        dtype: float64
+        applied_identically_to_both_classifiers: true
+    claim_boundary: >-
+      Mini-0 can provide only H2 feasibility on one axis against the frozen
+      prompt-embedding comparator. It cannot establish full H2 or the ASCR family
+      claim; full H2 still requires the registered stronger baseline battery and
+      adequately powered multi-axis evidence.
+
+  # Frozen operational reliability gate for the H2/H3 response target. Subset
+  # selection uses prompt metadata only and occurs before either labeler sees
+  # response labels; adjudication occurs only after pre-adjudication reliability.
+  response_label_reliability:
+    primary_labeler_scope: all_generated_responses
+    second_labeler: independent_human
+    second_labeler_blinded_to_primary_labels: true
+    subset_unit: complete_matched_group
+    subset_fraction: 0.30
+    subset_count_rule: ceil_0.30_times_total_complete_groups
+    selection_timing: before_response_labels_are_observed
+    stratification: domain_as_evenly_as_possible
+    subset_seed: 20260901
+    taxonomy: four_registered_response_strategy_superclasses
+    reliability_timing: before_adjudication
+    primary_statistic: cohen_kappa
+    pass_threshold_kappa: 0.60
+    fewer_than_two_observed_classes: NOT_ESTIMABLE_AND_FAIL
+    confidence_interval: 95pct_matched_group_cluster_bootstrap
+    bootstrap_unit: complete_matched_group
+    bootstrap_resamples: 1000
+    bootstrap_seed: 20260902
+    required_reports:
+      - raw_agreement
+      - four_class_confusion_matrix
+      - class_counts_by_labeler
+      - cohen_kappa
+      - kappa_95pct_cluster_bootstrap_ci
+    adjudication_timing: after_pre_adjudication_reliability
+    adjudicator_and_rule_recorded: true
+    failed_gate_action: withhold_H2_and_H3_inference
+
+  tfidf:
+    cross_mention_role: diagnostic_descriptive
+    ordinary_lodo_role: secondary_baseline
   primary_baselines:
     - prompt_embedding
     - difficulty_representation
@@ -114,60 +427,191 @@ analysis:
     - matched_norm_random_subspace
     - pca_subspace
 
-# Family-structure test (v0.1.1 amendment): the family claim requires A AND B AND C.
-# See preregistration/analysis-plan.md section 6b.
+fdr_families:
+  # Benjamini-Hochberg operates on preregistered one-sided RAW p-values, never on
+  # ordinary confidence intervals. Raw effect estimates and raw confidence
+  # intervals are reported separately from BH-adjusted q-values.
+  procedure:
+    method: benjamini_hochberg
+    q: 0.05
+    operates_on: preregistered_one_sided_raw_p_values
+    confidence_intervals_are_fdr_corrected: false
+    report_raw_effects_and_intervals_separately: true
+    secondary_can_replace_primary: false
+  h1_primary_aggregate:
+    correction: none_single_predeclared_statistic
+    members: [h1_pooled_oof_balanced_accuracy]
+  h1_direction_domain_secondary:
+    correction: benjamini_hochberg
+    raw_p_value_procedure:
+      test: matched_group_task_state_label_swap_randomization_test
+      null_unit: matched_group
+      null_construction: >-
+        Held-out domains, matched groups, cells, directions, and fixed
+        out-of-fold prediction scores are preserved. One swap indicator is drawn
+        per complete matched group; when it is set, the task-state labels are
+        exchanged within that group's task-state pair (cells B/D at concept
+        present, cells A/C at concept absent). The same group-level swap is
+        applied consistently to every paired cell of that group, so pooled,
+        direction-specific, and domain-specific statistics share one
+        group-level randomization per replicate.
+      pooled_statistic_scope: all_held_out_groups_both_directions
+      direction_specific_scope: groups_contributing_to_that_direction
+      domain_specific_scope: groups_of_that_held_out_domain
+      recomputed_statistic: balanced_accuracy_or_auroc_as_declared_per_member
+      permutations: 10000
+      plus_one_correction: true
+      p_value_formula: (1 + count(null_statistic >= observed_statistic)) / (1 + 10000)
+      one_sided_direction: observed_statistic_above_chance_0.5
+      seed: 20260831
+    members:
+      - ba_absent_to_present_software_debugging
+      - ba_absent_to_present_scheduling_planning
+      - ba_absent_to_present_policy_constrained_assistance
+      - ba_absent_to_present_document_editing
+      - ba_present_to_absent_software_debugging
+      - ba_present_to_absent_scheduling_planning
+      - ba_present_to_absent_policy_constrained_assistance
+      - ba_present_to_absent_document_editing
+      - auroc_absent_to_present_software_debugging
+      - auroc_absent_to_present_scheduling_planning
+      - auroc_absent_to_present_policy_constrained_assistance
+      - auroc_absent_to_present_document_editing
+      - auroc_present_to_absent_software_debugging
+      - auroc_present_to_absent_scheduling_planning
+      - auroc_present_to_absent_policy_constrained_assistance
+      - auroc_present_to_absent_document_editing
+  h1_layer_position_sensitivity:
+    status: TO_BE_FROZEN_WITH_LAYER_AND_POSITION_GRID_BEFORE_MINI_0
+    correction: benjamini_hochberg
+    member_rule: each_frozen_layer_x_position_x_direction_balanced_accuracy
+    raw_p_value_procedure: TO_BE_DEFINED_WITH_THE_FROZEN_LAYER_AND_POSITION_GRID
+    cannot_substitute_for_primary: true
+  h2_primary_aggregate:
+    correction: none_single_predeclared_paired_statistic
+    members: [paired_prompt_embedding_minus_hidden_state_held_out_log_loss]
+    sign_convention: positive_favors_hidden_state
+  h2_direction_domain_secondary:
+    correction: benjamini_hochberg
+    raw_p_value_procedure:
+      test: matched_group_paired_model_block_exchange_permutation_test
+      null_unit: matched_group
+      null_construction: >-
+        Held-out items and their response-strategy superclass labels stay fixed.
+        Under the null the hidden-state and prompt-embedding prediction blocks of
+        a complete matched group are exchanged, one exchange indicator per group.
+      recomputed_statistic: balanced_accuracy_difference_hidden_minus_prompt_embedding
+      permutations: 10000
+      plus_one_correction: true
+      p_value_formula: (1 + count(null_statistic >= observed_statistic)) / (1 + 10000)
+      one_sided_direction: hidden_state_better_than_prompt_embedding
+      seed: 20260831
+    members:
+      - ba_delta_absent_to_present_software_debugging
+      - ba_delta_absent_to_present_scheduling_planning
+      - ba_delta_absent_to_present_policy_constrained_assistance
+      - ba_delta_absent_to_present_document_editing
+      - ba_delta_present_to_absent_software_debugging
+      - ba_delta_present_to_absent_scheduling_planning
+      - ba_delta_present_to_absent_policy_constrained_assistance
+      - ba_delta_present_to_absent_document_editing
+  h3_intervention:
+    status: TO_BE_FROZEN_IN_SEPARATE_PRE_DATA_INTERVENTION_RUN_PLAN
+    correction: benjamini_hochberg
+    decision_block: exact_layer_strength_axis_members_require_author_approved_grid
+    raw_p_value_procedure: TO_BE_DEFINED_IN_THE_INTERVENTION_RUN_PLAN
+    confidence_intervals_are_fdr_corrected: false
+  family_structure_primary:
+    correction: benjamini_hochberg
+    members:
+      - A_shared_minus_separate_pooled_log_loss
+      - B_strategy_selectivity_contrast
+      - C_incremental_response_strategy_log_loss
+    raw_p_value_procedure: TO_BE_DEFINED_IN_THE_FAMILY_STRUCTURE_RUN_PLAN
+    confidence_intervals_are_fdr_corrected: false
+    historical_v011_wording_note: >-
+      The archived v0.1.1 amendment says each component CI must lie beyond zero
+      "after FDR". That historical text is preserved unchanged. v0.1.2 clarifies
+      the narrowest defensible reading: the paired bootstrap interval is reported
+      raw, and BH is applied to component-level one-sided raw p-values that a
+      future run plan must define before BH can be executed. Both conditions must
+      hold; neither is renamed as the other.
+
+# Unchanged from v0.1.1: the family claim requires all three components.
 family_structure_test:
   require_all_of: [A_shared_vs_separate, B_behavioral_specificity, C_incremental]
   shared_low_rank_vs_separate: true
   structured_behavioral_specificity: true
   incremental_shared_contribution: true
   min_axes_before_family_claim: 2
-  # Rank grid: primary r in {1,2} for three axes; r=3 secondary sensitivity only;
-  # r=1 admissible with two axes. Rank/regularization chosen in the inner CV loop.
   family_rank_grid: [1, 2]
   family_rank_grid_secondary: [3]
   primary_metric: pooled_held_out_log_loss
-  decision_rule: paired_matched_group_bootstrap_ci_below_zero_after_fdr
+  decision_logic: A_and_B_and_C
+  component_rules:
+    A_shared_vs_separate:
+      estimand: shared_minus_separate_pooled_log_loss
+      raw_interval_condition: raw_95pct_ci_entirely_below_zero
+      one_sided_direction: shared_lower_log_loss_than_separate
+      bh_condition: component_one_sided_raw_p_value_BH_adjusted_q_le_0.05
+    B_behavioral_specificity:
+      estimand: strategy_selectivity_contrast
+      raw_interval_condition: raw_95pct_ci_entirely_above_zero
+      one_sided_direction: target_strategy_shift_exceeds_non_target_shift
+      bh_condition: component_one_sided_raw_p_value_BH_adjusted_q_le_0.05
+    C_incremental:
+      estimand: base_minus_full_response_strategy_log_loss
+      raw_interval_condition: raw_95pct_ci_entirely_above_zero
+      one_sided_direction: full_model_lower_log_loss_than_base
+      bh_condition: component_one_sided_raw_p_value_BH_adjusted_q_le_0.05
   arbitrary_margin: none
 
-# Concept-mention QA thresholds enforced by the run-ready gate (ascr.schema).
 qa_thresholds:
   min_naturalness_rating: 4
   max_within_group_naturalness_spread: 1
   required_disposition: pass
   naturalness_scale: [1, 5]
+  observed_factor_values_must_match_item: true
+  non_target_primary_axes_absent_confirmed: true
 
 intervention:
-  methods:
-    - activation_addition
-    - directional_ablation
-    - counter_steering
-  controls:
-    - matched_norm_random_direction
-    - pca_direction
+  methods: [activation_addition, directional_ablation, counter_steering]
+  controls: [matched_norm_random_direction, pca_direction]
   strengths: [0.5, 1.0, 2.0, 4.0]
-  layers: "subset"
+  layers: subset
   seeds: [0, 1, 2, 3, 4]
 
-# Modular mini-shard pilot protocol (v0.1.1 amendment). Each shard tests a single
-# axis and carries an immutable run manifest; shards combine only if all
-# compatibility-relevant manifest fields are identical. Feasibility studies only —
-# no arbitrary success/failure thresholds. Mini-0/1/2 collect NO holonomy,
-# dialogue-loop, path-dependence, or user-signature data.
 mini_shards:
   - id: ASCR-Mini-0
     axis: uncertainty
     kind: feasibility
+    run_kind: scientific_feasibility
+    eligible_for_scientific_analysis: true
     goal: pipeline_stimulus_and_H1_feasibility
-    readout: prompt_final_token
     full_steering_sweep: false
     target_matched_groups: 40
     no_holonomy_data: true
   - id: ASCR-Mini-1
     axis: norm_tension
     kind: feasibility
+    run_kind: scientific_feasibility
+    eligible_for_scientific_analysis: true
     no_holonomy_data: true
   - id: ASCR-Mini-2
     axis: controllability
     kind: feasibility
+    run_kind: scientific_feasibility
+    eligible_for_scientific_analysis: true
     no_holonomy_data: true
+
+technical_smoke_protocol:
+  run_kind: technical_smoke
+  eligible_for_scientific_analysis: false
+  prompt_set_id_prefix: DISPOSABLE_
+  shard_id_must_not_use_prefix: ASCR-Mini-
+  output_directory: experiments/results/technical-smoke/
+  may_enter_scientific_statistics: false
+  may_enter_layer_selection: false
+  may_enter_power_or_precision_analysis: false
+  combination_with_scientific_feasibility: structurally_forbidden
+  retention: discard_or_archive_as_technical_log_only

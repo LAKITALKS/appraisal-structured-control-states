@@ -72,7 +72,7 @@ SUPERCLASS_DOMINANCE: Final[tuple[str, ...]] = (
 )
 
 
-def dominant_superclass(fine_labels: "list[str] | tuple[str, ...] | set[str]") -> str:
+def dominant_superclass(fine_labels: list[str] | tuple[str, ...] | set[str]) -> str:
     """Return the dominant superclass for a set of candidate fine labels.
 
     Deterministic tie-breaker (not a generative classifier): map each candidate

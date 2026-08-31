@@ -8,20 +8,31 @@ Response-Strategy Modulation*
 **Short name:** ASCR (a working abbreviation used in this repository; not an
 established field term).
 
-**Status:** `v0.1.1 pre-data amendment` — this repository still reports **no**
-experimental results, datasets, model runs, or figures. v0.1.1 tightens the v0.1.0
-preregistration *before any data collection*.
+**Status:** `v0.1.2 pre-data methodological correction` — GitHub release;
+version-specific Zenodo DOI pending. No data, model runs, activations,
+generations, interventions, or results exist.
 
-The v0.1.1 amendment completed its pre-data methodological review cycle (reviewed
-across multiple independent methodological and prior-art cycles before any data
-collection) and has been **merged to `main` and released on GitHub as `v0.1.1`**.
-The compiled 11-page preprint is `paper/preprint.pdf`. No model runs or experimental
-results exist. The **Zenodo archival version and its version-specific DOI are
-pending** (the GitHub release triggers the Zenodo deposit; the new DOI is recorded
-in a follow-up commit once Zenodo publishes).
+v0.1.2 publicly repairs a non-identifying H1 decision statistic before data
+collection. The replacement uses bidirectional concept-mention transfer within
+outer leave-one-domain-out folds, training-only nested selection, explicit H1/H2
+separation, typed axis-isolation QA, a defined Layer-0 baseline, and a structural
+boundary between technical smoke logs and scientific feasibility artifacts. A
+focused second correction pass, following an independent read-only audit, binds the
+H2 target, estimand, sign convention, and decision rule; freezes the probe
+pipeline, regularization grid, selection tie-breaking, and seed roles; replaces
+mixed-domain inner folds with inner leave-one-training-domain-out; states the
+cluster-bootstrap algorithm exactly; makes Benjamini–Hochberg operational on
+preregistered one-sided raw p-values; tightens the manifest guards; and fixes
+exactly one canonical release build. A final pre-release review makes the run gate
+fail closed unless configuration, frozen Mini-0 plan, immutable manifest, and
+canonical stimulus hash all agree; separates Mini-0 from the later H3 gate; fixes
+H2's independent comparator selection and sparse-class/convergence handling; and
+registers a deterministic two-human response-label reliability protocol. Historical
+v0.1.0 and v0.1.1 records remain unchanged.
 
-- [**v0.1.1 pre-data amendment**](preregistration/amendment-v0.1.1.md)
-- [**v0.1.1 pre-data review status**](preregistration/v0.1.1-review-status.md)
+- [**v0.1.2 methodological correction**](preregistration/amendment-v0.1.2.md)
+- [**v0.1.2 review status**](preregistration/v0.1.2-review-status.md)
+- [**Historical v0.1.1 amendment**](preregistration/amendment-v0.1.1.md)
 - [**GitHub release v0.1.1**](https://github.com/LAKITALKS/appraisal-structured-control-states/releases/tag/v0.1.1)
 
 ---
@@ -97,6 +108,8 @@ anthropomorphic commitment. The information-bottleneck formalization is optional
 │   └── figures/                   # placeholder (no result figures)
 ├── preregistration/
 │   ├── hypotheses.md              # H1–H4
+│   ├── amendment-v0.1.2.md        # current pre-data correction
+│   ├── v0.1.2-review-status.md     # implementation/review gate
 │   ├── experimental-design.md     # 2x2 design, axes, domains, model plan
 │   ├── analysis-plan.md           # probes, transfer, identifiability
 │   ├── controls-and-baselines.md  # baselines + lexical-geometry control
@@ -107,7 +120,7 @@ anthropomorphic commitment. The information-bottleneck formalization is optional
 │   ├── citation-verification.md   # verification log (source of truth)
 │   └── novelty-statement.md
 ├── experiments/
-│   ├── configs/pilot.yaml         # intended pilot configuration
+│   ├── configs/                    # pilot config + unfrozen Mini-0 run template
 │   ├── data/ notebooks/ results/  # placeholders (empty; README only)
 │   └── src/ascr/                  # tested design-time scaffold
 └── tests/                         # unit tests (all passing)
@@ -120,31 +133,49 @@ A feasibility pilot (not a powered study): three primary axes
 (software debugging, scheduling/planning, policy-constrained assistance, document
 editing), on an open-weight ~7–9B instruction-tuned model (default
 `Qwen/Qwen2.5-7B-Instruct`, with the exact revision hash frozen before data
-generation). Interpretable linear probes, leave-one-domain-out transfer, and causal
-interventions with matched-norm random/PCA controls. Details in
+generation). H1 uses double-crossed concept-mention transfer across outer LODO
+folds with whole matched groups and training-only layer/regularization selection.
+H2 separately compares hidden states with an author-approved frozen prompt
+embedding, predicting the same four response-strategy superclasses on the same
+held-out items, with the paired estimand
+`delta_H2 = log_loss_prompt_embedding - log_loss_hidden_state` (positive favors the
+hidden state). Its response target must pass pre-adjudication Cohen's kappa ≥ 0.60
+on an independently double-labeled, domain-stratified 30% complete-group subset;
+otherwise H2 and H3 inference are withheld. Interpretable linear probes and later causal interventions with
+matched-norm random/PCA controls. Details in
 [`preregistration/experimental-design.md`](preregistration/experimental-design.md).
 
 ## Reproducing the checks
 
 ```bash
 python -m pytest          # run the unit tests
-make paper                # build paper/preprint.pdf (latexmk or tectonic)
+make paper                # canonical build of paper/preprint.pdf (Tectonic 0.16.9)
+make paper-verify         # build twice from clean and require identical SHA-256
 ```
 
-> **Build note:** `paper/preprint.pdf` is the compiled version of `paper/main.tex`
-> (11 pages; no undefined citations, no missing references). `make paper` prefers
-> `latexmk` + TeX Live and falls back to the self-contained `tectonic` engine.
+> **Build note.** `paper/preprint.pdf` is built from `paper/main.tex` by exactly
+> one canonical engine: **Tectonic 0.16.9** with `-Z deterministic-mode` and
+> `SOURCE_DATE_EPOCH` fixed to the amendment date. `make paper` and its alias
+> `make paper-release` use that engine and **never** fall back to another one — a
+> missing or mismatched engine fails loudly, because different engines produce
+> valid but byte-different PDFs and would silently change the archival artifact.
+> `make paper-dev` runs `latexmk` as a clearly labelled **noncanonical development
+> build**; its output must never be committed as `paper/preprint.pdf`. No byte
+> identity is claimed across engines. The v0.1.2 release PDF is 13 pages and is
+> the verified GitHub Release artifact; Zenodo archival is pending.
 
 ## How to cite
 
 Please cite via [`CITATION.cff`](CITATION.cff). Zenodo DOIs:
 
 - **All versions (concept DOI):** [10.5281/zenodo.21294932](https://doi.org/10.5281/zenodo.21294932) — always resolves to the latest archived version.
-- **v0.1.1 (this pre-data amendment, current):** [10.5281/zenodo.21335529](https://doi.org/10.5281/zenodo.21335529) — cite this version-specific DOI for the present preregistration.
+- **v0.1.2:** GitHub Release published; version-specific Zenodo DOI pending.
+- **v0.1.1 (historical version DOI):** [10.5281/zenodo.21335529](https://doi.org/10.5281/zenodo.21335529) — the archived v0.1.1 preregistration.
 - **v0.1.0 (historical version DOI):** [10.5281/zenodo.21294933](https://doi.org/10.5281/zenodo.21294933) — the original archived preregistration.
 
-The v0.1.0 archived record remains unchanged. The badge above points to the concept
-DOI so it tracks the latest version.
+The v0.1.2 version-specific Zenodo DOI will be added after archival. Until then,
+the badge and concept DOI remain [10.5281/zenodo.21294932](https://doi.org/10.5281/zenodo.21294932).
+Historical v0.1.0 and v0.1.1 DOI records remain unchanged.
 
 ## Author
 

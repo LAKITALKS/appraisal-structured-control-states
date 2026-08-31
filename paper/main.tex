@@ -8,7 +8,13 @@
 % Author: Lazaros Varvatis (Independent Researcher, Berlin, Germany)
 %
 % This is a preregistered hypothesis and experimental-design note. It reports NO
-% experimental results. Build with: latexmk -pdf main.tex
+% experimental results.
+%
+% CANONICAL BUILD (the only engine permitted to produce paper/preprint.pdf):
+%   make paper            (equivalently: make paper-release)
+%   = Tectonic 0.16.9, -Z deterministic-mode, SOURCE_DATE_EPOCH=1788048000
+% `make paper-dev` runs latexmk as a NONCANONICAL development build; its output is
+% a different valid PDF with a different SHA-256 and must never be released.
 % ---------------------------------------------------------------------------
 
 \usepackage[utf8]{inputenc}
@@ -22,6 +28,13 @@
 \usepackage{microtype}
 \usepackage[hidelinks]{hyperref}
 \usepackage[round]{natbib}
+\setlength{\emergencystretch}{2em}
+\hypersetup{
+  pdftitle={Toward Appraisal-Structured Latent Control Representations in Language Models: A Preregistered Hypothesis and Experimental Design for Task-Induced Response-Strategy Modulation},
+  pdfauthor={Lazaros Varvatis},
+  pdfsubject={ASCR v0.1.2 pre-data methodological correction},
+  pdfkeywords={mechanistic interpretability, activation steering, task induction, response strategy, preregistration}
+}
 
 \newcommand{\ascr}{ASCR}
 \newcommand{\Hstate}{H_t}
@@ -35,7 +48,7 @@
 \small Independent Researcher, Berlin, Germany\\
 \small \texttt{varvatislazaros@gmail.com}}
 
-\date{Version 0.1.1 --- Pre-Data Amendment (2026-07-12)}
+\date{Version 0.1.2 --- Pre-Data Methodological Correction (2026-08-30)}
 
 \begin{document}
 \maketitle
@@ -69,15 +82,25 @@ experimental results and makes no claims about subjective experience, feeling, o
 related notions.
 
 \medskip
-\noindent\textbf{v0.1.1 pre-data amendment.} This is the v0.1.1 revision, a
-transparent amendment made \emph{before any data collection}. It sharpens one point
-in particular: demonstrating several individual task-state directions is not
-evidence of a shared control \emph{family}, so v0.1.1 adds an explicit
-family-structure test, a fixed primary direction-derivation rule, a concept-mention
-stimulus-quality protocol, a two-tier response-strategy taxonomy, a modular
-mini-shard protocol, a distinct-replication-model constraint, and expanded verified
-prior art. The full amendment is documented in the repository at
-\texttt{preregistration/amendment-v0.1.1.md}. No data have been collected.
+\noindent\textbf{v0.1.2 pre-data methodological correction.} The v0.1.1
+family-structure amendment remains binding. Before any data collection, v0.1.2
+repairs a non-identifying H1 statistic, replaces it with bidirectional
+cross-mention transfer inside outer leave-one-domain-out folds, separates H1 from
+H2 incremental value, fixes training-only layer selection, defines the Layer-0
+baseline, strengthens axis-isolation QA, and excludes technical smoke artifacts
+from scientific analysis. A focused second correction pass, following an
+independent read-only audit, additionally binds the H2 target, estimand, sign
+convention, and decision rule; freezes the probe pipeline, regularization grid,
+selection tie-breaking, and seed roles; replaces mixed-domain inner folds with
+inner leave-one-training-domain-out; states the cluster-bootstrap algorithm
+exactly; makes Benjamini--Hochberg operational on preregistered one-sided raw
+p-values; and fixes exactly one canonical release build. The correction is
+followed by a final pre-release review that makes authorization depend jointly on
+the frozen config, run plan, manifest, and stimulus hash; makes Mini-0 gates
+stage-specific; and fixes H2 selection, estimability, and label reliability.
+The correction is documented at
+\texttt{preregistration/amendment-v0.1.2.md}. No dataset, model run,
+activation, generation, intervention, or result exists.
 \end{abstract}
 
 \section{Introduction}
@@ -314,13 +337,56 @@ We preregister four hypotheses; H1--H3 are load-bearing and H4 is exploratory.
 Actual task-induced uncertainty, constraint conflict, or low controllability is
 decodable from activations independently of the presence of appraisal-related
 vocabulary; a probe tracks the real task condition more strongly than lexical
-concept mentions.
+concept mentions. The historical v0.1.1 difference between task-state-probe and
+concept-probe accuracy on cells B/C is non-identifying: on B/C the labels are exact
+complements, so two perfect probes and two chance probes can both yield a zero
+accuracy difference. It is therefore a non-deciding diagnostic after v0.1.2.
+
+The replacement H1 feasibility analysis targets \texttt{task\_state\_present}. It
+fits task state on A/C in three domains and evaluates on B/D in the held-out
+domain, then reverses the transfer (B/D to A/C), for every outer domain. Whole
+matched groups remain on one side of every boundary. Layer and logistic
+regularization are selected only inside the outer-training domains, using inner
+leave-one-training-domain-out folds: one of the three remaining domains validates
+while the other two fit, so the inner boundary mirrors the outer cross-domain
+claim. The primary statistic is balanced accuracy from pooled seed-0 out-of-fold
+predictions across domains and both directions, with a domain-stratified cluster
+bootstrap over complete matched groups. A lower 95\% confidence limit above 0.5 is
+positive feasibility; an upper limit at or below 0.5 weakens H1 if all technical
+and QA gates pass; overlap is indeterminate. Both directions must support transfer
+before bidirectional robustness is claimed.
 
 \paragraph{H2 --- Cross-domain and incremental structure.}
 Task-induced control representations transfer across semantically disjoint domains
 and predict response strategy beyond lexical features, prompt length, surface
 sentiment, valence/arousal baselines, generic difficulty, confidence or
-unanswerability alone, and a single refusal direction.
+unanswerability alone, and a single refusal direction. H2 is not merged with H1 and
+is not a second task-state classification test. Its target is the model's realized
+response strategy in the four registered superclasses (\texttt{direct\_or\_comply},
+\texttt{qualify\_or\_warn}, \texttt{redirect\_or\_clarify},
+\texttt{decline\_or\_abstain}), with the nine fine labels secondary. Under the
+identical double-crossed groups, folds, held-out items, and training-only selection
+boundary, the hidden-state and prompt-embedding classifiers predict that same
+target. On identical inner folds and the same log-loss objective, hidden states
+independently select layer and $C$, while prompt embeddings independently select
+their own $C$; the smaller-$C$ tie-break applies separately and the earlier-layer
+tie-break only to hidden states. The paired primary estimand is
+$\Delta_{\mathrm{H2}} = \mathrm{logloss}_{\text{prompt embedding}} -
+\mathrm{logloss}_{\text{hidden state}}$, so positive values favor the hidden
+state; a lower 95\% paired cluster-bootstrap limit above zero is positive
+feasibility, an upper limit at or below zero weakens H2 once all gates pass, and
+overlap is indeterminate. The secondary balanced-accuracy difference uses the same
+sign convention, hidden state minus prompt embedding. A single-class inner fit or
+final outer fit, or exhaustion of all converged candidates, marks the affected
+outer fold not estimable and the aggregate indeterminate. Classes are never merged
+post-data. Returned probability columns are aligned to the fixed four-class order,
+zero-filled for unseen training classes, then identically clipped and renormalized
+in float64. H2 inference is withheld if the response-label reliability gate fails.
+Mini-0
+can support only single-axis H2 feasibility. The embedding receives canonical
+user-visible prompt text, not chat-template artifacts; its identity, immutable
+revision, license, pooling, truncation rule, and maximum input length remain
+unresolved pre-data blockers rather than post-data choices.
 
 \paragraph{H3 --- Causal response-strategy modulation.}
 Intervening along an identified task-state direction shifts response strategy in
@@ -346,7 +412,9 @@ directions cannot trivially count as a family); (B) structured behavioral
 specificity, where each axis moves a preregistered target set of response strategies
 rather than producing a generic refusal, negativity, or fluency-degradation effect;
 and (C) an incremental shared contribution to held-out response-strategy prediction
-beyond known single directions and simple baselines. The full decision rules are in
+beyond known single directions and simple baselines. Component A requires a raw
+interval below zero; B and C require raw intervals above zero; each also requires
+its BH-adjusted one-sided raw p-value at $q=0.05$. The full decision rules are in
 the preregistration (\texttt{preregistration/analysis-plan.md} and the amendment).
 
 \section{Preregistered Experimental Design}
@@ -371,10 +439,10 @@ present & present & combined condition \\
 
 Prompts are authored in \emph{matched groups}: one base task instantiated across
 all four cells, differing only along the two intended factors, sharing a matched
-group identifier. Splits are made at the matched-group level so that siblings never
-straddle train and test. The primary analysis asks whether activation patterns
-follow the \emph{actual task-state} factor rather than the \emph{vocabulary}
-factor.
+group identifier. Whole groups are assigned to an outer training or test domain;
+cell restrictions choose used siblings without moving unused siblings across that
+boundary. The primary H1 analysis asks whether task-state decoding transfers when
+the concept-mention level and semantic domain both change.
 
 \paragraph{Axes and domains.}
 Primary pilot axes are uncertainty/unanswerability, rule/instruction conflict (norm
@@ -385,11 +453,13 @@ editing / creative problem solving---so that no single sensitive topic dominates
 The design supports leave-one-domain-out transfer.
 
 \paragraph{Pilot size.}
-The pilot targets on the order of a few hundred hand-authored, reviewed prompts
-(roughly twenty-four matched groups per primary axis across the four domains, plus
-a neutral holdout for competence checks). This is a feasibility pilot; we claim
-\emph{no} formal power analysis because none has been performed. A scaling plan and
-a pre-study power analysis are deferred to a later confirmatory phase.
+Mini-0 targets at least forty complete uncertainty-axis matched groups, distributed
+as evenly as feasible across the four domains, solely for pipeline and feasibility
+assessment. The broader historical sketch of roughly twenty-four matched groups
+per axis and a few hundred reviewed prompts is not a powered target. No formal
+power analysis has been performed. Effect-size and variance estimates from a valid
+feasibility run, if later produced, must inform a separately versioned pre-data
+power/precision plan before any confirmatory collection.
 
 \paragraph{Model and activations.}
 The primary model is an open-weight, instruction-tuned model in the $\sim$7--9B
@@ -401,13 +471,73 @@ preregistered set of early generated-token positions, across all layers or a
 preregistered subset, labeling each activation with token position, layer,
 prompt-vs-generated flag, and design cell.
 
+A tokenizer-only inspection on disposable strings, which loaded no model weights,
+showed that the inspected Qwen assistant-generation template ended in an identical
+newline token across prompts. Hidden layers retain the final non-padding prompt
+token (greatest index with attention mask one). At Layer 0, that final-token
+embedding is only a sanity check; the informative baseline mean-pools only the
+user-visible content span, excluding padding, system/role/template spans,
+assistant prefix, and special tokens. The binding tokenizer revision remains
+unfrozen and blocks a run.
+
 \paragraph{Probes and transfer.}
 We use interpretable linear methods first---logistic regression, ridge regression,
-and linear discriminant analysis---with matched-group train/validation/test splits,
-leave-one-domain-out evaluation, multiple random seeds, bootstrap confidence
-intervals, and multiple-comparison correction. High in-domain probe accuracy is
-\emph{not} treated as evidence of a general state; the load-bearing result is
-cross-domain transfer and incremental predictive value.
+and linear discriminant analysis---with matched-group train/validation/test splits
+and leave-one-domain-out evaluation. The primary classifier is one frozen
+training-only pipeline: a \texttt{StandardScaler} fitted on the training subset
+alone, then L2 logistic regression with the \texttt{lbfgs} solver, an intercept, no
+class weighting, \texttt{max\_iter}~$=5000$, \texttt{tol}~$=10^{-6}$, in float64,
+over the frozen grid $C \in \{10^{-4}, 10^{-3}, 10^{-2}, 10^{-1}, 1, 10, 100\}$.
+Inner selection maximizes pooled inner-validation balanced accuracy for H1 and
+minimizes pooled inner-validation response-strategy log-loss for H2, breaking ties
+first toward smaller $C$ and then, for hidden states only, toward the earlier layer
+under one fixed numerical tolerance. For H2 the hidden-state and prompt-embedding
+selectors choose their hyperparameters independently on the same folds and
+objective. Seed roles are fixed rather than counted: seed 0 alone
+produces the primary decision statistics, seeds 1--4 are reported separately and
+never pooled with it, and the bootstrap and permutation seeds are frozen
+separately. Confidence intervals come from a domain-stratified cluster bootstrap
+that resamples complete matched groups, carrying each group's four out-of-fold
+predictions, or its paired losses, together. H1, H2, H3, and the family test are
+separately declared comparison families; the single pooled H1 and H2 primary
+statistics are not FDR-corrected merely because secondary families exist.
+Benjamini--Hochberg, where it applies, operates at $q = 0.05$ on preregistered
+one-sided raw p-values from matched-group randomization and permutation tests, not
+on confidence intervals. High in-domain probe accuracy is \emph{not} treated as
+evidence of a general state; the load-bearing result is cross-domain transfer and
+incremental predictive value.
+
+\paragraph{Run-readiness and artifact separation.}
+Run-ready QA must confirm each registered task-state and concept-mention value and
+the absence of the two non-target primary axes. The current configuration remains
+blocked by unresolved model, tokenizer, prompt-embedding, layer/position grid, and
+H1 layer/position raw-p-procedure choices. Mini-0 requires only uncertainty-axis
+items, all four domains, at least forty complete groups, and domain counts differing
+by at most one. Its gate does not require the later H3 intervention grid; H3 has a
+separate stage gate.
+A technical smoke manifest must use disposable prompts and declare itself
+ineligible for scientific analysis; it is structurally incompatible with a
+scientific Mini-0 manifest and cannot enter selection, variance, effect-size, or
+power calculations. A scientific manifest must record full immutable hexadecimal
+commit revisions for the model, tokenizer, prompt embedding, and repository code;
+the embedding license, pooling, truncation, and maximum length; chat-template
+identity and hash; and an explicitly formatted canonical stimulus-content SHA-256.
+A smoke run that uses no
+prompt-embedding model records those fields as explicitly not applicable rather
+than inventing a frozen revision. The schema helpers are design-time guards. A
+configuration alone cannot authorize extraction: the future runner must jointly
+clear the frozen configuration, run plan, immutable manifest, and canonical
+stimulus payload before constructing or loading any model.
+
+\paragraph{Response-label reliability.}
+The primary human labels every generated response. Before labels are observed, an
+independent second human receives a deterministic, domain-stratified subset of
+$\lceil0.30N_{\mathrm{groups}}\rceil$ complete matched groups (seed 20260901), blind
+to primary labels. Before adjudication we report Cohen's kappa, raw agreement, the
+four-class confusion matrix, class counts, and a 95\% matched-group bootstrap
+interval. Passing requires $\kappa\geq0.60$; fewer than two observed classes fails
+as not estimable. Only then may recorded adjudication occur. Failure withholds both
+H2 and H3 inference.
 
 \paragraph{Causal interventions.}
 We preregister activation addition (sufficiency) and directional ablation /
@@ -428,6 +558,12 @@ sentiment/signed-valence, a valence/arousal subspace, a confidence/unanswerabili
 direction, a single refusal direction, an evaluation-awareness direction, and
 random and PCA subspaces of matched dimensionality. Support for \ascr{} requires
 beating the \emph{strongest} of these, not merely the weakest.
+
+The primary H2 comparator is one frozen prompt-embedding model on canonical prompt
+text. No model has yet been author-approved, so its immutable revision, license,
+pooling, and input rule remain run blockers. TF--IDF is diagnostic under
+cross-mention transfer and remains secondary under ordinary LODO; predictable
+vocabulary-shift failure cannot serve as the primary H2 comparator.
 
 \paragraph{Mandatory lexical-geometry control.}
 A deflationary account holds that a ``control direction'' only changes the
@@ -520,10 +656,14 @@ answerable.
 This is a design note; no data or results accompany it. The design scaffold,
 preregistration documents, prior-art matrix, and citation-verification log are in
 the accompanying repository. Code is released under the MIT License and written
-content under CC BY 4.0. This version (v0.1.1) is archived on Zenodo at
-DOI~\texttt{10.5281/zenodo.21335529} (concept DOI \texttt{10.5281/zenodo.21294932},
-resolving to the latest version; the v0.1.0 preregistration remains at
-\texttt{10.5281/zenodo.21294933}).
+content under CC BY 4.0. The canonical build of this document is Tectonic 0.16.9 in
+deterministic mode with a fixed source date; it is the only engine permitted to
+produce the repository PDF, and the committed PDF is a local review artifact rather
+than an archived publication. This unreleased v0.1.2 correction has no
+version-specific DOI. Historical archives remain unchanged: v0.1.1 is
+DOI~\texttt{10.5281/zenodo.21335529}, v0.1.0 is
+\texttt{10.5281/zenodo.21294933}, and the concept DOI is
+\texttt{10.5281/zenodo.21294932}.
 
 \bibliographystyle{plainnat}
 \bibliography{references}
