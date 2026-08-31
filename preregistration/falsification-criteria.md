@@ -1,6 +1,6 @@
 # Falsification Criteria
 
-**Status:** v0.1 criteria with the H1 decision rule corrected by the v0.1.2
+**Status:** v0.1 criteria with the H1 and H2 decision rules corrected by the v0.1.2
 pre-data methodological correction; no data collected.
 
 This document lists, in advance, the conditions under which the central
@@ -27,6 +27,16 @@ simple baselines, or lexical-phrase reweighting.
    not generalize to a held-out domain (fails H2).
 3. **Baselines suffice.** Lexical classifiers or simple prompt embeddings perform
    as well as the task-state representation, with no incremental value (fails H2).
+   Operationally at Mini-0 scale: with
+   `delta_H2 = log_loss_prompt_embedding - log_loss_hidden_state` (positive favors
+   the hidden state), the **upper** 95% paired cluster-bootstrap limit of
+   `delta_H2` at or below 0 weakens H2, provided the technical, QA,
+   label-reliability, split-integrity, and estimability gates pass. An interval
+   overlapping 0 is indeterminate, not a refutation. A `NOT_ESTIMABLE` primary
+   aggregate — including a single-class inner fit or final outer fit, or no
+   converged candidate — is indeterminate, never positive; response classes are
+   never merged and no fold, class, domain, or direction is dropped post-data.
+   Mini-0 can weaken or support only single-axis H2 **feasibility**.
 4. **Subsumed by a known single factor.** Valence/arousal, confidence, generic
    difficulty, or a single refusal direction alone explains the result (fails H2).
 5. **Lexical-geometry artifact.** Causal intervention changes only stereotyped
@@ -43,8 +53,10 @@ simple baselines, or lexical-phrase reweighting.
 10. **Controllability adds nothing.** The controllability/coping axis adds no
     explanatory value beyond simpler baselines (rejects a priority sub-hypothesis).
 11. **Not reproducible.** Results fail to replicate across random seeds.
-12. **Unstable labels.** Response-strategy labels are unstable or
-    evaluator-dependent, so the target variable itself is not well defined.
+12. **Unstable labels.** Pre-adjudication Cohen's kappa on the independently
+    double-labeled, domain-stratified 30% complete-group subset is below 0.60, or
+    fewer than two classes make it `NOT_ESTIMABLE`. The response target is then not
+    sufficiently reliable: H2 and H3 inference are withheld.
 
 ## Decision discipline
 

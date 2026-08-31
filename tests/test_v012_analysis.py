@@ -98,12 +98,16 @@ def test_double_crossed_cell_directions_are_correct() -> None:
 def test_inner_selection_never_receives_outer_test_domain() -> None:
     items = _stimuli(groups_per_domain=2)
     outer = plan_double_crossed_lodo(items)[0]
-    inner = plan_inner_selection_folds(items, outer, n_splits=3)
+    inner = plan_inner_selection_folds(items, outer)
     by_id = {item.item_id: item for item in items}
+    assert len(inner) == 3  # inner leave-one-training-domain-out
     for fold in inner:
         selected_ids = fold.training_item_ids + fold.validation_item_ids
-        assert all(by_id[item_id].domain != outer.test_domain for item_id in selected_ids)
+        assert all(
+            by_id[item_id].domain != outer.test_domain for item_id in selected_ids
+        )
         assert set(fold.training_group_ids).isdisjoint(fold.validation_group_ids)
+        assert fold.inner_validation_domain != outer.test_domain
 
 
 def test_layer_zero_mask_excludes_template_special_and_padding_tokens() -> None:
@@ -144,20 +148,26 @@ def _manifest(**overrides: object) -> RunManifest:
         "shard_id": "ASCR-Mini-0",
         "run_kind": "scientific_feasibility",
         "eligible_for_scientific_analysis": True,
+        "target_axis": "uncertainty",
         "prompt_set_id": "ASCR-Mini-0-prompts",
         "prompt_set_version": "unc-v1",
         "model_name": "Qwen/Qwen2.5-7B-Instruct",
-        "model_revision": "model-sha",
-        "tokenizer_revision": "tokenizer-sha",
+        "model_revision": "a" * 40,
+        "tokenizer_revision": "b" * 40,
         "prompt_embedding_model": "BAAI/bge-base-en-v1.5",
-        "prompt_embedding_revision": "embedding-sha",
+        "prompt_embedding_revision": "c" * 40,
+        "prompt_embedding_license": "mit",
+        "prompt_embedding_pooling_rule": "cls_then_l2_normalize",
+        "prompt_embedding_truncation_rule": "truncate_to_model_max_length",
+        "prompt_embedding_max_input_length": 512,
         "chat_template": "qwen-chatml",
-        "code_commit": "code-sha",
+        "chat_template_hash": "sha256:" + "f" * 64,
+        "code_commit": "d" * 40,
         "seed": 0,
         "decoding": {"temperature": 0.0},
         "layer": 16,
         "token_position": "prompt_final_non_padding",
-        "stimulus_file_hash": "sha256:abc",
+        "stimulus_file_hash": "sha256:" + "e" * 64,
         "output_directory": "experiments/results/ASCR-Mini-0/",
         "environment": "test-only",
         "timestamp": "2026-08-30T00:00:00Z",
@@ -197,6 +207,9 @@ def test_pilot_config_declares_exact_h1_and_h2_fdr_families() -> None:
     cfg = yaml.safe_load((REPO / "experiments/configs/pilot.yaml").read_text())
     families = cfg["fdr_families"]
     assert families["h1_primary_aggregate"]["correction"].startswith("none_")
+    assert families["h2_primary_aggregate"]["sign_convention"] == (
+        "positive_favors_hidden_state"
+    )
     assert len(families["h1_direction_domain_secondary"]["members"]) == 16
     assert len(families["h2_direction_domain_secondary"]["members"]) == 8
     assert families["family_structure_primary"]["members"] == [

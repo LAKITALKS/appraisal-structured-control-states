@@ -118,9 +118,18 @@ To keep labeling and evaluation robust to stereotyped phrasing (see
 
 ## Reliability
 
-At least two independent labelers (or an auditable protocol) label a shared subset;
-agreement (e.g. Cohen's/Fleiss' kappa) is reported. Unstable or evaluator-dependent
-labels are a falsification trigger (see
+The primary human labels every generated response. Before response labels are
+observed, a second independent human is assigned a deterministic, domain-stratified
+subset of `ceil(0.30 × N_complete_groups)` complete matched groups (seed
+`20260901`), allocated as evenly as possible across domains. The second labeler is
+blind to primary labels; both independently use the four-superclass rubric.
+
+Before adjudication, report Cohen's kappa, raw agreement, the four-class confusion
+matrix, per-labeler class counts, and a 95% matched-group cluster-bootstrap CI for
+kappa. Passing requires `kappa >= 0.60`; fewer than two observed classes is
+`NOT_ESTIMABLE` and fails. Only afterwards may disagreements be adjudicated, with
+the adjudicator and rule recorded. Failure withholds H2 and H3 inference and is a
+falsification trigger (see
 [`falsification-criteria.md`](falsification-criteria.md)).
 
 ## Machine-readable form

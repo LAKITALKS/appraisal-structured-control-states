@@ -40,6 +40,14 @@ domain and whole matched groups. This directly tests whether task-state decoding
 survives a change in concept-mention level. The historical v0.1.1 B/C
 accuracy-difference statistic is non-identifying and is non-deciding after v0.1.2.
 
+Inside each outer fold, layer and regularization are selected with **inner
+leave-one-training-domain-out** folds over the three remaining training domains —
+one held out for validation, the other two used for fitting — so the inner boundary
+mirrors the outer cross-domain claim (see
+[`analysis-plan.md`](analysis-plan.md) §2a). H2 reuses exactly these outer groups,
+directions, folds, held-out items, and selection boundary, but predicts the
+response-strategy superclass rather than the task state.
+
 ---
 
 ## 2. Candidate axes
@@ -182,6 +190,10 @@ We record residual-stream activations at:
 - a small, preregistered set of **early generated-token positions** (e.g. the
   first `k` generated tokens).
 
+The **exact position-sensitivity grid** used by the H1 layer/position family, like
+the layer candidate grid, is an **unresolved author decision** and a visible run
+blocker (`activations.primary_position_candidates`).
+
 Across:
 
 - **all residual-stream layers**, or a preregistered subset if compute-limited.
@@ -229,6 +241,13 @@ the lexical-normalization protocol in
 measured and reported; unstable or evaluator-dependent labels are a falsification
 trigger.
 
+These labels are also the **primary H2 target**, in their four-superclass form
+(`direct_or_comply`, `qualify_or_warn`, `redirect_or_clarify`,
+`decline_or_abstain`), with the nine fine labels secondary. Both the hidden-state
+and the prompt-embedding classifier predict this same target on the same held-out
+items. If the label-reliability gate fails, H2 inference is withheld along with H3
+conclusions.
+
 ---
 
 ## 7. Data provenance and release
@@ -275,9 +294,17 @@ the **within-group naturalness spread across A/B/C/D is at most one scale point*
 **Whole-set gate.** `ascr.schema.check_run_ready(...)` validates an entire stimulus
 set and blocks a run unless every matched group is run_ready, the model revision is
 frozen, the tokenizer revision is frozen, the author-approved prompt-embedding
-model and revision are frozen, the layer candidate grid is frozen, the configured
+model, revision, license, pooling rule, truncation rule, and maximum input length
+are frozen, the layer and position candidate grids are frozen, the configured
 sample-size floor is met, and any externally-sourced items are review-approved (see
-§10). Marker masking
+§10). The runner-facing entry point is the integrated
+`ascr.schema.integrated_pre_run_gate_problems(config, items, run_plan=plan,
+manifest=manifest)`, which must be empty before any model is constructed or loaded.
+The gate requires the configuration, frozen run plan, immutable manifest, and
+canonical typed stimulus payload to agree; no config-only helper can authorize a
+run. For Mini-0 it additionally requires only the uncertainty axis, all four
+registered domains, at least 40 complete groups, and domain counts with
+`max − min <= 1`. Marker masking
 and synonym-based robustness are evaluated; prompt embeddings, length, and register
 features are stored as baselines/covariates. Groups failing QA are `revise`d or
 `discard`ed; the disposition is logged. **No activations are collected from
@@ -315,16 +342,46 @@ dialogue-loop, path-dependence, or user-signature data (amendment §4).
 
 Each shard carries an **immutable run manifest** with: experiment ID, shard ID,
 run kind, scientific-eligibility flag, prompt-set ID and version, model name,
-immutable model and tokenizer revisions, prompt-embedding name and revision, chat
-template, code commit, seed, decoding configuration, layer, token position,
-stimulus-file hash, output directory, environment, and timestamp (validated by
-`ascr.schema.RunManifest`).
+immutable model and tokenizer revisions, target axis, prompt-embedding name,
+revision, license, pooling, truncation, and maximum input length, chat-template
+identity and hash, code commit, seed, decoding configuration, layer, token position,
+canonical stimulus-content hash, output directory, environment, and timestamp
+(validated by `ascr.schema.RunManifest`).
+
+**Immutability and format rules (v0.1.2).** A `scientific_feasibility` manifest
+must record the model revision, the tokenizer revision, the prompt-embedding
+revision, and the repository code commit as **full immutable hexadecimal commit
+revisions** (40 lowercase hex characters) — never a short prefix, a branch name, or
+a movable tag. SHA-256 fields, including `stimulus_file_hash` and
+`chat_template_hash`, are validated against the explicit `sha256:<64 lowercase
+hex>` format. The stimulus digest is computed from the complete canonical typed-item
+payload, independent of YAML whitespace or item order. A `technical_smoke` manifest that
+uses no prompt-embedding model may record its prompt-embedding fields explicitly as
+`NOT_APPLICABLE_TECHNICAL_SMOKE`, so a non-scientific extraction smoke test never
+has to invent a fake frozen embedding revision; the same sentinel is rejected in a
+scientific manifest, where those fields stay mandatory and frozen.
 
 **Combination rule.** Shards may be combined only if all compatibility-relevant
-manifest fields are identical (`ascr.schema.manifests_compatible`). Any change to
-model, prompt construction, readout, or code is recorded as a new prompt-set
+manifest fields are identical (`ascr.schema.manifests_compatible`). Those fields
+are: experiment ID, run kind, scientific-eligibility flag, target axis, prompt-set
+ID and version, stimulus hash, model name, model revision, tokenizer revision,
+prompt-embedding model/revision/license/pooling/truncation/maximum length,
+chat-template identity and hash, code commit, decoding configuration, layer, token
+position, and environment — each named exactly once.
+Per-run timestamp, output directory, shard identity, and seed are intentionally
+excluded, because shard combination ranges over exactly those. Any change to model,
+prompt construction, stimulus file, readout, or code is recorded as a new prompt-set
 version or a separate experiment. There is **no** cherry-picking or merging of only
 positive shards; all run shards are reported.
+
+**Design-time guards versus the run gate.** `ascr.schema` validates configurations,
+stimulus sets, and manifests at design time; it runs no model. The future
+extraction runner must call the **four-artifact gate**
+`ascr.schema.integrated_pre_run_gate_problems(config, items, run_plan=plan,
+manifest=manifest)` and find it empty **before** constructing, downloading, or
+loading any model, tokenizer, or prompt-embedding model. A configuration alone is
+deliberately fail-closed. The Mini-0 gate does not require the later H3 intervention
+grid; `ascr.schema.h3_run_ready_problems` enforces that grid only at the H3 stage.
 
 ### Non-scientific technical smoke runs
 

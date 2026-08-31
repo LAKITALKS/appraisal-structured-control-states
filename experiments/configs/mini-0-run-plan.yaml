@@ -4,28 +4,108 @@
 
 run_plan_version: "0.1.2"
 status: PRE_DATA_UNFROZEN
+validation_mode: draft
 experiment_id: "TO_BE_ASSIGNED_BEFORE_MINI_0"
 shard_id: ASCR-Mini-0
 run_kind: scientific_feasibility
 eligible_for_scientific_analysis: true
+target_axis: uncertainty
 prompt_set_id: "TO_BE_ASSIGNED_AFTER_STIMULUS_QA"
 prompt_set_version: "TO_BE_FROZEN_AFTER_STIMULUS_QA"
+stimulus_file_hash: "TO_BE_HASHED_AFTER_STIMULUS_QA"  # sha256:<64 lowercase hex>
+stimulus_hash_rule: canonical_order_independent_complete_typed_item_payload
 target_matched_groups: 40
 model_name: "Qwen/Qwen2.5-7B-Instruct"
 model_revision: "TO_BE_FROZEN_BEFORE_DATA_GENERATION"
 tokenizer_revision: "TO_BE_FROZEN_BEFORE_DATA_GENERATION"
 prompt_embedding_model: "TO_BE_SELECTED_BY_AUTHOR_BEFORE_MINI_0"
 prompt_embedding_revision: "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION"
+prompt_embedding_selection_status: AUTHOR_APPROVAL_REQUIRED
+prompt_embedding_license: "TO_BE_RECORDED_AFTER_AUTHOR_SELECTION"
+prompt_embedding_pooling_rule: "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION"
+prompt_embedding_truncation_rule: "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION"
+prompt_embedding_max_input_length: "TO_BE_FROZEN_AFTER_AUTHOR_SELECTION"
 chat_template: "TO_BE_HASHED_WITH_TOKENIZER_REVISION"
+chat_template_hash: "TO_BE_HASHED_WITH_TOKENIZER_REVISION"  # sha256:<64 lowercase hex>
 code_commit: "TO_BE_FROZEN_BEFORE_MINI_0"
 layer_candidates: "TO_BE_FROZEN_BEFORE_MINI_0"
+position_candidates: "TO_BE_FROZEN_BEFORE_MINI_0"
 token_position: final_non_padding_prompt_token
 layer_zero_pooling: mean_pooled_user_content_token_embeddings
-bootstrap_resamples: 1000
-inner_matched_group_folds: 3
+
+# Immutability requirement for every scientific run: model, tokenizer, and
+# prompt-embedding revisions and the repository code commit must be recorded as
+# full 40-character lowercase hexadecimal commit revisions, never short prefixes,
+# branches, or movable tags.
+immutable_revision_format: full_40_character_lowercase_hex_commit
+sha256_field_format: "sha256:<64 lowercase hex>"
+
 outer_folds: leave_one_domain_out_all_four_domains
 transfer_directions:
   - concept_absent_to_present
   - concept_present_to_absent
+inner_validation:
+  scheme: leave_one_training_domain_out
+  folds: 3
+  fit_domains_per_fold: 2
+  validation_domains_per_fold: 1
+  outer_test_domain_excluded: true
+
+seeds:
+  primary_seed: 0
+  sensitivity_seeds: [1, 2, 3, 4]
+  bootstrap_seed: 20260830
+  permutation_seed: 20260831
+  pool_predictions_across_seeds: false
+  primary_decision_uses_primary_seed_only: true
+  split_assignments_depend_on_seed: false
+
+probe_pipeline:
+  order: [standard_scaler, logistic_regression]
+  penalty: l2
+  solver: lbfgs
+  fit_intercept: true
+  class_weight: null
+  max_iter: 5000
+  tol: 1.0e-6
+  dtype: float64
+  regularization_grid_C: [1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0, 10.0, 100.0]
+  sklearn_version: "TO_BE_RECORDED_IN_THE_RUN_ENVIRONMENT"
+
+bootstrap_resamples: 1000
+bootstrap:
+  resampling_unit: complete_matched_group_cluster
+  stratified_within_held_out_domain: true
+  interval_type: percentile
+  interval_percentiles: [2.5, 97.5]
+
+h1_target: task_state_present
+h2_target: response_strategy_superclass
+h2_primary_estimand: log_loss_prompt_embedding_minus_log_loss_hidden_state
+h2_sign_convention: positive_favors_hidden_state
+
+fdr:
+  method: benjamini_hochberg
+  q: 0.05
+  operates_on: preregistered_one_sided_raw_p_values
+  confidence_intervals_are_fdr_corrected: false
+  h1_layer_position_sensitivity:
+    status: TO_BE_FROZEN_WITH_LAYER_AND_POSITION_GRID_BEFORE_MINI_0
+    raw_p_value_procedure: TO_BE_DEFINED_WITH_THE_FROZEN_LAYER_AND_POSITION_GRID
+
+# The runner must call the integrated configuration-plus-stimulus gate and find
+# it empty before constructing, downloading, or loading any model.
+integrated_gate_function: ascr.schema.integrated_pre_run_gate_problems
+integrated_gate_must_pass_before_model_construction: true
+
+remaining_mini0_author_decisions:
+  - prompt_embedding_selection_and_immutable_details
+  - qwen_model_revision
+  - tokenizer_revision
+  - primary_layer_candidate_grid
+  - exact_position_sensitivity_grid
+deferred_non_mini0_author_decisions:
+  - later_h3_intervention_grid
+
 no_holonomy_data: true
 no_data_declaration: "No model run is authorized by this unfrozen template."

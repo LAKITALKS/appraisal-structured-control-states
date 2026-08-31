@@ -112,7 +112,12 @@ v0.1.0 plan named several probes and interventions but did not fix a single prim
 steering direction. To remove analytic degrees of freedom, exactly one primary rule
 is fixed here; everything else is a declared robustness analysis.
 
-1. **Primary decoding:** regularized logistic regression.
+1. **Primary decoding:** regularized logistic regression, in the frozen v0.1.2
+   pipeline: training-subset-only `StandardScaler`, then logistic regression with L2
+   penalty, `solver="lbfgs"`, `fit_intercept=True`, `class_weight=None`,
+   `max_iter=5000`, `tol=1e-6`, float64, over the frozen grid
+   `C ∈ {1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100}`
+   ([`analysis-plan.md`](analysis-plan.md) §2b).
 2. **Primary intervention direction:** the **normalized difference-in-means** of
    activations between task-state-present and task-state-absent, computed **only**
    from training groups, with the concept-mention factor **balanced** within the
@@ -121,8 +126,12 @@ is fixed here; everything else is a declared robustness analysis.
    `d = (mu_present - mu_absent) / || mu_present - mu_absent ||`.
 3. **Robustness only:** probe-weight, LDA, and ridge directions are declared
    robustness analyses, never the primary result.
-4. **Layer selection:** chosen using training/validation data only. The test set is
-   never used to choose layer or direction.
+4. **Layer selection:** chosen using training/validation data only, through the
+   inner leave-one-training-domain-out folds of
+   [`analysis-plan.md`](analysis-plan.md) §2a, with the registered objectives and
+   tie-breaks (smaller `C` first, then earlier layer index). The test set is never
+   used to choose layer or direction. The author-approved layer and position
+   candidate grids remain unresolved run blockers.
 5. **Intervention strengths:** a fixed, preregistered set of values. The best
    strength is never selected on the final test set.
 6. **Normalization:** the primary direction and every control share **identical
@@ -143,13 +152,20 @@ The v0.1.0 baseline list (Section 2 above) is retained and refined. Two baseline
 are elevated to **primary** comparisons:
 
 - **Prompt-embedding baseline** — the primary non-mechanistic H2 comparator under
-  the same double-crossed outer groups, directions, LODO folds, and training-only
-  hyperparameter selection as the hidden-state probe. Its input is canonical
+  the same double-crossed outer groups, directions, LODO folds, held-out items, and
+  training-only hyperparameter selection as the hidden-state probe, predicting the
+  **same** target: the four response-strategy superclasses. Its input is canonical
   user-visible prompt text, excluding chat-template/special-token artifacts. Exact
-  model, immutable revision, license, pooling, and input handling must be frozen
-  before Mini-0; the unresolved author decision is documented in
-  [`amendment-v0.1.2.md`](amendment-v0.1.2.md). Held-out log-loss is primary and
-  paired balanced-accuracy difference secondary.
+  model, immutable revision, license, pooling rule, truncation/input rule, and
+  maximum input length must be frozen before Mini-0; the unresolved author decision
+  is documented in [`amendment-v0.1.2.md`](amendment-v0.1.2.md) §5.5. Its
+  model-card pooling and normalization run **before** the training-only
+  `StandardScaler` + logistic-regression pipeline of
+  [`analysis-plan.md`](analysis-plan.md) §2b. Held-out response-strategy log-loss is
+  primary, with the paired estimand
+  `delta_H2 = log_loss_prompt_embedding - log_loss_hidden_state` (positive favors
+  the hidden state); the paired balanced-accuracy difference, hidden state minus
+  prompt embedding, is secondary.
 - **Difficulty-representation baseline** — a decodable generic-difficulty
   representation (cf. linear difficulty probes in prior work), included because
   difficulty is a known confound for the task-state axes. Primary **where
@@ -175,7 +191,9 @@ the weakest.
 
 TF-IDF/Bag-of-Words is retained but is **diagnostic/descriptive** under the H1/H2
 cross-mention transfer boundary; predictable failure under a vocabulary shift is
-not the primary H2 comparison. Under ordinary standard LODO it remains a secondary
+not the primary H2 comparison. Sparse baselines use an appropriate **sparse-safe**
+pipeline without dense mean-centering; they remain secondary and never silently
+inherit the dense `StandardScaler` step of the primary pipeline. Under ordinary standard LODO it remains a secondary
 comparison together with prompt length, token entropy, difficulty, prompt
 embeddings, and the other registered baselines. This classification does not alter
 H1: H1 is task-state transfer across concept level, while H2 asks whether hidden

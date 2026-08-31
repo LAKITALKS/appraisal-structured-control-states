@@ -16,6 +16,7 @@ env/
 # LaTeX build artifacts (the committed PDF paper/preprint.pdf is kept explicitly;
 # the intermediate paper/main.pdf produced by the build is not tracked)
 paper/main.pdf
+paper/main-dev.pdf
 paper/*.aux
 paper/*.log
 paper/*.out

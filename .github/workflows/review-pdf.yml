@@ -1,0 +1,50 @@
+name: ASCR review PDF
+
+on:
+  push:
+    branches:
+      - codex/ascr-v0.1.2-predata-correction
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ascr-v012-review-pdf-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  canonical-pdf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out the review branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Install pinned Tectonic
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=/tmp/tectonic-0.16.9.tar.gz
+          curl --fail --location --retry 3 \
+            --output "$archive" \
+            https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic%400.16.9/tectonic-0.16.9-x86_64-unknown-linux-gnu.tar.gz
+          echo "f3c825128095dc3399ea11c08c18035b33050a216930c295c79e8eb11bd21de4  $archive" \
+            | sha256sum --check --strict
+          tar --extract --gzip --file "$archive" --directory /tmp tectonic
+          sudo install -m 0755 /tmp/tectonic /usr/local/bin/tectonic
+          test "$(tectonic --version | tr -cd '0-9.\n')" = "0.16.9"
+
+      - name: Build twice and verify byte identity
+        run: make paper-verify
+
+      - name: Upload review-only build artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ascr-v012-review-pdf
+          path: |
+            paper/preprint.pdf
+            paper/main.log
+          if-no-files-found: error
+          retention-days: 7

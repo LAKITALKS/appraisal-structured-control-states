@@ -2,8 +2,9 @@
 
 **Project:** Toward Appraisal-Structured Latent Control Representations in Language
 Models (ASCR)
-**Status:** v0.1 hypotheses; H1's decision statistic is corrected by the v0.1.2
-pre-data methodological correction; no data collected.
+**Status:** v0.1 hypotheses; H1's decision statistic and H2's target, estimand, and
+decision rule are corrected by the v0.1.2 pre-data methodological correction; no
+data collected.
 **Author:** Lazaros Varvatis, Independent Researcher, Berlin, Germany.
 
 This document states the hypotheses that the pilot is designed to test. Each is
@@ -79,6 +80,28 @@ single refusal direction.
 held-out domain retains predictive value for response strategy above chance and
 above the strongest simple baseline, and adds incremental predictive value in a
 nested model comparison that already includes those baselines.
+
+**H2 target (fixed in v0.1.2).** The primary H2 target is the model's realized
+**response strategy**, represented by the four registered superclasses
+`direct_or_comply`, `qualify_or_warn`, `redirect_or_clarify`, and
+`decline_or_abstain`; the nine fine labels are secondary. H2 is therefore **not** a
+second `task_state_present` classification test — that is H1's target. Both the
+hidden-state and the prompt-embedding classifier predict this same target on the
+same held-out items, under the same splits and the same training-only selection
+boundary.
+
+**H2 Mini-0 estimand and decision (v0.1.2).** The paired primary improvement is
+`delta_H2 = log_loss_prompt_embedding - log_loss_hidden_state`, so positive values
+favor the hidden state. Under the paired matched-group cluster bootstrap: a lower
+95% limit above 0 is positive H2 feasibility; an upper limit at or below 0 is
+weakened / no incremental evidence once the technical, QA, label-reliability,
+split-integrity, and estimability gates pass; an interval overlapping 0 is
+indeterminate. A `NOT_ESTIMABLE` aggregate is indeterminate, never positive. H2
+inference is withheld unless pre-adjudication Cohen's kappa on the independently
+double-labeled, domain-stratified 30% complete-group subset is at least 0.60 (fewer
+than two observed classes is `NOT_ESTIMABLE` and fails). Mini-0
+provides only single-axis H2 **feasibility** against the frozen prompt-embedding
+comparator; it cannot establish full H2 or the family claim.
 
 **Primary. Falsified if** cross-domain transfer collapses to chance, or if simpler
 baselines match the task-state representation with no incremental value.

@@ -25,8 +25,46 @@ released, or archived.
 - A deterministic paper-build setting tied to the amendment date, preventing
   review PDFs from differing only in generated timestamp metadata.
 - Tests for the corrected H1 design, leakage boundary, tokenizer masks, axis QA,
-  smoke separation, historical readability, metadata, and no-data guards (90
-  passing in the completed branch verification).
+  smoke separation, historical readability, metadata, and no-data guards.
+- **Second correction pass (post-audit).** A frozen, machine-enforced statistical
+  specification: the H2 target and fixed four-superclass vocabulary, the paired
+  estimand `delta_H2 = log_loss_prompt_embedding - log_loss_hidden_state` with its
+  sign convention and positive/weakened/indeterminate rules, the conservative
+  `NOT_ESTIMABLE` and unseen-class handling with a fixed float64 log-loss clipping
+  rule, the `StandardScaler` + L2 `lbfgs` logistic pipeline, the frozen grid
+  `C ∈ {1e-4 … 100}`, the inner selection objectives and tie-breaks with one
+  numerical tolerance, and the frozen seed roles (primary `0`; sensitivity
+  `1–4`; bootstrap `20260830`; permutation `20260831`).
+- Inner **leave-one-training-domain-out** selection folds replacing the earlier
+  round-robin mixed-domain inner folds (`ascr.splits.plan_inner_selection_folds`,
+  `InnerSelectionFold.inner_validation_domain`).
+- A design-time domain-stratified matched-group cluster-bootstrap planner
+  (`ascr.splits.plan_cluster_bootstrap`) that returns drawn group identifiers only.
+- An operational Benjamini–Hochberg procedure at `q = 0.05` over preregistered
+  one-sided raw p-values: a matched-group task-state-label-swap randomization test
+  for the H1 secondary family and a paired model-block exchange permutation test
+  for the H2 secondary family, both with 10,000 permutations, the `+1` correction,
+  and the frozen permutation seed.
+- The integrated pre-run gate `ascr.schema.integrated_pre_run_gate_problems`, which
+  the future runner must clear before constructing or loading any model.
+- **Final pre-release review.** The authoritative gate now requires four mutually
+  compatible artifacts — config, frozen Mini-0 run plan, immutable manifest, and
+  canonical typed stimulus payload — and a config-only helper is permanently
+  fail-closed. Model/tokenizer/embedding/code revisions require full 40-hex commits;
+  stimulus and chat-template identities require `sha256:<64 hex>` digests.
+- Mini-0 stimulus gates enforce the uncertainty axis, all four registered domains,
+  at least 40 complete run-ready groups, and domain counts with `max - min <= 1`;
+  split and bootstrap planners reject mixed axes or missing domains.
+- A deterministic, pre-label second-reviewer subset planner implementing
+  `ceil(0.30 × N_groups)`, domain stratification, and seed `20260901`.
+- One canonical release build: `make paper` / `make paper-release` use Tectonic
+  0.16.9 in deterministic mode with no engine fallback; `make paper-verify` builds
+  twice from clean and requires identical SHA-256; `make paper-dev` is an
+  explicitly noncanonical `latexmk` development build.
+- Regression suites that fail if
+  any of the above is altered, if a document mislabels a raw interval as already
+  BH-adjusted, if the canonical build could switch engines, or if publication or
+  data artifacts appear.
 
 ### Changed
 
@@ -34,14 +72,52 @@ released, or archived.
   bidirectional cross-mention LODO transfer. AUROC is secondary; matched groups are
   the bootstrap unit. The historical B/C statistic is non-deciding.
 - H2 is a separate gate comparing hidden-state and frozen prompt-embedding models
-  on identical splits, with held-out log-loss primary. Prompt-embedding selection
+  on identical splits, held-out items, and training-only selection boundary, both
+  predicting the **same** target: the four response-strategy superclasses, with the
+  nine fine labels secondary. Held-out response-strategy log-loss is primary, under
+  the paired estimand `delta_H2` above; the balanced-accuracy difference is
+  secondary with the same sign (hidden state minus prompt embedding). H2 inference
+  is withheld if the response-label reliability gate fails, and Mini-0 can support
+  only single-axis H2 feasibility. Prompt-embedding selection — model, immutable
+  revision, license, pooling rule, truncation rule, and maximum input length —
   remains an explicit author decision that blocks `run_ready`.
+- H2 hidden states independently select `(layer, C)` while prompt embeddings select
+  their own `C` on the same folds, target, items, and log-loss objective. Single-class
+  inner/final fits and unrecoverable convergence failures make the affected outer
+  fold `NOT_ESTIMABLE`; probability columns are aligned to the fixed class order,
+  zero-filled for unseen training classes, then identically clipped/renormalized.
+- The response-label gate now requires two humans: the primary labels all responses;
+  the independent second labels the frozen 30% group subset. Pre-adjudication
+  Cohen's kappa must be at least 0.60, with raw agreement, confusion matrix, class
+  counts, and matched-group bootstrap CI reported; failure withholds H2 and H3.
+- Manifest compatibility now includes `experiment_id` and `stimulus_file_hash`,
+  with each field named exactly once and with timestamp, output directory, shard
+  identity, and seed still intentionally excluded. Scientific manifests require
+  full 40-character lowercase hexadecimal commit revisions and an explicitly
+  formatted `sha256:<64 hex>` stimulus hash; a technical smoke run that uses no
+  prompt-embedding model records those fields as `NOT_APPLICABLE_TECHNICAL_SMOKE`
+  instead of inventing a frozen revision.
+- Mini-0 blocks on its exact layer/position grid and H1 sensitivity raw-p procedure.
+  The H3 intervention grid remains visible but is enforced only by the later H3
+  stage gate, not by Mini-0.
 - TF-IDF is diagnostic under cross-mention transfer and secondary under ordinary
   LODO, not the primary H2 comparator.
 - Run-ready QA now records observed factor values and exact confirmation that the
   other two primary axes are absent; partial v0.1.1 QA remains draft-readable only.
 - Multiple-comparison families are named separately for H1, H2, H3, and the family
-  test. Unresolved layer/intervention grids remain visible decision blocks.
+  test, and each applicable family now names the raw-p-value procedure BH operates
+  on. Unresolved layer/position/intervention grids remain visible decision blocks.
+- Raw effect estimates and raw confidence intervals are reported separately from
+  BH-adjusted q-values, and no document any longer labels an ordinary interval as
+  though BH had already been applied to it. The
+  archived v0.1.1 "after FDR" wording for family components A/B/C is preserved
+  unchanged; v0.1.2 records the conflict openly and implements the narrowest
+  clarification — the raw interval must lie beyond zero **and** the component's
+  BH-adjusted one-sided raw p-value must satisfy `q = 0.05` once a future run plan
+  defines it.
+- The machine-readable family rule is component-specific: A's raw interval is below
+  zero; B's and C's are above zero; all three separately require their BH-adjusted
+  one-sided raw p-values. The stale one-sign generic rule was removed.
 - Repository versions advance to 0.1.2 on this branch; top-level CFF type is
   corrected to `software`, while the preferred paper citation remains a report.
 

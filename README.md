@@ -15,9 +15,19 @@ v0.1.2 publicly repairs a non-identifying H1 decision statistic before data
 collection. The replacement uses bidirectional concept-mention transfer within
 outer leave-one-domain-out folds, training-only nested selection, explicit H1/H2
 separation, typed axis-isolation QA, a defined Layer-0 baseline, and a structural
-boundary between technical smoke logs and scientific feasibility artifacts. It is
-not merged, tagged, released, or archived. Archived v0.1.0 and v0.1.1 remain
-unchanged.
+boundary between technical smoke logs and scientific feasibility artifacts. A
+focused second correction pass, following an independent read-only audit, binds the
+H2 target, estimand, sign convention, and decision rule; freezes the probe
+pipeline, regularization grid, selection tie-breaking, and seed roles; replaces
+mixed-domain inner folds with inner leave-one-training-domain-out; states the
+cluster-bootstrap algorithm exactly; makes Benjamini–Hochberg operational on
+preregistered one-sided raw p-values; tightens the manifest guards; and fixes
+exactly one canonical release build. A final pre-release review makes the run gate
+fail closed unless configuration, frozen Mini-0 plan, immutable manifest, and
+canonical stimulus hash all agree; separates Mini-0 from the later H3 gate; fixes
+H2's independent comparator selection and sparse-class/convergence handling; and
+registers a deterministic two-human response-label reliability protocol. It is not merged, tagged, released, or
+archived. Archived v0.1.0 and v0.1.1 remain unchanged.
 
 - [**v0.1.2 methodological correction**](preregistration/amendment-v0.1.2.md)
 - [**v0.1.2 review status**](preregistration/v0.1.2-review-status.md)
@@ -125,24 +135,33 @@ editing), on an open-weight ~7–9B instruction-tuned model (default
 generation). H1 uses double-crossed concept-mention transfer across outer LODO
 folds with whole matched groups and training-only layer/regularization selection.
 H2 separately compares hidden states with an author-approved frozen prompt
-embedding. Interpretable linear probes and later causal
-interventions with matched-norm random/PCA controls. Details in
+embedding, predicting the same four response-strategy superclasses on the same
+held-out items, with the paired estimand
+`delta_H2 = log_loss_prompt_embedding - log_loss_hidden_state` (positive favors the
+hidden state). Its response target must pass pre-adjudication Cohen's kappa ≥ 0.60
+on an independently double-labeled, domain-stratified 30% complete-group subset;
+otherwise H2 and H3 inference are withheld. Interpretable linear probes and later causal interventions with
+matched-norm random/PCA controls. Details in
 [`preregistration/experimental-design.md`](preregistration/experimental-design.md).
 
 ## Reproducing the checks
 
 ```bash
 python -m pytest          # run the unit tests
-make paper                # build paper/preprint.pdf (latexmk or tectonic)
+make paper                # canonical build of paper/preprint.pdf (Tectonic 0.16.9)
+make paper-verify         # build twice from clean and require identical SHA-256
 ```
 
-> **Build note:** `paper/preprint.pdf` is built from `paper/main.tex`. `make paper`
-> prefers `latexmk` + TeX Live and falls back to the self-contained `tectonic`
-> engine. The current v0.1.2 branch build is 12 pages; it compiled with Tectonic
-> 0.16.9 after the local TinyTeX installation lacked `enumitem.sty`. The PDF is a
-> local review artifact and is not an archival release. The build fixes
-> `SOURCE_DATE_EPOCH` to the amendment date and enables Tectonic's deterministic
-> mode so repeated fallback builds are byte-reproducible.
+> **Build note.** `paper/preprint.pdf` is built from `paper/main.tex` by exactly
+> one canonical engine: **Tectonic 0.16.9** with `-Z deterministic-mode` and
+> `SOURCE_DATE_EPOCH` fixed to the amendment date. `make paper` and its alias
+> `make paper-release` use that engine and **never** fall back to another one — a
+> missing or mismatched engine fails loudly, because different engines produce
+> valid but byte-different PDFs and would silently change the archival artifact.
+> `make paper-dev` runs `latexmk` as a clearly labelled **noncanonical development
+> build**; its output must never be committed as `paper/preprint.pdf`. No byte
+> identity is claimed across engines. The current v0.1.2 branch build is 13 pages.
+> The PDF is a local review artifact and is not an archival release.
 
 ## How to cite
 

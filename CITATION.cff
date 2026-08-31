@@ -8,7 +8,9 @@ abstract: >-
   general family of task-induced, appraisal-structured latent control
   representations that partially govern response-strategy selection across
   domains. Version 0.1.2 is an unreleased pre-data methodological correction of
-  the H1 decision rule and reports no experimental results.
+  the H1 and H2 decision rules, frozen analysis specification, pre-run artifact
+  gate, and response-label reliability protocol; it reports no experimental
+  results.
 type: software
 version: "0.1.2"
 authors:

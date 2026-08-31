@@ -57,8 +57,13 @@ def _qa(
     return qa
 
 
-def _item(cell_flags: tuple[bool, bool], *, qa: dict[str, object] | None,
-          gid: str = "unc-dbg-0001", provenance: dict[str, object] | None = None):
+def _item(
+    cell_flags: tuple[bool, bool],
+    *,
+    qa: dict[str, object] | None,
+    gid: str = "unc-dbg-0001",
+    provenance: dict[str, object] | None = None,
+):
     ts, cm = cell_flags
     data: dict[str, object] = {
         "item_id": f"{gid}-{int(ts)}{int(cm)}",
@@ -157,7 +162,8 @@ def test_incomplete_group_fails_run_ready() -> None:
 def test_placeholder_revision_blocks_run() -> None:
     problems = check_run_ready(_full_group(), model_revision=PLACEHOLDER_MODEL_REVISION)
     assert any("placeholder" in p for p in problems)
-    assert check_run_ready(_full_group(), model_revision="deadbeef") == []
+    assert check_run_ready(_full_group(), model_revision="a" * 40) == []
+    assert check_run_ready(_full_group(), model_revision="deadbeef")
 
 
 def test_missing_sample_size_blocks_run() -> None:
@@ -165,7 +171,9 @@ def test_missing_sample_size_blocks_run() -> None:
     assert any("sample-size" in p for p in problems)
 
 
-def _provenance(decision: str = "include", reviewed: str = "unanswerable") -> dict[str, object]:
+def _provenance(
+    decision: str = "include", reviewed: str = "unanswerable"
+) -> dict[str, object]:
     return {
         "dataset_name": "ExampleQA",
         "version": "1.0",
