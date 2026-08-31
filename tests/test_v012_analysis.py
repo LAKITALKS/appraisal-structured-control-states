@@ -6,7 +6,6 @@ import pathlib
 
 import pytest
 import yaml
-
 from ascr.pooling import (
     final_non_padding_index,
     mean_pool_user_content_embeddings,

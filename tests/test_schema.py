@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 import pytest
-
 from ascr import schema
 from ascr.schema import (
     PLACEHOLDER_MODEL_REVISION,
     PLACEHOLDER_REPLICATION_MODEL,
-    REQUIRED_QA_FIELDS,
     PromptItem,
     RunManifest,
     ValidationError,
@@ -335,35 +333,35 @@ def test_complete_matched_group_helper() -> None:
 
 
 def _manifest(**overrides: object) -> RunManifest:
-    base: dict[str, object] = dict(
-        experiment_id="ASCR-pilot",
-        shard_id="ASCR-Mini-0",
-        run_kind="scientific_feasibility",
-        eligible_for_scientific_analysis=True,
-        target_axis="uncertainty",
-        prompt_set_id="ASCR-Mini-0-prompts",
-        prompt_set_version="unc-v1",
-        model_name="Qwen/Qwen2.5-7B-Instruct",
-        model_revision="a" * 40,
-        tokenizer_revision="b" * 40,
-        prompt_embedding_model="BAAI/bge-base-en-v1.5",
-        prompt_embedding_revision="c" * 40,
-        prompt_embedding_license="mit",
-        prompt_embedding_pooling_rule="cls_then_l2_normalize",
-        prompt_embedding_truncation_rule="truncate_to_model_max_length",
-        prompt_embedding_max_input_length=512,
-        chat_template="qwen-chatml",
-        chat_template_hash="sha256:" + "f" * 64,
-        code_commit="d" * 40,
-        seed=0,
-        decoding={"temperature": 0.0},
-        layer=16,
-        token_position="prompt_final",
-        stimulus_file_hash="sha256:" + "e" * 64,
-        output_directory="experiments/results/ASCR-Mini-0/",
-        environment="py3.11-linux",
-        timestamp="2026-07-12T00:00:00Z",
-    )
+    base: dict[str, object] = {
+        "experiment_id": "ASCR-pilot",
+        "shard_id": "ASCR-Mini-0",
+        "run_kind": "scientific_feasibility",
+        "eligible_for_scientific_analysis": True,
+        "target_axis": "uncertainty",
+        "prompt_set_id": "ASCR-Mini-0-prompts",
+        "prompt_set_version": "unc-v1",
+        "model_name": "Qwen/Qwen2.5-7B-Instruct",
+        "model_revision": "a" * 40,
+        "tokenizer_revision": "b" * 40,
+        "prompt_embedding_model": "BAAI/bge-base-en-v1.5",
+        "prompt_embedding_revision": "c" * 40,
+        "prompt_embedding_license": "mit",
+        "prompt_embedding_pooling_rule": "cls_then_l2_normalize",
+        "prompt_embedding_truncation_rule": "truncate_to_model_max_length",
+        "prompt_embedding_max_input_length": 512,
+        "chat_template": "qwen-chatml",
+        "chat_template_hash": "sha256:" + "f" * 64,
+        "code_commit": "d" * 40,
+        "seed": 0,
+        "decoding": {"temperature": 0.0},
+        "layer": 16,
+        "token_position": "prompt_final",
+        "stimulus_file_hash": "sha256:" + "e" * 64,
+        "output_directory": "experiments/results/ASCR-Mini-0/",
+        "environment": "py3.11-linux",
+        "timestamp": "2026-07-12T00:00:00Z",
+    }
     base.update(overrides)
     return RunManifest(**base)  # type: ignore[arg-type]
 

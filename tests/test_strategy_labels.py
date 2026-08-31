@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from ascr import strategy_labels as sl
 
 
@@ -44,7 +43,9 @@ def test_design_cells_cover_the_full_2x2() -> None:
         (True, True, "D_"),
     ],
 )
-def test_design_cell_labels(task_state: bool, concept: bool, expected_prefix: str) -> None:
+def test_design_cell_labels(
+    task_state: bool, concept: bool, expected_prefix: str
+) -> None:
     assert sl.design_cell(task_state, concept).startswith(expected_prefix)
 
 

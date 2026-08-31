@@ -16,11 +16,12 @@ from __future__ import annotations
 import pathlib
 import re
 
+import ascr
 import pytest
 import yaml
-
-import ascr
 from ascr.schema import (
+    _MANIFEST_COMPAT_FIELDS,
+    _MANIFEST_EXCLUDED_COMPAT_FIELDS,
     BH_Q,
     BOOTSTRAP_SEED,
     H1_TARGET,
@@ -37,8 +38,6 @@ from ascr.schema import (
     PromptItem,
     RunManifest,
     ValidationError,
-    _MANIFEST_COMPAT_FIELDS,
-    _MANIFEST_EXCLUDED_COMPAT_FIELDS,
     integrated_pre_run_gate_problems,
     item_from_dict,
     load_config,

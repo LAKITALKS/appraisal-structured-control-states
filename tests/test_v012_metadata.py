@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import json
 import pathlib
-import tomllib
-
-import pytest
-import yaml
 
 import ascr
+import pytest
+import tomllib
+import yaml
 from ascr.schema import (
     QA_BOOLEAN_FIELDS,
     ValidationError,

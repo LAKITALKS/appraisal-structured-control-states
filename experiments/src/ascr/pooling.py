@@ -76,6 +76,5 @@ def mean_pool_user_content_embeddings(
         raise ValidationError("token embeddings must have one non-zero dimension")
     dimension = next(iter(dimensions))
     return tuple(
-        sum(float(row[j]) for row in selected) / len(selected)
-        for j in range(dimension)
+        sum(float(row[j]) for row in selected) / len(selected) for j in range(dimension)
     )

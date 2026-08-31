@@ -10,7 +10,6 @@ import pathlib
 
 import pytest
 import yaml
-
 from ascr import schema
 from ascr.schema import (
     PLACEHOLDER_MODEL_REVISION,

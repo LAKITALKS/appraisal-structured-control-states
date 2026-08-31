@@ -36,8 +36,18 @@ jobs:
           sudo install -m 0755 /tmp/tectonic /usr/local/bin/tectonic
           test "$(tectonic --version | tr -cd '0-9.\n')" = "0.16.9"
 
+      - name: Preserve the committed review artifact
+        run: cp paper/preprint.pdf /tmp/committed-preprint.pdf
+
       - name: Build twice and verify byte identity
         run: make paper-verify
+
+      - name: Verify the committed PDF is the canonical build
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmp --silent /tmp/committed-preprint.pdf paper/preprint.pdf
+          sha256sum paper/preprint.pdf
 
       - name: Upload review-only build artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -47,4 +57,4 @@ jobs:
             paper/preprint.pdf
             paper/main.log
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 1
