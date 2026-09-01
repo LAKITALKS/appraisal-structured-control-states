@@ -152,17 +152,30 @@ def test_versions_and_authorship_metadata_are_consistent() -> None:
     assert len(cff["authors"]) == 1
     assert len(cff["preferred-citation"]["authors"]) == 1
     assert len(zenodo["creators"]) == 1
-    serialized = json.dumps({"cff": cff, "zenodo": zenodo}).lower()
-    assert "orcid" not in serialized
+    orcid_id = "0009-0002-2075-9893"
+    orcid_url = f"https://orcid.org/{orcid_id}"
+    assert zenodo["creators"][0]["orcid"] == orcid_id
+    assert cff["authors"][0]["orcid"] == orcid_url
+    assert cff["preferred-citation"]["authors"][0]["orcid"] == orcid_url
+    assert cff["authors"][0]["orcid"].removeprefix("https://orcid.org/") == orcid_id
+    assert zenodo["related_identifiers"] == [
+        {
+            "identifier": "https://github.com/LAKITALKS/"
+            "appraisal-structured-control-states/tree/v0.1.2",
+            "relation": "isSupplementedBy",
+            "resource_type": "software",
+        }
+    ]
 
 
-def test_historical_dois_preserved_and_v012_unreleased() -> None:
+def test_historical_dois_preserved_and_v012_released_without_version_doi() -> None:
     text = (REPO / "README.md").read_text()
     assert "10.5281/zenodo.21294932" in text
     assert "10.5281/zenodo.21294933" in text
     assert "10.5281/zenodo.21335529" in text
     cff = yaml.safe_load((REPO / "CITATION.cff").read_text())
-    assert "date-released" not in cff
+    assert str(cff["date-released"]) == "2026-08-31"
+    assert "doi" not in cff
     assert "doi" not in cff["preferred-citation"]
 
 

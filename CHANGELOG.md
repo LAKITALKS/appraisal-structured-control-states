@@ -3,11 +3,12 @@
 All notable changes to this repository are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for its metadata version field.
 
-## [0.1.2] — Unreleased (pre-data methodological correction)
+## [0.1.2] — 2026-08-31 (pre-data methodological correction)
 
-This review-branch correction was prepared before any data collection. It does not
-alter the archived v0.1.0 or v0.1.1 versions and is not yet merged, tagged,
-released, or archived.
+This correction was prepared and released before any data collection. It was
+merged to `main`, tagged `v0.1.2`, and released on GitHub on 2026-08-31. Its
+version-specific Zenodo DOI is pending. It does not alter the archived v0.1.0 or
+v0.1.1 versions.
 
 ### Added
 
@@ -144,6 +145,15 @@ survives concept-level change without conflating H1 with H2 incremental value.
 - No dataset, model run, model response, activation, intervention, statistic, or
   scientific result was produced. The only tokenizer inspection used disposable
   strings and loaded no model weights.
+
+### Release
+
+- The canonical 13-page `paper/preprint.pdf` is the official GitHub Release asset.
+- The v0.1.2 version-specific Zenodo DOI is pending and will be recorded in a
+  follow-up metadata commit without moving the `v0.1.2` tag.
+- The concept DOI `10.5281/zenodo.21294932`, v0.1.0 version DOI
+  `10.5281/zenodo.21294933`, and v0.1.1 version DOI `10.5281/zenodo.21335529`
+  remain unchanged.
 
 ## [0.1.1] — 2026-07-12 (pre-data amendment)
 

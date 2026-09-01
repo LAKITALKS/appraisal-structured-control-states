@@ -13,9 +13,11 @@ abstract: >-
   results.
 type: software
 version: "0.1.2"
+date-released: "2026-08-31"
 authors:
   - family-names: "Varvatis"
     given-names: "Lazaros"
+    orcid: "https://orcid.org/0009-0002-2075-9893"
     city: "Berlin"
     country: "DE"
     email: "varvatislazaros@gmail.com"
@@ -26,6 +28,7 @@ preferred-citation:
   authors:
     - family-names: "Varvatis"
       given-names: "Lazaros"
+      orcid: "https://orcid.org/0009-0002-2075-9893"
   year: 2026
   version: "0.1.2"
   url: "https://github.com/LAKITALKS/appraisal-structured-control-states"

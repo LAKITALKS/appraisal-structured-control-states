@@ -2,8 +2,8 @@
 
 **Amendment date:** 2026-08-30
 
-**Status:** pre-data correction on a review branch; not merged, tagged, released,
-or archived
+**Status:** released on GitHub as `v0.1.2` on 2026-08-31; version-specific Zenodo
+DOI pending
 
 **Author:** Lazaros Varvatis, Independent Researcher, Berlin, Germany
 
@@ -575,24 +575,25 @@ Exactly one canonical release build is now defined:
   byte-identical output;
 - no byte identity is claimed across different engines.
 
-`paper/preprint.pdf` remains a **local review artifact**, not an archived
-publication. It carries no DOI and no release date, because neither exists.
+`paper/preprint.pdf` is the canonical **v0.1.2 GitHub Release artifact**. It carries
+the release date but no version-specific DOI because Zenodo assignment is pending.
 
 ## 15. Metadata and historical records
 
-Repository version fields are advanced to `0.1.2` on this branch. The top-level CFF
-artifact type is corrected to `software`, while the preferred citation remains a
-report. No v0.1.2 release date or DOI is recorded because no release or archive
-exists. Historical identifiers remain:
+Repository version fields are advanced to `0.1.2`. The top-level CFF artifact type
+is corrected to `software`, while the preferred citation remains a report. The
+v0.1.2 release date is recorded as 2026-08-31; its version-specific Zenodo DOI is
+pending. Historical identifiers remain:
 
 - concept DOI: `10.5281/zenodo.21294932`;
 - v0.1.0 version DOI: `10.5281/zenodo.21294933`;
 - v0.1.1 version DOI: `10.5281/zenodo.21335529`.
 
-For a future Zenodo version, the intended related-resource direction is: **the
-preprint is supplemented by the GitHub software**. The current `.zenodo.json`
-schema does not encode that relation here; it is recorded as a manual Zenodo
-metadata check rather than represented with invented syntax. No ORCID is added.
+For the Zenodo version, the related-resource direction is: **the preprint is
+supplemented by the GitHub software**. `.zenodo.json` encodes that relation as
+`isSupplementedBy` and identifies the related resource as software. The sole
+author's ORCID, `0009-0002-2075-9893`, is recorded in `.zenodo.json` and
+`CITATION.cff`.
 
 v0.1.2 is **not** a non-substantive metadata release. It is an explicit pre-data
 methodological correction.

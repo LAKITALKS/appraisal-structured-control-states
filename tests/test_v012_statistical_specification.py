@@ -6,7 +6,7 @@ the H1/H2 target separation, the probe pipeline and regularization grid, the
 selection tie-breaking, the seed roles, the inner leave-one-training-domain-out
 structure, the cluster-bootstrap algorithm, the Benjamini-Hochberg raw-p-value
 procedure, the manifest guards, the canonical PDF build, and the no-data /
-unpublished status of this branch.
+released-with-DOI-pending status of this version.
 
 No model is run and no data are produced by any test in this file.
 """
@@ -661,18 +661,42 @@ def test_documented_canonical_engine_is_consistent() -> None:
 # --------------------------------------------------------------------------- #
 # Publication status and no-data guards
 # --------------------------------------------------------------------------- #
-def test_v012_is_not_claimed_as_published_released_or_archived() -> None:
-    claims = re.compile(
-        r"v0\.1\.2[^.\n]{0,80}\b(is (released|published|archived|tagged|merged)"
-        r"|has (a )?DOI)",
+def test_v012_is_declared_released_with_zenodo_doi_pending() -> None:
+    release_claim = re.compile(
+        r"v0\.1\.2[\s\S]{0,120}?\b(?:(?:is|was)\s+)?"
+        r"(?:released|published|tagged|merged)\b",
         re.IGNORECASE,
     )
-    targets = sorted(REPO.glob("preregistration/*.md"))
-    targets += [REPO / "README.md", REPO / "CHANGELOG.md", REPO / "paper/main.tex"]
+    # Guard both the original grammatical form and the README form that escaped it.
+    assert release_claim.search("v0.1.2 is released")
+    assert release_claim.search("v0.1.2: GitHub Release published")
+
+    targets = (
+        REPO / "README.md",
+        REPO / "CHANGELOG.md",
+        REPO / "preregistration/amendment-v0.1.2.md",
+        REPO / "preregistration/v0.1.2-review-status.md",
+        REPO / "paper/main.tex",
+    )
+    stale_status = re.compile(
+        r"v0\.1\.2[\s\S]{0,160}?\b(?:unreleased|not\s+(?:yet\s+)?"
+        r"(?:merged|tagged|released|archived))\b",
+        re.IGNORECASE,
+    )
+    forbidden_pdf_status = re.compile(
+        r"(?:paper/preprint\.pdf|(?:committed|release)\s+PDF)"
+        r"[\s\S]{0,160}?\b(?:local review artifact|review artifact only|"
+        r"must not be attached|must not be deposited)\b",
+        re.IGNORECASE,
+    )
     for path in targets:
-        assert not claims.search(path.read_text(encoding="utf-8")), path.name
+        text = path.read_text(encoding="utf-8")
+        assert release_claim.search(text), path.name
+        assert "pending" in text.lower(), path.name
+        assert not stale_status.search(text), path.name
+        assert not forbidden_pdf_status.search(text), path.name
     cff = yaml.safe_load((REPO / "CITATION.cff").read_text(encoding="utf-8"))
-    assert "date-released" not in cff
+    assert str(cff["date-released"]) == "2026-08-31"
     assert "doi" not in cff
     assert "doi" not in cff["preferred-citation"]
 

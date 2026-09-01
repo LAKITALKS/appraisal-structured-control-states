@@ -8,8 +8,8 @@ Response-Strategy Modulation*
 **Short name:** ASCR (a working abbreviation used in this repository; not an
 established field term).
 
-**Status:** `v0.1.2 pre-data methodological correction` — GitHub release;
-version-specific Zenodo DOI pending. No data, model runs, activations,
+**Status:** `v0.1.2 pre-data methodological correction` — released on GitHub on
+2026-08-31; version-specific Zenodo DOI pending. No data, model runs, activations,
 generations, interventions, or results exist.
 
 v0.1.2 publicly repairs a non-identifying H1 decision statistic before data
@@ -32,6 +32,7 @@ v0.1.0 and v0.1.1 records remain unchanged.
 
 - [**v0.1.2 methodological correction**](preregistration/amendment-v0.1.2.md)
 - [**v0.1.2 review status**](preregistration/v0.1.2-review-status.md)
+- [**GitHub release v0.1.2**](https://github.com/LAKITALKS/appraisal-structured-control-states/releases/tag/v0.1.2)
 - [**Historical v0.1.1 amendment**](preregistration/amendment-v0.1.1.md)
 - [**GitHub release v0.1.1**](https://github.com/LAKITALKS/appraisal-structured-control-states/releases/tag/v0.1.1)
 
