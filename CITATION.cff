@@ -13,6 +13,7 @@ abstract: >-
   results.
 type: software
 version: "0.1.2"
+doi: "10.5281/zenodo.22232409"
 date-released: "2026-08-31"
 authors:
   - family-names: "Varvatis"
@@ -31,8 +32,9 @@ preferred-citation:
       orcid: "https://orcid.org/0009-0002-2075-9893"
   year: 2026
   version: "0.1.2"
-  url: "https://github.com/LAKITALKS/appraisal-structured-control-states"
-  notes: "Pre-data methodological correction; reports no experimental results. The v0.1.2 version-specific Zenodo DOI is pending. Historical identifiers are: concept DOI 10.5281/zenodo.21294932, v0.1.0 DOI 10.5281/zenodo.21294933, and v0.1.1 DOI 10.5281/zenodo.21335529."
+  doi: "10.5281/zenodo.22232409"
+  url: "https://doi.org/10.5281/zenodo.22232409"
+  notes: "Pre-data methodological correction; reports no experimental results. Archived on Zenodo on 2026-09-01; the original release-edition date is retained above. Historical identifiers are: concept DOI 10.5281/zenodo.21294932, v0.1.0 DOI 10.5281/zenodo.21294933, and v0.1.1 DOI 10.5281/zenodo.21335529."
 keywords:
   - "mechanistic interpretability"
   - "representation engineering"

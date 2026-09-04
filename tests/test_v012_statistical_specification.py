@@ -6,7 +6,7 @@ the H1/H2 target separation, the probe pipeline and regularization grid, the
 selection tie-breaking, the seed roles, the inner leave-one-training-domain-out
 structure, the cluster-bootstrap algorithm, the Benjamini-Hochberg raw-p-value
 procedure, the manifest guards, the canonical PDF build, and the no-data /
-released-with-DOI-pending status of this version.
+archived-with-version-DOI status of this version.
 
 No model is run and no data are produced by any test in this file.
 """
@@ -661,7 +661,7 @@ def test_documented_canonical_engine_is_consistent() -> None:
 # --------------------------------------------------------------------------- #
 # Publication status and no-data guards
 # --------------------------------------------------------------------------- #
-def test_v012_is_declared_released_with_zenodo_doi_pending() -> None:
+def test_v012_is_declared_released_with_assigned_zenodo_doi() -> None:
     release_claim = re.compile(
         r"v0\.1\.2[\s\S]{0,120}?\b(?:(?:is|was)\s+)?"
         r"(?:released|published|tagged|merged)\b",
@@ -678,6 +678,8 @@ def test_v012_is_declared_released_with_zenodo_doi_pending() -> None:
         REPO / "preregistration/v0.1.2-review-status.md",
         REPO / "paper/main.tex",
     )
+    # The paper source/PDF are retained archival artifacts, not current metadata;
+    # their pre-assignment DOI wording is documented in the README/review status.
     stale_status = re.compile(
         r"v0\.1\.2[\s\S]{0,160}?\b(?:unreleased|not\s+(?:yet\s+)?"
         r"(?:merged|tagged|released|archived))\b",
@@ -689,16 +691,25 @@ def test_v012_is_declared_released_with_zenodo_doi_pending() -> None:
         r"must not be attached|must not be deposited)\b",
         re.IGNORECASE,
     )
+    stale_doi_status = re.compile(
+        r"(?:Zenodo\s+DOI|DOI\s+assignment|version-specific\s+(?:Zenodo\s+)?DOI)"
+        r"\s+(?:(?:is|remains)\s+)?pending",
+        re.IGNORECASE,
+    )
+    assert stale_doi_status.search("version-specific Zenodo DOI pending")
+    assert stale_doi_status.search("Zenodo DOI is\npending")
     for path in targets:
         text = path.read_text(encoding="utf-8")
         assert release_claim.search(text), path.name
-        assert "pending" in text.lower(), path.name
+        if path != REPO / "paper/main.tex":
+            assert "10.5281/zenodo.22232409" in text, path.name
+            assert not stale_doi_status.search(text), path.name
         assert not stale_status.search(text), path.name
         assert not forbidden_pdf_status.search(text), path.name
     cff = yaml.safe_load((REPO / "CITATION.cff").read_text(encoding="utf-8"))
     assert str(cff["date-released"]) == "2026-08-31"
-    assert "doi" not in cff
-    assert "doi" not in cff["preferred-citation"]
+    assert cff["doi"] == "10.5281/zenodo.22232409"
+    assert cff["preferred-citation"]["doi"] == cff["doi"]
 
 
 def test_branch_is_not_declared_run_ready() -> None:

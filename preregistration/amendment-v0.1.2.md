@@ -2,8 +2,8 @@
 
 **Amendment date:** 2026-08-30
 
-**Status:** released on GitHub as `v0.1.2` on 2026-08-31; version-specific Zenodo
-DOI pending
+**Status:** released on GitHub as `v0.1.2` on 2026-09-01; archived on Zenodo as
+DOI `10.5281/zenodo.22232409` (metadata updated 2026-09-04)
 
 **Author:** Lazaros Varvatis, Independent Researcher, Berlin, Germany
 
@@ -575,15 +575,20 @@ Exactly one canonical release build is now defined:
   byte-identical output;
 - no byte identity is claimed across different engines.
 
-`paper/preprint.pdf` is the canonical **v0.1.2 GitHub Release artifact**. It carries
-the release date but no version-specific DOI because Zenodo assignment is pending.
+`paper/preprint.pdf` in the `v0.1.2` tag is the canonical **GitHub Release artifact**,
+created before the version-specific DOI was assigned. The paper source and PDF on
+`main` remain byte-identical to that archival state, including the pre-assignment
+DOI wording; the assigned DOI is recorded in the current repository metadata.
+The tag and release asset remain unchanged; the PDF checksum is recorded in
+`preregistration/v0.1.2-review-status.md`.
 
 ## 15. Metadata and historical records
 
 Repository version fields are advanced to `0.1.2`. The top-level CFF artifact type
 is corrected to `software`, while the preferred citation remains a report. The
-v0.1.2 release date is recorded as 2026-08-31; its version-specific Zenodo DOI is
-pending. Historical identifiers remain:
+v0.1.2 release-edition date remains 2026-08-31; GitHub/Zenodo publication occurred
+on 2026-09-01. Its version-specific Zenodo DOI is `10.5281/zenodo.22232409`.
+Historical identifiers remain:
 
 - concept DOI: `10.5281/zenodo.21294932`;
 - v0.1.0 version DOI: `10.5281/zenodo.21294933`;

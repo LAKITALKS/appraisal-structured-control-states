@@ -9,8 +9,9 @@ Response-Strategy Modulation*
 established field term).
 
 **Status:** `v0.1.2 pre-data methodological correction` — released on GitHub on
-2026-08-31; version-specific Zenodo DOI pending. No data, model runs, activations,
-generations, interventions, or results exist.
+2026-09-01; archived on Zenodo as
+[10.5281/zenodo.22232409](https://doi.org/10.5281/zenodo.22232409). No data, model
+runs, activations, generations, interventions, or results exist.
 
 v0.1.2 publicly repairs a non-identifying H1 decision statistic before data
 collection. The replacement uses bidirectional concept-mention transfer within
@@ -162,21 +163,25 @@ make paper-verify         # build twice from clean and require identical SHA-256
 > valid but byte-different PDFs and would silently change the archival artifact.
 > `make paper-dev` runs `latexmk` as a clearly labelled **noncanonical development
 > build**; its output must never be committed as `paper/preprint.pdf`. No byte
-> identity is claimed across engines. The v0.1.2 release PDF is 13 pages and is
-> the verified GitHub Release artifact; Zenodo archival is pending.
+> identity is claimed across engines. The 13-page PDF in the `v0.1.2` tag and
+> GitHub Release is the unchanged pre-DOI archival build. `paper/main.tex` and
+> `paper/preprint.pdf` on `main` also retain that archival state, including its
+> pre-assignment DOI wording. The assigned DOI is recorded below and in
+> `CITATION.cff`; no PDF rebuild is claimed for this metadata follow-up.
 
 ## How to cite
 
 Please cite via [`CITATION.cff`](CITATION.cff). Zenodo DOIs:
 
 - **All versions (concept DOI):** [10.5281/zenodo.21294932](https://doi.org/10.5281/zenodo.21294932) — always resolves to the latest archived version.
-- **v0.1.2:** GitHub Release published; version-specific Zenodo DOI pending.
+- **v0.1.2 (latest archived version):** [10.5281/zenodo.22232409](https://doi.org/10.5281/zenodo.22232409) — the archived pre-data methodological correction.
 - **v0.1.1 (historical version DOI):** [10.5281/zenodo.21335529](https://doi.org/10.5281/zenodo.21335529) — the archived v0.1.1 preregistration.
 - **v0.1.0 (historical version DOI):** [10.5281/zenodo.21294933](https://doi.org/10.5281/zenodo.21294933) — the original archived preregistration.
 
-The v0.1.2 version-specific Zenodo DOI will be added after archival. Until then,
-the badge and concept DOI remain [10.5281/zenodo.21294932](https://doi.org/10.5281/zenodo.21294932).
-Historical v0.1.0 and v0.1.1 DOI records remain unchanged.
+The badge retains the concept DOI, which identifies all versions.
+The DOI was added on `main` in a post-archival metadata follow-up, without moving
+the `v0.1.2` tag or replacing its release asset. Historical v0.1.0 and v0.1.1 DOI
+records remain unchanged.
 
 ## Author
 

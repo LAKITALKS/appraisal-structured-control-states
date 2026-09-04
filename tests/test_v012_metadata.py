@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import pathlib
+import re
 
 import ascr
 import pytest
@@ -168,15 +170,31 @@ def test_versions_and_authorship_metadata_are_consistent() -> None:
     ]
 
 
-def test_historical_dois_preserved_and_v012_released_without_version_doi() -> None:
+def test_historical_dois_preserved_and_v012_archived_with_version_doi() -> None:
     text = (REPO / "README.md").read_text()
     assert "10.5281/zenodo.21294932" in text
     assert "10.5281/zenodo.21294933" in text
     assert "10.5281/zenodo.21335529" in text
     cff = yaml.safe_load((REPO / "CITATION.cff").read_text())
     assert str(cff["date-released"]) == "2026-08-31"
-    assert "doi" not in cff
-    assert "doi" not in cff["preferred-citation"]
+    assert cff["doi"] == "10.5281/zenodo.22232409"
+    assert cff["preferred-citation"]["doi"] == cff["doi"]
+    assert cff["preferred-citation"]["url"] == f"https://doi.org/{cff['doi']}"
+    assert "https://zenodo.org/badge/DOI/10.5281/zenodo.21294932.svg" in text
+
+
+def test_metadata_backfill_preserves_archived_pdf_and_records_its_hash() -> None:
+    review = (REPO / "preregistration/v0.1.2-review-status.md").read_text()
+    archived = "2b78eaa93a57f3ff905d888af2cb5db8b83377c65317f9024a865a1f79569f39"
+    current = hashlib.sha256((REPO / "paper/preprint.pdf").read_bytes()).hexdigest()
+    for label, expected in (
+        ("Archived v0.1.2 release PDF SHA-256", archived),
+        ("Current main PDF SHA-256", current),
+    ):
+        match = re.search(re.escape(label) + r":\s*`([0-9a-f]{64})`", review)
+        assert match is not None, label
+        assert match.group(1) == expected, label
+    assert current == archived
 
 
 def test_no_scientific_artifacts_exist() -> None:

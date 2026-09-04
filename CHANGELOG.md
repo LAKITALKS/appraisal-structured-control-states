@@ -6,9 +6,9 @@ All notable changes to this repository are documented here. This project follows
 ## [0.1.2] — 2026-08-31 (pre-data methodological correction)
 
 This correction was prepared and released before any data collection. It was
-merged to `main`, tagged `v0.1.2`, and released on GitHub on 2026-08-31. Its
-version-specific Zenodo DOI is pending. It does not alter the archived v0.1.0 or
-v0.1.1 versions.
+merged to `main`, tagged `v0.1.2`, and released on GitHub on 2026-09-01. Its
+version-specific Zenodo DOI is `10.5281/zenodo.22232409`. It does not alter the
+archived v0.1.0 or v0.1.1 versions.
 
 ### Added
 
@@ -148,12 +148,29 @@ survives concept-level change without conflating H1 with H2 incremental value.
 
 ### Release
 
-- The canonical 13-page `paper/preprint.pdf` is the official GitHub Release asset.
-- The v0.1.2 version-specific Zenodo DOI is pending and will be recorded in a
-  follow-up metadata commit without moving the `v0.1.2` tag.
+- The canonical 13-page PDF in the `v0.1.2` tag is the official GitHub Release asset.
+- The v0.1.2 version-specific Zenodo DOI is `10.5281/zenodo.22232409`, archived
+  on 2026-09-01.
 - The concept DOI `10.5281/zenodo.21294932`, v0.1.0 version DOI
   `10.5281/zenodo.21294933`, and v0.1.1 version DOI `10.5281/zenodo.21335529`
   remain unchanged.
+
+### Post-archival metadata follow-up — 2026-09-04
+
+- Added the assigned v0.1.2 DOI to the README citation, CFF metadata, and
+  amendment/review status; updated the corresponding metadata regression tests.
+  The README badge retains the concept DOI.
+- Retained the original 2026-08-31 release-edition date in CFF and this version
+  heading; distinguished it from actual GitHub/Zenodo publication on 2026-09-01.
+- Preserved `paper/main.tex` and `paper/preprint.pdf` byte-for-byte. A canonical
+  rebuild attempt was blocked by HTTP 403 when retrieving the Tectonic bundle;
+  no rebuilt PDF is claimed or included. The original pre-assignment DOI wording
+  remains inside the archival paper; current citation metadata is in `CITATION.cff`.
+  The tagged commit
+  `84ba323f9dbe0295761d5bb515b60ffda2e5d8af`, GitHub Release PDF, and Zenodo
+  archive remain unchanged. The review status records the unchanged PDF checksum.
+- No hypotheses, analysis rules, experiment configuration, run-readiness gates,
+  historical versions, or author identity changed. No model or experiment ran.
 
 ## [0.1.1] — 2026-07-12 (pre-data amendment)
 
