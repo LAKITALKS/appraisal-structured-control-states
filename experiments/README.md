@@ -1,8 +1,11 @@
 # Experiments
 
 This directory holds the **v0.1.2 design-time scaffold** for the ASCR pilot. It
-does not run any model and contains no datasets, activations, generations, or
-results.
+contains no scientific model-run data, activation datasets, generations,
+interventions, or results. A separate, deliberately non-scientific Technical Smoke
+completed on 2026-09-04; it did not run Mini-0 and its disposable artifacts are
+ineligible for scientific analysis. See the
+[technical report](../docs/technical-smoke-2026-09-04.md).
 
 ## Layout
 
@@ -11,9 +14,19 @@ experiments/
 ├── configs/         # pilot config + unfrozen Mini-0 run-plan template
 ├── data/            # (empty) pilot prompts will live here; README only for now
 ├── notebooks/       # (empty) analysis notebooks; README only for now
-├── results/         # (empty) probe/intervention outputs; README only for now
+├── results/         # no scientific probe/intervention outputs
 └── src/ascr/        # importable package: schemas, labels, config validation
 ```
+
+## Technical Smoke record
+
+The successful CPU smoke exercised tokenization, chat-template application,
+hidden-state extraction, pooling, serialization, and manifest construction with
+eight disposable prompts and `Qwen/Qwen2.5-0.5B-Instruct`. No generation or
+causal-LM-head execution occurred. The local smoke implementation and ignored
+runtime artifacts are not part of this documentation-only branch or of the public
+`main` state against which it was prepared; the report records the exact executed
+commit and publication boundary.
 
 ## What the scaffold provides
 

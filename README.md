@@ -10,8 +10,20 @@ established field term).
 
 **Status:** `v0.1.2 pre-data methodological correction` — released on GitHub on
 2026-09-01; archived on Zenodo as
-[10.5281/zenodo.22232409](https://doi.org/10.5281/zenodo.22232409). No data, model
-runs, activations, generations, interventions, or results exist.
+[10.5281/zenodo.22232409](https://doi.org/10.5281/zenodo.22232409). The
+preregistered study remains pre-data: Mini-0 has not run, and no scientific ASCR
+model-run data, activation dataset, generation, intervention, statistic, or result
+exists.
+
+### Technical execution status (2026-09-04)
+
+A deliberately **non-scientific Technical Smoke** completed successfully on Modal
+CPU with `Qwen/Qwen2.5-0.5B-Instruct` and eight disposable prompts. It exercised
+the path from tokenization and the chat template through hidden-state extraction,
+pooling, serialization, and manifest construction. It did **not** run Mini-0 or
+test any ASCR hypothesis; every smoke artifact is explicitly ineligible for
+scientific analysis. The planned scientific 7B model revision and run plan remain
+unfrozen. See the [evidence-scoped technical report](docs/technical-smoke-2026-09-04.md).
 
 v0.1.2 publicly repairs a non-identifying H1 decision statistic before data
 collection. The replacement uses bidirectional concept-mention transfer within
@@ -50,7 +62,8 @@ appraisal-structured latent control representations*: low-dimensional, potential
 correlated representations of the model's **own current task situation** that
 partially govern its choice of **response strategy** across semantic domains. It
 provides the hypotheses, the experimental design, the analysis and control plan, a
-verified prior-art review, and a small tested code scaffold — but no results.
+verified prior-art review, and a small tested code scaffold — but no scientific
+results.
 
 ## Central hypothesis
 
@@ -104,6 +117,8 @@ anthropomorphic commitment. The information-bottleneck formalization is optional
 ├── CITATION.cff / .zenodo.json    # metadata (author: Lazaros Varvatis only)
 ├── LICENSE / LICENSE-CODE / LICENSE-CONTENT   # dual license (see below)
 ├── Makefile / pyproject.toml
+├── docs/
+│   └── technical-smoke-2026-09-04.md  # non-scientific smoke record
 ├── paper/
 │   ├── main.tex                   # the preregistration paper (LaTeX source)
 │   ├── references.bib             # verified-only bibliography
@@ -123,7 +138,7 @@ anthropomorphic commitment. The information-bottleneck formalization is optional
 │   └── novelty-statement.md
 ├── experiments/
 │   ├── configs/                    # pilot config + unfrozen Mini-0 run template
-│   ├── data/ notebooks/ results/  # placeholders (empty; README only)
+│   ├── data/ notebooks/ results/  # no scientific data or results
 │   └── src/ascr/                  # tested design-time scaffold
 └── tests/                         # unit tests (all passing)
 ```
@@ -146,6 +161,8 @@ on an independently double-labeled, domain-stratified 30% complete-group subset;
 otherwise H2 and H3 inference are withheld. Interpretable linear probes and later causal interventions with
 matched-norm random/PCA controls. Details in
 [`preregistration/experimental-design.md`](preregistration/experimental-design.md).
+The exact 7B model/tokenizer revision and scientific run plan remain unfrozen; the
+0.5B Technical Smoke described above does not change that gate.
 
 ## Reproducing the checks
 
